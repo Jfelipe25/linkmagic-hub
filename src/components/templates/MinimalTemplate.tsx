@@ -1,0 +1,68 @@
+import { ProfileData, SocialLinks, SOCIAL_PLATFORMS } from '@/types/profile';
+import {
+  Facebook, Twitter, Instagram, Github, Send, Linkedin,
+  Mail, MessageCircle, Youtube, Music, ExternalLink
+} from 'lucide-react';
+
+const iconMap: Record<string, React.ElementType> = {
+  Facebook, Twitter, Instagram, Github, Send, Linkedin,
+  Mail, MessageCircle, Youtube, Music,
+};
+
+interface TemplateProps {
+  profile: ProfileData;
+  accentColor: string;
+}
+
+const MinimalTemplate = ({ profile, accentColor }: TemplateProps) => {
+  const socialEntries = Object.entries(profile.social_links || {}).filter(([, v]) => v);
+
+  return (
+    <div className="min-h-full flex flex-col items-center px-6 py-12" style={{ backgroundColor: '#ffffff', color: '#111' }}>
+      {profile.avatar && (
+        <img src={profile.avatar} alt={profile.name} className="w-20 h-20 rounded-full object-cover mb-4" />
+      )}
+      {!profile.avatar && (
+        <div className="w-20 h-20 rounded-full mb-4 flex items-center justify-center text-2xl font-bold" style={{ backgroundColor: accentColor + '22', color: accentColor }}>
+          {profile.name?.charAt(0)?.toUpperCase() || '?'}
+        </div>
+      )}
+      <h1 className="text-xl font-bold" style={{ color: '#111' }}>{profile.name || 'Tu Nombre'}</h1>
+      <p className="text-sm mt-1 text-center max-w-[220px]" style={{ color: '#666' }}>{profile.bio || 'Tu biografía aquí'}</p>
+
+      {socialEntries.length > 0 && (
+        <div className="flex gap-3 mt-4">
+          {socialEntries.map(([key, url]) => {
+            const platform = SOCIAL_PLATFORMS.find(p => p.key === key);
+            const Icon = platform ? iconMap[platform.icon] : ExternalLink;
+            return (
+              <a key={key} href={url as string} target="_blank" rel="noopener noreferrer"
+                className="w-8 h-8 flex items-center justify-center rounded-full transition-colors hover:opacity-80"
+                style={{ color: accentColor }}>
+                <Icon size={18} />
+              </a>
+            );
+          })}
+        </div>
+      )}
+
+      <div className="w-full mt-6 space-y-3">
+        {profile.links?.map((link) => (
+          <a key={link.id} href={link.url} target="_blank" rel="noopener noreferrer"
+            className="block w-full text-center py-3 rounded-full text-sm font-medium transition-all"
+            style={{
+              border: `2px solid ${accentColor}`,
+              color: accentColor,
+            }}
+            onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = accentColor; e.currentTarget.style.color = '#fff'; }}
+            onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; e.currentTarget.style.color = accentColor; }}
+          >
+            {link.label || 'Link'}
+          </a>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+export default MinimalTemplate;
