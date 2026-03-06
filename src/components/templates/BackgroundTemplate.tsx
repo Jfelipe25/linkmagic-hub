@@ -1,0 +1,81 @@
+import { ProfileData, SOCIAL_PLATFORMS } from '@/types/profile';
+import {
+  Facebook, Twitter, Instagram, Github, Send, Linkedin,
+  Mail, MessageCircle, Youtube, Music, ExternalLink
+} from 'lucide-react';
+
+const iconMap: Record<string, React.ElementType> = {
+  Facebook, Twitter, Instagram, Github, Send, Linkedin,
+  Mail, MessageCircle, Youtube, Music,
+};
+
+interface TemplateProps {
+  profile: ProfileData;
+  accentColor: string;
+}
+
+const BackgroundTemplate = ({ profile, accentColor }: TemplateProps) => {
+  const socialEntries = Object.entries(profile.social_links || {}).filter(([, v]) => v);
+  const bgImage = profile.background_image;
+
+  return (
+    <div
+      className="min-h-full flex flex-col items-center px-6 py-12 relative"
+      style={{
+        backgroundImage: bgImage ? `url(${bgImage})` : undefined,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundColor: bgImage ? undefined : '#1a1a2e',
+        color: '#fff',
+      }}
+    >
+      {/* Overlay */}
+      <div className="absolute inset-0" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }} />
+
+      <div className="relative z-10 flex flex-col items-center w-full">
+        {profile.avatar ? (
+          <img src={profile.avatar} alt={profile.name}
+            className="w-20 h-20 rounded-full object-cover mb-4"
+            style={{ border: '3px solid rgba(255,255,255,0.8)' }} />
+        ) : (
+          <div className="w-20 h-20 rounded-full mb-4 flex items-center justify-center text-2xl font-bold"
+            style={{ backgroundColor: 'rgba(255,255,255,0.2)', border: '3px solid rgba(255,255,255,0.8)' }}>
+            {profile.name?.charAt(0)?.toUpperCase() || '?'}
+          </div>
+        )}
+        <h1 className="text-xl font-bold drop-shadow-md">{profile.name || 'Tu Nombre'}</h1>
+        <p className="text-sm mt-1 text-center max-w-[220px] drop-shadow-sm" style={{ color: 'rgba(255,255,255,0.85)' }}>
+          {profile.bio || 'Tu biografía aquí'}
+        </p>
+
+        {socialEntries.length > 0 && (
+          <div className="flex gap-3 mt-4">
+            {socialEntries.map(([key, url]) => {
+              const platform = SOCIAL_PLATFORMS.find(p => p.key === key);
+              const Icon = platform ? iconMap[platform.icon] : ExternalLink;
+              return (
+                <a key={key} href={url as string} target="_blank" rel="noopener noreferrer"
+                  className="w-8 h-8 flex items-center justify-center rounded-full transition-all hover:opacity-80"
+                  style={{ color: 'rgba(255,255,255,0.9)' }}>
+                  <Icon size={18} />
+                </a>
+              );
+            })}
+          </div>
+        )}
+
+        <div className="w-full mt-6 space-y-3">
+          {profile.links?.map((link) => (
+            <a key={link.id} href={link.url} target="_blank" rel="noopener noreferrer"
+              className="block w-full text-center py-3 rounded-full text-sm font-semibold transition-all hover:opacity-90 backdrop-blur-sm"
+              style={{ backgroundColor: 'rgba(255,255,255,0.15)', color: '#fff', border: '1px solid rgba(255,255,255,0.3)' }}>
+              {link.label || 'Link'}
+            </a>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default BackgroundTemplate;
