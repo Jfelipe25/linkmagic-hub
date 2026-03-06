@@ -18,6 +18,7 @@ export type Database = {
         Row: {
           accent_color: string | null
           avatar: string | null
+          background_image: string | null
           bio: string | null
           created_at: string | null
           id: string
@@ -33,6 +34,7 @@ export type Database = {
         Insert: {
           accent_color?: string | null
           avatar?: string | null
+          background_image?: string | null
           bio?: string | null
           created_at?: string | null
           id?: string
@@ -48,6 +50,7 @@ export type Database = {
         Update: {
           accent_color?: string | null
           avatar?: string | null
+          background_image?: string | null
           bio?: string | null
           created_at?: string | null
           id?: string
