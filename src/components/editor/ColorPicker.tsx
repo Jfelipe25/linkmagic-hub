@@ -41,10 +41,15 @@ const ColorPicker = ({ selected, onChange }: ColorPickerProps) => {
         ))}
       </div>
       <div className="flex items-center gap-2">
-        <div
-          className="w-8 h-8 rounded-md border border-input shrink-0"
-          style={{ backgroundColor: selected }}
-        />
+        <label className="relative w-8 h-8 rounded-md border border-input shrink-0 cursor-pointer overflow-hidden">
+          <div className="w-full h-full" style={{ backgroundColor: selected }} />
+          <input
+            type="color"
+            value={selected}
+            onChange={(e) => handlePresetClick(e.target.value)}
+            className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+          />
+        </label>
         <input
           type="text"
           value={hexInput}
@@ -53,6 +58,7 @@ const ColorPicker = ({ selected, onChange }: ColorPickerProps) => {
           maxLength={7}
           className="w-28 h-9 rounded-md border border-input bg-background px-3 text-sm text-foreground font-mono placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring"
         />
+      </div>
       </div>
     </div>
   );
