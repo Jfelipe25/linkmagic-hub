@@ -24,7 +24,7 @@ serve(async (req) => {
 
   try {
     const body = await req.json();
-    const { name, bio, avatar, template, accent_color, social_links, links } = body;
+    const { name, bio, avatar, template, accent_color, social_links, links, slug: customSlug, background_image } = body;
 
     if (!name || !name.trim()) {
       return new Response(JSON.stringify({ error: 'Name is required' }), {
@@ -40,14 +40,26 @@ serve(async (req) => {
 
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    // Generate unique slug
-    let slug = generateSlug(name);
-    let suffix = 1;
-    while (true) {
-      const { data } = await supabase.from('profiles').select('id').eq('slug', slug).maybeSingle();
-      if (!data) break;
-      suffix++;
-      slug = `${generateSlug(name)}-${suffix}`;
+    // Use custom slug if provided, otherwise generate from name
+    let slug = customSlug && customSlug.trim() ? customSlug.trim().toLowerCase().replace(/[^a-z0-9-]/g, '').slice(0, 30) : generateSlug(name);
+    
+    // Check if slug is taken
+    const { data: existingSlug } = await supabase.from('profiles').select('id').eq('slug', slug).maybeSingle();
+    if (existingSlug) {
+      if (customSlug && customSlug.trim()) {
+        return new Response(JSON.stringify({ error: 'Este nombre de URL ya está en uso' }), {
+          status: 409,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+      // Auto-generate unique slug
+      let suffix = 2;
+      while (true) {
+        const candidate = `${slug}-${suffix}`;
+        const { data } = await supabase.from('profiles').select('id').eq('slug', candidate).maybeSingle();
+        if (!data) { slug = candidate; break; }
+        suffix++;
+      }
     }
 
     // Create session_id
@@ -61,6 +73,7 @@ serve(async (req) => {
       avatar: avatar || '',
       template: template || 'minimal',
       accent_color: accent_color || '#d4a432',
+      background_image: background_image || '',
       social_links: social_links || {},
       links: links || [],
       paid: false,
