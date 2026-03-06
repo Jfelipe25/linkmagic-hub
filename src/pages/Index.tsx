@@ -45,11 +45,22 @@ const Index = () => {
 
       <div className="max-w-7xl mx-auto px-6 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* Preview - visible on mobile too */}
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="flex items-start justify-center lg:order-2 lg:sticky lg:top-8"
+          >
+            <PhoneMockup>
+              <TemplateRenderer profile={profile} />
+            </PhoneMockup>
+          </motion.div>
+
           {/* Form */}
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
-            className="space-y-5 max-h-[calc(100vh-140px)] overflow-y-auto pr-2"
+            className="space-y-5 lg:order-1"
           >
             <ProfileEditorForm
               profile={profile}
@@ -57,17 +68,6 @@ const Index = () => {
               onPublish={handlePublish}
               isPublishing={publishing}
             />
-          </motion.div>
-
-          {/* Preview */}
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            className="hidden lg:flex items-start justify-center sticky top-8"
-          >
-            <PhoneMockup>
-              <TemplateRenderer profile={profile} />
-            </PhoneMockup>
           </motion.div>
         </div>
       </div>
