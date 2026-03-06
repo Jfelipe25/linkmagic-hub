@@ -18,7 +18,7 @@ export interface CustomLink {
   icon?: string;
 }
 
-export type TemplateType = 'minimal' | 'dark' | 'gradient';
+export type TemplateType = 'minimal' | 'dark' | 'gradient' | 'background';
 
 export interface ProfileData {
   name: string;
@@ -27,6 +27,7 @@ export interface ProfileData {
   slug: string;
   template: TemplateType;
   accent_color: string;
+  background_image: string;
   social_links: SocialLinks;
   links: CustomLink[];
   paid?: boolean;
@@ -64,6 +65,7 @@ export const DEFAULT_PROFILE: ProfileData = {
   slug: '',
   template: 'minimal',
   accent_color: '#d4a432',
+  background_image: '',
   social_links: {},
   links: [],
 };

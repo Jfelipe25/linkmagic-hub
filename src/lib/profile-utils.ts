@@ -19,6 +19,7 @@ export function profileFromRow(row: any): ProfileData {
     slug: row.slug || '',
     template: row.template || 'minimal',
     accent_color: row.accent_color || '#d4a432',
+    background_image: row.background_image || '',
     social_links: (typeof row.social_links === 'object' && row.social_links) ? row.social_links : {},
     links: Array.isArray(row.links) ? row.links : [],
     paid: row.paid ?? false,

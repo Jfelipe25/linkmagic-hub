@@ -1,5 +1,5 @@
-import { useState, useCallback } from 'react';
-import { Plus, Upload, Loader2 } from 'lucide-react';
+import { useState, useCallback, useEffect } from 'react';
+import { Plus, Upload, Loader2, Check, X, Image } from 'lucide-react';
 import {
   DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors
 } from '@dnd-kit/core';
@@ -7,6 +7,7 @@ import {
   arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy
 } from '@dnd-kit/sortable';
 import { ProfileData, CustomLink, SOCIAL_PLATFORMS, TemplateType } from '@/types/profile';
+import { supabase } from '@/integrations/supabase/client';
 import FormSection from './FormSection';
 import SocialInput from './SocialInput';
 import LinkItem from './LinkItem';
@@ -25,6 +26,10 @@ const IMGBB_API_KEY = '6adb05b927a84a01cc6266417c3198dd';
 
 const ProfileEditorForm = ({ profile, onChange, onPublish, publishLabel = 'Publicar · $5 USD', isPublishing }: ProfileEditorFormProps) => {
   const [uploading, setUploading] = useState(false);
+  const [uploadingBg, setUploadingBg] = useState(false);
+  const [slugInput, setSlugInput] = useState(profile.slug);
+  const [slugStatus, setSlugStatus] = useState<'idle' | 'checking' | 'available' | 'taken'>('idle');
+  const [slugTimeout, setSlugTimeoutId] = useState<ReturnType<typeof setTimeout> | null>(null);
 
   const update = useCallback(<K extends keyof ProfileData>(key: K, value: ProfileData[K]) => {
     onChange({ ...profile, [key]: value });
@@ -64,6 +69,53 @@ const ProfileEditorForm = ({ profile, onChange, onPublish, publishLabel = 'Publi
       console.error('Upload failed', err);
     }
     setUploading(false);
+  };
+
+  const handleBgUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadingBg(true);
+    try {
+      const form = new FormData();
+      form.append('image', file);
+      const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, { method: 'POST', body: form });
+      const data = await res.json();
+      if (data.success) update('background_image', data.data.url);
+    } catch (err) {
+      console.error('Upload failed', err);
+    }
+    setUploadingBg(false);
+  };
+
+  // Slug validation
+  const normalizeSlug = (val: string) =>
+    val.toLowerCase().replace(/[^a-z0-9-]/g, '').replace(/-+/g, '-').slice(0, 30);
+
+  const checkSlugAvailability = useCallback(async (slug: string) => {
+    if (!slug || slug.length < 3) {
+      setSlugStatus('idle');
+      return;
+    }
+    setSlugStatus('checking');
+    try {
+      const { data } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('slug', slug)
+        .maybeSingle();
+      setSlugStatus(data ? 'taken' : 'available');
+    } catch {
+      setSlugStatus('idle');
+    }
+  }, []);
+
+  const handleSlugChange = (val: string) => {
+    const normalized = normalizeSlug(val);
+    setSlugInput(normalized);
+    update('slug', normalized);
+    if (slugTimeout) clearTimeout(slugTimeout);
+    const tid = setTimeout(() => checkSlugAvailability(normalized), 500);
+    setSlugTimeoutId(tid);
   };
 
   const sensors = useSensors(
@@ -110,19 +162,53 @@ const ProfileEditorForm = ({ profile, onChange, onPublish, publishLabel = 'Publi
             </label>
           </div>
         </div>
+        <div>
+          <label className="text-xs text-muted-foreground block mb-1">URL personalizada</label>
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-muted-foreground whitespace-nowrap">linkbio.pro/u/</span>
+            <input
+              type="text" value={slugInput} onChange={(e) => handleSlugChange(e.target.value)}
+              placeholder="tu-nombre" maxLength={30}
+              className="flex-1 h-9 rounded-md border border-input bg-background px-3 text-sm text-foreground font-mono placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring"
+            />
+            {slugStatus === 'checking' && <Loader2 size={16} className="animate-spin text-muted-foreground" />}
+            {slugStatus === 'available' && <Check size={16} className="text-green-500" />}
+            {slugStatus === 'taken' && <X size={16} className="text-red-500" />}
+          </div>
+          {slugStatus === 'taken' && <p className="text-xs text-red-500 mt-1">Este nombre ya está en uso</p>}
+          {slugStatus === 'available' && <p className="text-xs text-green-500 mt-1">¡Disponible!</p>}
+          {slugInput.length > 0 && slugInput.length < 3 && <p className="text-xs text-muted-foreground mt-1">Mínimo 3 caracteres</p>}
+        </div>
       </FormSection>
 
       <FormSection title="Template" description="Elige el diseño de tu página">
-        <div className="flex gap-3">
-          {(['minimal', 'dark', 'gradient'] as TemplateType[]).map((t) => (
+        <div className="flex gap-3 flex-wrap">
+          {(['minimal', 'dark', 'gradient', 'background'] as TemplateType[]).map((t) => (
             <TemplateCard key={t} type={t} selected={profile.template === t} onClick={() => update('template', t)} />
           ))}
         </div>
       </FormSection>
 
-      <FormSection title="Color de acento" description="Personaliza el color principal">
-        <ColorPicker selected={profile.accent_color} onChange={(c) => update('accent_color', c)} />
-      </FormSection>
+      {profile.template === 'gradient' && (
+        <FormSection title="Color de acento" description="Personaliza el color de la gradiente">
+          <ColorPicker selected={profile.accent_color} onChange={(c) => update('accent_color', c)} />
+        </FormSection>
+      )}
+
+      {profile.template === 'background' && (
+        <FormSection title="Imagen de fondo" description="Sube una imagen para el fondo de tu página">
+          <div className="flex items-center gap-3">
+            {profile.background_image && (
+              <img src={profile.background_image} alt="bg" className="w-16 h-10 rounded-md object-cover border border-input" />
+            )}
+            <label className="cursor-pointer flex items-center gap-2 px-3 py-2 rounded-md border border-input bg-secondary text-sm text-foreground hover:bg-muted transition-colors">
+              {uploadingBg ? <Loader2 size={14} className="animate-spin" /> : <Image size={14} />}
+              {uploadingBg ? 'Subiendo...' : 'Subir fondo'}
+              <input type="file" accept="image/*" onChange={handleBgUpload} className="hidden" />
+            </label>
+          </div>
+        </FormSection>
+      )}
 
       <FormSection title="Redes sociales" description="Añade tus perfiles sociales">
         <div className="space-y-2">
@@ -157,7 +243,7 @@ const ProfileEditorForm = ({ profile, onChange, onPublish, publishLabel = 'Publi
 
       {onPublish && (
         <button
-          onClick={onPublish} disabled={isPublishing}
+          onClick={onPublish} disabled={isPublishing || slugStatus === 'taken'}
           className="w-full h-11 rounded-full gold-gradient text-sm font-semibold text-primary-foreground hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center justify-center gap-2"
         >
           {isPublishing && <Loader2 size={16} className="animate-spin" />}
