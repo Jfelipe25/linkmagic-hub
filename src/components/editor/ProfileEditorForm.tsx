@@ -6,7 +6,7 @@ import {
 import {
   arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy
 } from '@dnd-kit/sortable';
-import { ProfileData, CustomLink, SOCIAL_PLATFORMS, TemplateType } from '@/types/profile';
+import { ProfileData, CustomLink, SOCIAL_PLATFORMS, TemplateType, DEFAULT_PROFILE } from '@/types/profile';
 import { supabase } from '@/integrations/supabase/client';
 import FormSection from './FormSection';
 import SocialInput from './SocialInput';
@@ -190,8 +190,23 @@ const ProfileEditorForm = ({ profile, onChange, onPublish, publishLabel = 'Publi
       </FormSection>
 
       {profile.template === 'gradient' && (
-        <FormSection title="Color de acento" description="Personaliza el color de la gradiente">
-          <ColorPicker selected={profile.accent_color} onChange={(c) => update('accent_color', c)} />
+        <FormSection title="Colores" description="Color de acento y color de letra">
+          <div className="flex items-center gap-4 flex-wrap">
+            <div>
+              <label className="text-xs text-muted-foreground block mb-1">Acento</label>
+              <ColorPicker selected={profile.accent_color} onChange={(c) => update('accent_color', c)} />
+            </div>
+            <div>
+              <label className="text-xs text-muted-foreground block mb-1">Letra</label>
+              <ColorPicker selected={profile.font_color} onChange={(c) => update('font_color', c)} />
+            </div>
+          </div>
+        </FormSection>
+      )}
+
+      {(profile.template === 'minimal' || profile.template === 'dark' || profile.template === 'background') && (
+        <FormSection title="Color de letra" description="Personaliza el color del texto">
+          <ColorPicker selected={profile.font_color} onChange={(c) => update('font_color', c)} />
         </FormSection>
       )}
 

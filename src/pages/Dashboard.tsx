@@ -52,6 +52,8 @@ const Dashboard = () => {
         avatar: profile.avatar,
         template: profile.template,
         accent_color: profile.accent_color,
+        font_color: profile.font_color,
+        background_image: profile.background_image,
         social_links: profile.social_links as any,
         links: profile.links as any,
       })

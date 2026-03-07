@@ -73,6 +73,7 @@ serve(async (req) => {
       avatar: avatar || '',
       template: template || 'minimal',
       accent_color: accent_color || '#d4a432',
+      font_color: body.font_color || '#ffffff',
       background_image: background_image || '',
       social_links: social_links || {},
       links: links || [],
