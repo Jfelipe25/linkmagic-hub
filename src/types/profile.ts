@@ -27,6 +27,7 @@ export interface ProfileData {
   slug: string;
   template: TemplateType;
   accent_color: string;
+  font_color: string;
   background_image: string;
   social_links: SocialLinks;
   links: CustomLink[];
@@ -65,6 +66,7 @@ export const DEFAULT_PROFILE: ProfileData = {
   slug: '',
   template: 'minimal',
   accent_color: '#d4a432',
+  font_color: '#ffffff',
   background_image: '',
   social_links: {},
   links: [],
