@@ -17,6 +17,7 @@ interface TemplateProps {
 const BackgroundTemplate = ({ profile, accentColor }: TemplateProps) => {
   const socialEntries = Object.entries(profile.social_links || {}).filter(([, v]) => v);
   const bgImage = profile.background_image;
+  const fontColor = profile.font_color || '#ffffff';
 
   return (
     <div
@@ -26,25 +27,24 @@ const BackgroundTemplate = ({ profile, accentColor }: TemplateProps) => {
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundColor: bgImage ? undefined : '#1a1a2e',
-        color: '#fff',
+        color: fontColor,
       }}
     >
-      {/* Overlay */}
       <div className="absolute inset-0" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }} />
 
       <div className="relative z-10 flex flex-col items-center w-full">
         {profile.avatar ? (
           <img src={profile.avatar} alt={profile.name}
             className="w-20 h-20 rounded-full object-cover mb-4"
-            style={{ border: '3px solid rgba(255,255,255,0.8)' }} />
+            style={{ border: `3px solid ${fontColor}cc` }} />
         ) : (
           <div className="w-20 h-20 rounded-full mb-4 flex items-center justify-center text-2xl font-bold"
-            style={{ backgroundColor: 'rgba(255,255,255,0.2)', border: '3px solid rgba(255,255,255,0.8)' }}>
+            style={{ backgroundColor: `${fontColor}33`, border: `3px solid ${fontColor}cc` }}>
             {profile.name?.charAt(0)?.toUpperCase() || '?'}
           </div>
         )}
-        <h1 className="text-xl font-bold drop-shadow-md">{profile.name || 'Tu Nombre'}</h1>
-        <p className="text-sm mt-1 text-center max-w-[220px] drop-shadow-sm" style={{ color: 'rgba(255,255,255,0.85)' }}>
+        <h1 className="text-xl font-bold drop-shadow-md" style={{ color: fontColor }}>{profile.name || 'Tu Nombre'}</h1>
+        <p className="text-sm mt-1 text-center max-w-[220px] drop-shadow-sm" style={{ color: fontColor, opacity: 0.85 }}>
           {profile.bio || 'Tu biografía aquí'}
         </p>
 
@@ -56,7 +56,7 @@ const BackgroundTemplate = ({ profile, accentColor }: TemplateProps) => {
               return (
                 <a key={key} href={url as string} target="_blank" rel="noopener noreferrer"
                   className="w-8 h-8 flex items-center justify-center rounded-full transition-all hover:opacity-80"
-                  style={{ color: 'rgba(255,255,255,0.9)' }}>
+                  style={{ color: fontColor, opacity: 0.9 }}>
                   <Icon size={18} />
                 </a>
               );
@@ -68,7 +68,7 @@ const BackgroundTemplate = ({ profile, accentColor }: TemplateProps) => {
           {profile.links?.map((link) => (
             <a key={link.id} href={link.url} target="_blank" rel="noopener noreferrer"
               className="block w-full text-center py-3 rounded-full text-sm font-semibold transition-all hover:opacity-90 backdrop-blur-sm"
-              style={{ backgroundColor: 'rgba(255,255,255,0.15)', color: '#fff', border: '1px solid rgba(255,255,255,0.3)' }}>
+              style={{ backgroundColor: `${fontColor}26`, color: fontColor, border: `1px solid ${fontColor}4d` }}>
               {link.label || 'Link'}
             </a>
           ))}
