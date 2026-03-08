@@ -9,6 +9,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 import { usePricing } from '@/hooks/usePricing';
+import ThemeToggle from '@/components/ThemeToggle';
 
 const Index = () => {
   const [profile, setProfile] = useState<ProfileData>({ ...DEFAULT_PROFILE });
@@ -59,6 +60,7 @@ const Index = () => {
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <h1 className="text-lg font-bold gold-text">LinkBio Pro</h1>
           <div className="flex items-center gap-3">
+            <ThemeToggle />
             {user ? (
               <button onClick={() => navigate('/dashboard')} className="text-xs text-primary hover:underline">
                 Mi Dashboard
