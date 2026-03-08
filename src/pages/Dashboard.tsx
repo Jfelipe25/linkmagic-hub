@@ -208,7 +208,7 @@ const Dashboard = () => {
           <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="rounded-xl border border-yellow-500/30 bg-yellow-500/10 p-4 mb-4 flex items-center gap-3"
+            className="rounded-xl border border-accent/30 bg-accent/10 p-4 mb-4 flex items-center gap-3"
           >
             <span className="text-lg">👀</span>
             <div>
