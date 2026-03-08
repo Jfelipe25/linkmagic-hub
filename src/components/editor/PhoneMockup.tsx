@@ -12,7 +12,7 @@ const PhoneMockup = ({ children }: PhoneMockupProps) => {
         {/* Notch */}
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-28 h-6 bg-[#2a2a2a] rounded-b-2xl z-10" />
         {/* Screen */}
-        <div className="relative w-full overflow-y-auto" style={{ height: 580 }}>
+        <div className="relative w-full overflow-y-auto scrollbar-hide" style={{ height: 580 }}>
           {children}
         </div>
         {/* Home indicator */}
