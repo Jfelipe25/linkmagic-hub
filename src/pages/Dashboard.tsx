@@ -203,6 +203,23 @@ const Dashboard = () => {
       </header>
 
       <div className="max-w-7xl mx-auto px-6 py-8">
+        {/* Demo banner */}
+        {isDemo && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="rounded-xl border border-yellow-500/30 bg-yellow-500/10 p-4 mb-4 flex items-center gap-3"
+          >
+            <span className="text-lg">👀</span>
+            <div>
+              <p className="text-sm font-semibold text-foreground">Esto es un demo</p>
+              <p className="text-xs text-muted-foreground">
+                Así se verá tu dashboard cuando tengas una página activa. ¡Crea tu primera URL para empezar!
+              </p>
+            </div>
+          </motion.div>
+        )}
+
         {/* Welcome banner */}
         <motion.div
           initial={{ opacity: 0, y: -10 }}
