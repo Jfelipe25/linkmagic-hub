@@ -1,4 +1,5 @@
 import { ProfileData, SOCIAL_PLATFORMS } from '@/types/profile';
+import { trackLinkClick } from '@/hooks/useLinkClicks';
 import {
   Facebook, Twitter, Instagram, Github, Send, Linkedin,
   Mail, MessageCircle, Youtube, Music, ExternalLink
@@ -53,7 +54,8 @@ const DarkTemplate = ({ profile, accentColor }: TemplateProps) => {
         {profile.links?.map((link) => (
           <a key={link.id} href={link.url} target="_blank" rel="noopener noreferrer"
             className="block w-full text-center py-3 rounded-full text-sm font-semibold transition-all hover:opacity-90"
-            style={{ backgroundColor: fontColor, color: '#0f0f0f' }}>
+            style={{ backgroundColor: fontColor, color: '#0f0f0f' }}
+            onClick={() => profile.slug && trackLinkClick(profile.slug, link.id)}>
             {link.label || 'Link'}
           </a>
         ))}
