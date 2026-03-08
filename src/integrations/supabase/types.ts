@@ -14,6 +14,35 @@ export type Database = {
   }
   public: {
     Tables: {
+      link_clicks: {
+        Row: {
+          clicked_at: string
+          id: string
+          link_id: string
+          profile_id: string
+        }
+        Insert: {
+          clicked_at?: string
+          id?: string
+          link_id: string
+          profile_id: string
+        }
+        Update: {
+          clicked_at?: string
+          id?: string
+          link_id?: string
+          profile_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "link_clicks_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       pricing: {
         Row: {
           country_code: string
@@ -139,6 +168,10 @@ export type Database = {
       }
       increment_profile_views: {
         Args: { profile_slug: string }
+        Returns: undefined
+      }
+      track_link_click: {
+        Args: { p_link_id: string; p_profile_slug: string }
         Returns: undefined
       }
     }
