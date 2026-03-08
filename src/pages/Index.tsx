@@ -15,6 +15,7 @@ const Index = () => {
   const [publishing, setPublishing] = useState(false);
   const { user } = useAuth();
   const navigate = useNavigate();
+  const { options: pricingOptions, selected: selectedPricing, setSelected: setSelectedPricing, loading: pricingLoading } = usePricing();
 
   const handlePublish = async () => {
     if (!profile.name.trim()) {
