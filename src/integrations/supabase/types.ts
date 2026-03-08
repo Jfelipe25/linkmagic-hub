@@ -14,6 +14,39 @@ export type Database = {
   }
   public: {
     Tables: {
+      pricing: {
+        Row: {
+          country_code: string
+          country_name: string
+          created_at: string | null
+          currency_id: string
+          display_price: string
+          id: string
+          is_default: boolean
+          price: number
+        }
+        Insert: {
+          country_code: string
+          country_name: string
+          created_at?: string | null
+          currency_id: string
+          display_price: string
+          id?: string
+          is_default?: boolean
+          price: number
+        }
+        Update: {
+          country_code?: string
+          country_name?: string
+          created_at?: string | null
+          currency_id?: string
+          display_price?: string
+          id?: string
+          is_default?: boolean
+          price?: number
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           accent_color: string | null
