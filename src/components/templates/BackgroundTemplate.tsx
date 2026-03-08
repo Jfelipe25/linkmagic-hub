@@ -17,7 +17,7 @@ interface TemplateProps {
 const BackgroundTemplate = ({ profile, accentColor }: TemplateProps) => {
   const socialEntries = Object.entries(profile.social_links || {}).filter(([, v]) => v);
   const bgImage = profile.background_image;
-  const fontColor = profile.font_color || '#000000';
+  const fontColor = profile.font_color || '#cc0000';
 
   return (
     <div
@@ -26,7 +26,7 @@ const BackgroundTemplate = ({ profile, accentColor }: TemplateProps) => {
         backgroundImage: bgImage ? `url(${bgImage})` : undefined,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
-        backgroundColor: bgImage ? undefined : '#1a1a2e',
+        backgroundColor: bgImage ? undefined : '#ffffff',
         color: fontColor,
       }}
     >
