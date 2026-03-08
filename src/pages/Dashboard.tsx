@@ -113,6 +113,10 @@ const Dashboard = () => {
             <p className="text-sm text-foreground capitalize">{profile.template}</p>
           </div>
           <div>
+            <p className="text-xs text-muted-foreground">Visitas</p>
+            <p className="text-sm text-foreground font-semibold">{profile.views ?? 0}</p>
+          </div>
+          <div>
             <p className="text-xs text-muted-foreground">Creado</p>
             <p className="text-sm text-foreground">
               {profile.created_at ? new Date(profile.created_at).toLocaleDateString() : '—'}
