@@ -24,7 +24,7 @@ interface ProfileEditorFormProps {
 
 const IMGBB_API_KEY = '6adb05b927a84a01cc6266417c3198dd';
 
-const ProfileEditorForm = ({ profile, onChange, onPublish, publishLabel = 'Publicar · $5 USD', isPublishing }: ProfileEditorFormProps) => {
+const ProfileEditorForm = ({ profile, onChange, onPublish, publishLabel = 'Pagar y publicar', isPublishing }: ProfileEditorFormProps) => {
   const [uploading, setUploading] = useState(false);
   const [uploadingBg, setUploadingBg] = useState(false);
   const [slugInput, setSlugInput] = useState(profile.slug);
