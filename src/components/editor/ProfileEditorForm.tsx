@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from 'react';
-import { Plus, Upload, Loader2, Check, X, Image, Type } from 'lucide-react';
+import { Plus, Upload, Loader2, Check, X, Image } from 'lucide-react';
 import {
   DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors
 } from '@dnd-kit/core';
