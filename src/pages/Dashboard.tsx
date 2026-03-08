@@ -7,7 +7,9 @@ import { profileFromRow } from '@/lib/profile-utils';
 import ProfileEditorForm from '@/components/editor/ProfileEditorForm';
 import PhoneMockup from '@/components/editor/PhoneMockup';
 import TemplateRenderer from '@/components/templates/TemplateRenderer';
-import { Copy, Check, Loader2, ExternalLink, LogOut } from 'lucide-react';
+import QRCodeCard from '@/components/QRCodeCard';
+import { useLinkClicks } from '@/hooks/useLinkClicks';
+import { Copy, Check, Loader2, ExternalLink, LogOut, MousePointerClick } from 'lucide-react';
 import { toast } from 'sonner';
 import { motion } from 'framer-motion';
 
@@ -19,6 +21,7 @@ const Dashboard = () => {
   const [saving, setSaving] = useState(false);
   const [copied, setCopied] = useState(false);
   const [profileId, setProfileId] = useState<string>('');
+  const { stats: clickStats, totalClicks } = useLinkClicks(profileId || null);
 
   useEffect(() => {
     if (!authLoading && !user) navigate('/login');
@@ -117,12 +120,41 @@ const Dashboard = () => {
             <p className="text-sm text-foreground font-semibold">{profile.views ?? 0}</p>
           </div>
           <div>
+            <p className="text-xs text-muted-foreground flex items-center gap-1"><MousePointerClick size={12} /> Clics</p>
+            <p className="text-sm text-foreground font-semibold">{totalClicks}</p>
+          </div>
+          <div>
             <p className="text-xs text-muted-foreground">Creado</p>
             <p className="text-sm text-foreground">
               {profile.created_at ? new Date(profile.created_at).toLocaleDateString() : '—'}
             </p>
           </div>
         </motion.div>
+
+        {/* QR Code + Click stats */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+          <QRCodeCard slug={profile.slug} />
+          <div className="rounded-lg border border-border bg-card p-4">
+            <p className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2">
+              <MousePointerClick size={16} className="text-primary" /> Clics por link
+            </p>
+            {profile.links.length === 0 ? (
+              <p className="text-xs text-muted-foreground">No tienes links aún</p>
+            ) : (
+              <div className="space-y-2">
+                {profile.links.map(link => {
+                  const clicks = clickStats.find(s => s.link_id === link.id)?.clicks || 0;
+                  return (
+                    <div key={link.id} className="flex items-center justify-between text-sm">
+                      <span className="text-foreground truncate max-w-[200px]">{link.label || 'Sin nombre'}</span>
+                      <span className="text-primary font-semibold">{clicks}</span>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           <motion.div
