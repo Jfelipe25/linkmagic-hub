@@ -7,6 +7,7 @@ import {
   arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy
 } from '@dnd-kit/sortable';
 import { ProfileData, CustomLink, SOCIAL_PLATFORMS, TemplateType, DEFAULT_PROFILE } from '@/types/profile';
+import type { PricingOption } from '@/hooks/usePricing';
 import { supabase } from '@/integrations/supabase/client';
 import FormSection from './FormSection';
 import SocialInput from './SocialInput';
