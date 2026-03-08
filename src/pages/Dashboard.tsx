@@ -71,6 +71,7 @@ const Dashboard = () => {
   const [showNewForm, setShowNewForm] = useState(false);
   const [newProfile, setNewProfile] = useState<ProfileData>({ ...DEFAULT_PROFILE });
   const [isDemo, setIsDemo] = useState(false);
+  const [showFirstVisit, setShowFirstVisit] = useState(false);
 
   const { stats: clickStats, totalClicks } = useLinkClicks(isDemo ? null : (activeProfileId || null));
   const { options: pricingOptions, selected: selectedPricing, setSelected: setSelectedPricing } = usePricing();
