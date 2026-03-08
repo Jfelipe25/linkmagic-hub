@@ -13,7 +13,9 @@ const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
-  const [mode, setMode] = useState<'login' | 'register' | 'reset'>('login');
+  const [mode, setMode] = useState<'login' | 'register' | 'reset'>(
+    searchParams.get('redirect') === 'publish' ? 'register' : 'login'
+  );
 
   const redirectTarget = searchParams.get('redirect');
 
@@ -68,10 +70,11 @@ const Login = () => {
     const { error } = await signUp(email, password);
     if (error) {
       toast.error(error.message);
+      setLoading(false);
     } else {
-      toast.success('¡Registro exitoso! Revisa tu email para confirmar tu cuenta.');
+      toast.success('¡Cuenta creada exitosamente!');
+      // Navigation handled by useEffect when user state changes (auto-confirm enabled)
     }
-    setLoading(false);
   };
 
   const handleReset = async (e: React.FormEvent) => {
