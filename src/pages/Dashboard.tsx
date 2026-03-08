@@ -353,7 +353,7 @@ const Dashboard = () => {
                 ) : (
                   <div className="space-y-2">
                     {profile.links.map(link => {
-                      const clicks = clickStats.find(s => s.link_id === link.id)?.clicks || 0;
+                      const clicks = effectiveClickStats.find(s => s.link_id === link.id)?.clicks || 0;
                       return (
                         <div key={link.id} className="flex items-center justify-between text-sm">
                           <span className="text-foreground truncate max-w-[200px]">{link.label || 'Sin nombre'}</span>
