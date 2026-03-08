@@ -159,6 +159,27 @@ const Dashboard = () => {
       </header>
 
       <div className="max-w-7xl mx-auto px-6 py-8">
+        {/* Welcome banner */}
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="rounded-xl border border-primary/20 bg-gradient-to-r from-primary/10 via-primary/5 to-transparent p-6 mb-6"
+        >
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center text-primary text-xl font-bold">
+              {profile.name ? profile.name.charAt(0).toUpperCase() : '👋'}
+            </div>
+            <div>
+              <h2 className="text-lg font-bold text-foreground">
+                ¡Hola, {profile.name || user?.email?.split('@')[0] || 'crack'}! 🎉
+              </h2>
+              <p className="text-sm text-muted-foreground">
+                Tu página está activa y lista para compartir. Personalízala, comparte tu link y crece tu audiencia.
+              </p>
+            </div>
+          </div>
+        </motion.div>
+
         {/* Profile switcher */}
         <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}
           className="rounded-lg border border-border bg-card p-4 mb-6">
