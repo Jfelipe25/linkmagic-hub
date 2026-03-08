@@ -228,6 +228,29 @@ const ProfileEditorForm = ({ profile, onChange, onPublish, publishLabel = 'Pagar
         </FormSection>
       )}
 
+      <FormSection title="Tipografía" description="Elige la fuente de tu página">
+        <div className="grid grid-cols-2 gap-2">
+          {FONT_FAMILIES.map((f) => (
+            <button
+              key={f.key}
+              onClick={() => update('font_family', f.key)}
+              className={`p-3 rounded-lg border text-left transition-all ${
+                profile.font_family === f.key
+                  ? 'border-primary bg-primary/10'
+                  : 'border-border bg-card hover:border-muted-foreground'
+              }`}
+            >
+              <span className="text-sm font-medium text-foreground block" style={{ fontFamily: `'${f.key}', sans-serif` }}>
+                {f.label}
+              </span>
+              <span className="text-xs text-muted-foreground mt-1 block" style={{ fontFamily: `'${f.key}', sans-serif` }}>
+                Aa Bb Cc 123
+              </span>
+            </button>
+          ))}
+        </div>
+      </FormSection>
+
       <FormSection title="Redes sociales" description="Añade tus perfiles sociales">
         <div className="space-y-2">
           {SOCIAL_PLATFORMS.map((p) => (

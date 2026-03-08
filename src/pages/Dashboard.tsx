@@ -53,6 +53,7 @@ const Dashboard = () => {
         template: profile.template,
         accent_color: profile.accent_color,
         font_color: profile.font_color,
+        font_family: profile.font_family,
         background_image: profile.background_image,
         social_links: profile.social_links as any,
         links: profile.links as any,
