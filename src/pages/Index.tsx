@@ -29,7 +29,7 @@ const Index = () => {
 
     // If not logged in, save profile to sessionStorage and redirect to login
     if (!user) {
-      sessionStorage.setItem('pending_profile', JSON.stringify(profile));
+      sessionStorage.setItem('pending_profile', JSON.stringify({ ...profile, country_code: selectedPricing?.country_code }));
       toast.info('Primero debes crear una cuenta para publicar');
       navigate('/login?redirect=publish');
       return;
