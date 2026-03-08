@@ -143,6 +143,9 @@ const Index = () => {
               onChange={setProfile}
               onPublish={handlePublish}
               isPublishing={publishing}
+              pricingOptions={pricingOptions}
+              selectedPricing={selectedPricing}
+              onPricingChange={setSelectedPricing}
             />
           </motion.div>
         </div>
