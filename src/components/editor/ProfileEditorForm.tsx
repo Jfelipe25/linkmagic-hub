@@ -21,6 +21,9 @@ interface ProfileEditorFormProps {
   onPublish?: () => void;
   publishLabel?: string;
   isPublishing?: boolean;
+  pricingOptions?: PricingOption[];
+  selectedPricing?: PricingOption | null;
+  onPricingChange?: (option: PricingOption) => void;
 }
 
 const IMGBB_API_KEY = '6adb05b927a84a01cc6266417c3198dd';
