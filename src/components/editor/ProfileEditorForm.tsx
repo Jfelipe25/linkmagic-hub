@@ -184,7 +184,10 @@ const ProfileEditorForm = ({ profile, onChange, onPublish, publishLabel = 'Pagar
       <FormSection title="Template" description="Elige el diseño de tu página">
         <div className="flex gap-3 flex-wrap">
           {(['minimal', 'dark', 'gradient', 'background'] as TemplateType[]).map((t) => (
-            <TemplateCard key={t} type={t} selected={profile.template === t} onClick={() => update('template', t)} />
+            <TemplateCard key={t} type={t} selected={profile.template === t} onClick={() => {
+              const defaultFontColor = t === 'dark' ? '#ffffff' : '#000000';
+              onChange({ ...profile, template: t, font_color: defaultFontColor });
+            }} />
           ))}
         </div>
       </FormSection>
