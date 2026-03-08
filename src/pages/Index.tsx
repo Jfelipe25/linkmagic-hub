@@ -8,12 +8,14 @@ import TemplateRenderer from '@/components/templates/TemplateRenderer';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
+import { usePricing } from '@/hooks/usePricing';
 
 const Index = () => {
   const [profile, setProfile] = useState<ProfileData>({ ...DEFAULT_PROFILE });
   const [publishing, setPublishing] = useState(false);
   const { user } = useAuth();
   const navigate = useNavigate();
+  const { options: pricingOptions, selected: selectedPricing, setSelected: setSelectedPricing, loading: pricingLoading } = usePricing();
 
   const handlePublish = async () => {
     if (!profile.name.trim()) {
@@ -27,7 +29,7 @@ const Index = () => {
 
     // If not logged in, save profile to sessionStorage and redirect to login
     if (!user) {
-      sessionStorage.setItem('pending_profile', JSON.stringify(profile));
+      sessionStorage.setItem('pending_profile', JSON.stringify({ ...profile, country_code: selectedPricing?.country_code }));
       toast.info('Primero debes crear una cuenta para publicar');
       navigate('/login?redirect=publish');
       return;
@@ -37,7 +39,7 @@ const Index = () => {
     setPublishing(true);
     try {
       const { data, error } = await supabase.functions.invoke('create-payment', {
-        body: { ...profile, user_id: user.id },
+        body: { ...profile, user_id: user.id, country_code: selectedPricing?.country_code },
       });
       if (error) throw error;
       if (data?.init_point) {
@@ -94,7 +96,7 @@ const Index = () => {
               <a href="#editor" className="px-6 py-3 rounded-lg bg-primary text-primary-foreground font-semibold text-sm hover:opacity-90 transition-opacity">
                 Crea tu LinkBio gratis ↓
               </a>
-              <span className="text-xs text-muted-foreground">Solo pagas al publicar • Desde $2.990 CLP</span>
+              <span className="text-xs text-muted-foreground">Solo pagas al publicar • {selectedPricing ? `Desde ${selectedPricing.display_price}` : 'Desde $20.000 COP'}</span>
             </div>
           </motion.div>
           
@@ -141,6 +143,9 @@ const Index = () => {
               onChange={setProfile}
               onPublish={handlePublish}
               isPublishing={publishing}
+              pricingOptions={pricingOptions}
+              selectedPricing={selectedPricing}
+              onPricingChange={setSelectedPricing}
             />
           </motion.div>
         </div>

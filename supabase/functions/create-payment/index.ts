@@ -24,7 +24,7 @@ serve(async (req) => {
 
   try {
     const body = await req.json();
-    const { name, bio, avatar, template, accent_color, social_links, links, slug: customSlug, background_image, font_family } = body;
+    const { name, bio, avatar, template, accent_color, social_links, links, slug: customSlug, background_image, font_family, country_code } = body;
 
     if (!name || !name.trim()) {
       return new Response(JSON.stringify({ error: 'Name is required' }), {
@@ -40,6 +40,22 @@ serve(async (req) => {
 
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
+    // Get pricing for selected country (or default)
+    let pricingQuery = supabase.from('pricing').select('*');
+    if (country_code) {
+      pricingQuery = pricingQuery.eq('country_code', country_code);
+    } else {
+      pricingQuery = pricingQuery.eq('is_default', true);
+    }
+    const { data: pricingData } = await pricingQuery.maybeSingle();
+    
+    // Fallback to default if country not found
+    let pricing = pricingData;
+    if (!pricing) {
+      const { data: defaultPricing } = await supabase.from('pricing').select('*').eq('is_default', true).maybeSingle();
+      pricing = defaultPricing || { currency_id: 'COP', price: 20000, display_price: '$20.000 COP' };
+    }
+
     // Use custom slug if provided, otherwise generate from name
     let slug = customSlug && customSlug.trim() ? customSlug.trim().toLowerCase().replace(/[^a-z0-9-]/g, '').slice(0, 30) : generateSlug(name);
     
@@ -52,7 +68,6 @@ serve(async (req) => {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         });
       }
-      // Auto-generate unique slug
       let suffix = 2;
       while (true) {
         const candidate = `${slug}-${suffix}`;
@@ -62,10 +77,8 @@ serve(async (req) => {
       }
     }
 
-    // Create session_id
     const session_id = crypto.randomUUID();
 
-    // Save profile
     const { error: insertError } = await supabase.from('profiles').insert({
       slug,
       name: name.trim(),
@@ -90,7 +103,6 @@ serve(async (req) => {
       });
     }
 
-    // If no MP token, return slug directly (for testing)
     if (!mpAccessToken) {
       return new Response(JSON.stringify({
         init_point: `${appUrl}/pago/exitoso?session_id=${session_id}`,
@@ -102,7 +114,6 @@ serve(async (req) => {
       });
     }
 
-    // Create MercadoPago preference
     const mpResponse = await fetch('https://api.mercadopago.com/checkout/preferences', {
       method: 'POST',
       headers: {
@@ -113,8 +124,8 @@ serve(async (req) => {
         items: [{
           title: 'LinkBio Pro - Acceso permanente',
           quantity: 1,
-          unit_price: 5,
-          currency_id: 'USD',
+          unit_price: Number(pricing.price),
+          currency_id: pricing.currency_id,
         }],
         back_urls: {
           success: `${appUrl}/pago/exitoso?session_id=${session_id}`,
