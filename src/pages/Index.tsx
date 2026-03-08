@@ -8,6 +8,7 @@ import TemplateRenderer from '@/components/templates/TemplateRenderer';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
+import { usePricing } from '@/hooks/usePricing';
 
 const Index = () => {
   const [profile, setProfile] = useState<ProfileData>({ ...DEFAULT_PROFILE });
