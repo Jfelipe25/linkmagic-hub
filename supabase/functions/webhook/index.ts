@@ -81,7 +81,23 @@ serve(async (req) => {
               .update({ user_id: authData.user.id })
               .eq('session_id', sessionId);
 
-            console.log(`User created for ${payment.payer.email}, temp password: ${tempPassword}`);
+            // Send password reset email so user can set their own password
+            const appUrl = Deno.env.get('PUBLIC_APP_URL') || 'https://linkbio.pro';
+            await supabase.auth.admin.generateLink({
+              type: 'recovery',
+              email: payment.payer.email,
+              options: {
+                redirectTo: `${appUrl}/reset-password`,
+              },
+            });
+
+            // Also try the public method which actually sends the email
+            const publicSupabase = createClient(supabaseUrl, Deno.env.get('SUPABASE_ANON_KEY')!);
+            await publicSupabase.auth.resetPasswordForEmail(payment.payer.email, {
+              redirectTo: `${appUrl}/reset-password`,
+            });
+
+            console.log(`User created for ${payment.payer.email}, recovery email sent`);
           }
         }
       }

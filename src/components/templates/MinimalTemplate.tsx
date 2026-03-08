@@ -1,4 +1,5 @@
 import { ProfileData, SocialLinks, SOCIAL_PLATFORMS } from '@/types/profile';
+import { trackLinkClick } from '@/hooks/useLinkClicks';
 import {
   Facebook, Twitter, Instagram, Github, Send, Linkedin,
   Mail, MessageCircle, Youtube, Music, ExternalLink
@@ -55,6 +56,7 @@ const MinimalTemplate = ({ profile, accentColor }: TemplateProps) => {
               border: `2px solid ${fontColor}`,
               color: fontColor,
             }}
+            onClick={() => profile.slug && trackLinkClick(profile.slug, link.id)}
             onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = fontColor; e.currentTarget.style.color = '#fff'; }}
             onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; e.currentTarget.style.color = fontColor; }}
           >
