@@ -10,7 +10,8 @@ import TemplateRenderer from '@/components/templates/TemplateRenderer';
 import QRCodeCard from '@/components/QRCodeCard';
 import { useLinkClicks } from '@/hooks/useLinkClicks';
 import { usePricing } from '@/hooks/usePricing';
-import { Copy, Check, Loader2, ExternalLink, LogOut, MousePointerClick, Plus, ChevronDown, Download, QrCode, X } from 'lucide-react';
+import { Copy, Check, Loader2, ExternalLink, LogOut, MousePointerClick, Plus, ChevronDown, Download, QrCode, X, Moon, Sun } from 'lucide-react';
+import { Switch } from '@/components/ui/switch';
 import { toast } from 'sonner';
 import { motion, AnimatePresence } from 'framer-motion';
 
