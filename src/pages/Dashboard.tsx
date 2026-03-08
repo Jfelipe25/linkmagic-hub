@@ -250,6 +250,54 @@ const Dashboard = () => {
           </motion.div>
         )}
 
+        {/* First-visit banner with QR + link */}
+        <AnimatePresence>
+          {showFirstVisit && !isDemo && profile.slug && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              className="rounded-xl border-2 border-primary/30 bg-gradient-to-br from-primary/15 via-primary/5 to-transparent p-6 mb-6 relative"
+            >
+              <button onClick={dismissFirstVisit} className="absolute top-3 right-3 text-muted-foreground hover:text-foreground">
+                <X size={16} />
+              </button>
+              <div className="flex flex-col md:flex-row items-center gap-6">
+                {/* QR */}
+                <div className="flex flex-col items-center gap-2">
+                  <div className="rounded-lg border border-border bg-white p-3">
+                    <img src={qrUrl} alt="QR Code" className="w-32 h-32" />
+                  </div>
+                  <button onClick={handleDownloadQR}
+                    className="flex items-center gap-1.5 text-xs text-primary hover:underline font-medium">
+                    <Download size={12} /> Descargar QR
+                  </button>
+                </div>
+                {/* Info */}
+                <div className="flex-1 text-center md:text-left space-y-3">
+                  <div>
+                    <h2 className="text-lg font-bold text-foreground flex items-center gap-2 justify-center md:justify-start">
+                      🎉 ¡Tu página está lista!
+                    </h2>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Guarda tu QR y comparte tu link. Siempre puedes encontrarlos aquí en el dashboard.
+                    </p>
+                  </div>
+                  <div className="rounded-lg border border-border bg-card p-3 inline-flex items-center gap-2">
+                    <code className="text-sm text-primary font-medium">{profileUrl}</code>
+                    <button onClick={copyLink} className="text-muted-foreground hover:text-primary">
+                      {copied ? <Check size={14} /> : <Copy size={14} />}
+                    </button>
+                    <a href={profileUrl} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary">
+                      <ExternalLink size={14} />
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         {/* Welcome banner */}
         <motion.div
           initial={{ opacity: 0, y: -10 }}
