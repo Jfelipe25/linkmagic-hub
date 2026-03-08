@@ -266,12 +266,32 @@ const ProfileEditorForm = ({ profile, onChange, onPublish, publishLabel = 'Pagar
       </FormSection>
 
       {onPublish && (
+        <FormSection title="País y precio" description="Selecciona tu país para ver el precio">
+          <div className="flex flex-wrap gap-2">
+            {pricingOptions.map((opt) => (
+              <button
+                key={opt.country_code}
+                onClick={() => onPricingChange?.(opt)}
+                className={`px-3 py-2 rounded-lg border text-sm transition-colors ${
+                  selectedPricing?.country_code === opt.country_code
+                    ? 'border-primary bg-primary/10 text-primary font-semibold'
+                    : 'border-border bg-card text-muted-foreground hover:border-primary/50'
+                }`}
+              >
+                {opt.country_name} — {opt.display_price}
+              </button>
+            ))}
+          </div>
+        </FormSection>
+      )}
+
+      {onPublish && (
         <button
           onClick={onPublish} disabled={isPublishing || slugStatus === 'taken'}
           className="w-full h-11 rounded-full gold-gradient text-sm font-semibold text-primary-foreground hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center justify-center gap-2"
         >
           {isPublishing && <Loader2 size={16} className="animate-spin" />}
-          {publishLabel}
+          {selectedPricing ? `Pagar ${selectedPricing.display_price} y publicar` : publishLabel}
         </button>
       )}
     </div>
