@@ -1,12 +1,12 @@
 import { useState, useCallback, useEffect } from 'react';
-import { Plus, Upload, Loader2, Check, X, Image, Type } from 'lucide-react';
+import { Plus, Upload, Loader2, Check, X, Image } from 'lucide-react';
 import {
   DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors
 } from '@dnd-kit/core';
 import {
   arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy
 } from '@dnd-kit/sortable';
-import { ProfileData, CustomLink, SOCIAL_PLATFORMS, TemplateType, DEFAULT_PROFILE, FONT_FAMILIES, FontFamily } from '@/types/profile';
+import { ProfileData, CustomLink, SOCIAL_PLATFORMS, TemplateType, DEFAULT_PROFILE } from '@/types/profile';
 import { supabase } from '@/integrations/supabase/client';
 import FormSection from './FormSection';
 import SocialInput from './SocialInput';
@@ -228,28 +228,7 @@ const ProfileEditorForm = ({ profile, onChange, onPublish, publishLabel = 'Pagar
         </FormSection>
       )}
 
-      <FormSection title="Tipografía" description="Elige la fuente de tu página">
-        <div className="grid grid-cols-2 gap-2">
-          {FONT_FAMILIES.map((f) => (
-            <button
-              key={f.key}
-              onClick={() => update('font_family', f.key)}
-              className={`p-3 rounded-lg border text-left transition-all ${
-                profile.font_family === f.key
-                  ? 'border-primary bg-primary/10'
-                  : 'border-border bg-card hover:border-muted-foreground'
-              }`}
-            >
-              <span className="text-sm font-medium text-foreground block" style={{ fontFamily: `'${f.key}', sans-serif` }}>
-                {f.label}
-              </span>
-              <span className="text-xs text-muted-foreground mt-1 block" style={{ fontFamily: `'${f.key}', sans-serif` }}>
-                Aa Bb Cc 123
-              </span>
-            </button>
-          ))}
-        </div>
-      </FormSection>
+
 
       <FormSection title="Redes sociales" description="Añade tus perfiles sociales">
         <div className="space-y-2">

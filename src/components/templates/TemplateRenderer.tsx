@@ -10,22 +10,17 @@ interface TemplateRendererProps {
 
 const TemplateRenderer = ({ profile }: TemplateRendererProps) => {
   const accentColor = profile.accent_color || '#d4a432';
-  const fontFamily = profile.font_family || 'Inter';
-
-  const wrappedProfile = { ...profile };
-
-  const wrapperStyle = { fontFamily: `'${fontFamily}', sans-serif` };
 
   switch (profile.template) {
     case 'dark':
-      return <div style={wrapperStyle}><DarkTemplate profile={wrappedProfile} accentColor={accentColor} /></div>;
+      return <DarkTemplate profile={profile} accentColor={accentColor} />;
     case 'gradient':
-      return <div style={wrapperStyle}><GradientTemplate profile={wrappedProfile} accentColor={accentColor} /></div>;
+      return <GradientTemplate profile={profile} accentColor={accentColor} />;
     case 'background':
-      return <div style={wrapperStyle}><BackgroundTemplate profile={wrappedProfile} accentColor={accentColor} /></div>;
+      return <BackgroundTemplate profile={profile} accentColor={accentColor} />;
     case 'minimal':
     default:
-      return <div style={wrapperStyle}><MinimalTemplate profile={wrappedProfile} accentColor={accentColor} /></div>;
+      return <MinimalTemplate profile={profile} accentColor={accentColor} />;
   }
 };
 
