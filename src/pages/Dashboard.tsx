@@ -24,6 +24,40 @@ interface ProfileRow {
   [key: string]: any;
 }
 
+const DEMO_PROFILES: ProfileRow[] = [
+  {
+    id: 'demo-1',
+    slug: 'felipe-rodriguez',
+    name: 'Felipe Rodriguez',
+    bio: 'Ingeniero Mecánico | MBA',
+    avatar: '',
+    paid: true,
+    views: 342,
+    created_at: '2025-01-15T10:00:00Z',
+    template: 'minimal',
+    accent_color: '#d4a432',
+    font_color: '#ffffff',
+    font_family: 'Inter',
+    background_image: '',
+    social_links: { instagram: 'https://instagram.com/felipe', linkedin: 'https://linkedin.com/in/felipe', twitter: 'https://twitter.com/felipe' },
+    links: [
+      { id: '1', label: 'Mi portafolio', url: 'https://example.com' },
+      { id: '2', label: 'Agendar reunión', url: 'https://calendly.com' },
+      { id: '3', label: 'Mi empresa', url: 'https://miempresa.com' },
+      { id: '4', label: 'Blog personal', url: 'https://blog.example.com' },
+    ],
+    user_id: 'demo',
+    session_id: null,
+  },
+];
+
+const DEMO_CLICK_STATS = [
+  { link_id: '1', clicks: 87 },
+  { link_id: '2', clicks: 54 },
+  { link_id: '3', clicks: 31 },
+  { link_id: '4', clicks: 12 },
+];
+
 const Dashboard = () => {
   const { user, loading: authLoading, signOut } = useAuth();
   const navigate = useNavigate();
@@ -36,9 +70,13 @@ const Dashboard = () => {
   const [creatingNew, setCreatingNew] = useState(false);
   const [showNewForm, setShowNewForm] = useState(false);
   const [newProfile, setNewProfile] = useState<ProfileData>({ ...DEFAULT_PROFILE });
+  const [isDemo, setIsDemo] = useState(false);
 
-  const { stats: clickStats, totalClicks } = useLinkClicks(activeProfileId || null);
+  const { stats: clickStats, totalClicks } = useLinkClicks(isDemo ? null : (activeProfileId || null));
   const { options: pricingOptions, selected: selectedPricing, setSelected: setSelectedPricing } = usePricing();
+
+  const effectiveClickStats = isDemo ? DEMO_CLICK_STATS : clickStats;
+  const effectiveTotalClicks = isDemo ? DEMO_CLICK_STATS.reduce((sum, s) => sum + s.clicks, 0) : totalClicks;
 
   useEffect(() => {
     if (!authLoading && !user) navigate('/login');
@@ -55,11 +93,17 @@ const Dashboard = () => {
         .order('created_at', { ascending: true });
       if (data && data.length > 0) {
         setProfiles(data);
-        // Select first profile by default
+        setIsDemo(false);
         if (!activeProfileId || !data.find(p => p.id === activeProfileId)) {
           setActiveProfileId(data[0].id);
           setProfile(profileFromRow(data[0]));
         }
+      } else {
+        // No profiles yet — show demo
+        setProfiles(DEMO_PROFILES);
+        setActiveProfileId(DEMO_PROFILES[0].id);
+        setProfile(profileFromRow(DEMO_PROFILES[0]));
+        setIsDemo(true);
       }
       setLoading(false);
     };
@@ -159,6 +203,23 @@ const Dashboard = () => {
       </header>
 
       <div className="max-w-7xl mx-auto px-6 py-8">
+        {/* Demo banner */}
+        {isDemo && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="rounded-xl border border-accent/30 bg-accent/10 p-4 mb-4 flex items-center gap-3"
+          >
+            <span className="text-lg">👀</span>
+            <div>
+              <p className="text-sm font-semibold text-foreground">Esto es un demo</p>
+              <p className="text-xs text-muted-foreground">
+                Así se verá tu dashboard cuando tengas una página activa. ¡Crea tu primera URL para empezar!
+              </p>
+            </div>
+          </motion.div>
+        )}
+
         {/* Welcome banner */}
         <motion.div
           initial={{ opacity: 0, y: -10 }}
@@ -270,7 +331,7 @@ const Dashboard = () => {
               </div>
               <div>
                 <p className="text-xs text-muted-foreground flex items-center gap-1"><MousePointerClick size={12} /> Clics</p>
-                <p className="text-sm text-foreground font-semibold">{totalClicks}</p>
+                <p className="text-sm text-foreground font-semibold">{effectiveTotalClicks}</p>
               </div>
               <div>
                 <p className="text-xs text-muted-foreground">Creado</p>
@@ -292,7 +353,7 @@ const Dashboard = () => {
                 ) : (
                   <div className="space-y-2">
                     {profile.links.map(link => {
-                      const clicks = clickStats.find(s => s.link_id === link.id)?.clicks || 0;
+                      const clicks = effectiveClickStats.find(s => s.link_id === link.id)?.clicks || 0;
                       return (
                         <div key={link.id} className="flex items-center justify-between text-sm">
                           <span className="text-foreground truncate max-w-[200px]">{link.label || 'Sin nombre'}</span>
