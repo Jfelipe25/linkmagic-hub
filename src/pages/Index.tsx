@@ -70,7 +70,56 @@ const Index = () => {
         </div>
       </header>
 
-      <div className="max-w-7xl mx-auto px-6 py-8">
+      {/* Hero Banner */}
+      <section className="relative overflow-hidden bg-gradient-to-br from-primary/5 via-background to-accent/10 border-b border-border">
+        <div className="max-w-7xl mx-auto px-6 py-16 md:py-24 text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="max-w-3xl mx-auto space-y-6"
+          >
+            <span className="inline-block px-4 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-semibold tracking-wide uppercase">
+              Tu identidad digital en un solo link
+            </span>
+            <h2 className="text-3xl md:text-5xl font-extrabold text-foreground leading-tight">
+              Todas tus redes, contenido y links<br className="hidden md:block" />
+              <span className="gold-text">en una sola página personalizada</span>
+            </h2>
+            <p className="text-muted-foreground text-base md:text-lg max-w-2xl mx-auto leading-relaxed">
+              Un <strong className="text-foreground">Link in Bio</strong> es la página que pones en tu perfil de Instagram, TikTok o cualquier red social. 
+              En lugar de elegir un solo enlace, compartes <strong className="text-foreground">todos tus links</strong> — redes sociales, tienda, portafolio, WhatsApp y más — en un diseño profesional con tu marca personal.
+            </p>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
+              <a href="#editor" className="px-6 py-3 rounded-lg bg-primary text-primary-foreground font-semibold text-sm hover:opacity-90 transition-opacity">
+                Crea tu LinkBio gratis ↓
+              </a>
+              <span className="text-xs text-muted-foreground">Solo pagas al publicar • Desde $2.990 CLP</span>
+            </div>
+          </motion.div>
+          
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.3 }}
+            className="mt-12 grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-2xl mx-auto"
+          >
+            {[
+              { icon: '🎨', title: 'Personalizable', desc: 'Elige plantillas, colores y fuentes' },
+              { icon: '🔗', title: 'Links ilimitados', desc: 'Agrega todos los enlaces que quieras' },
+              { icon: '📱', title: 'Optimizado para móvil', desc: 'Se ve perfecto en cualquier dispositivo' },
+            ].map((item, i) => (
+              <div key={i} className="flex flex-col items-center gap-2 p-4 rounded-xl bg-card border border-border">
+                <span className="text-2xl">{item.icon}</span>
+                <span className="text-sm font-semibold text-foreground">{item.title}</span>
+                <span className="text-xs text-muted-foreground text-center">{item.desc}</span>
+              </div>
+            ))}
+          </motion.div>
+        </div>
+      </section>
+
+      <div id="editor" className="max-w-7xl mx-auto px-6 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           <motion.div
             initial={{ opacity: 0, y: -10 }}
