@@ -180,6 +180,30 @@ const Dashboard = () => {
     setCreatingNew(false);
   };
 
+  const dismissFirstVisit = () => {
+    localStorage.setItem('linkbio_welcome_dismissed', 'true');
+    setShowFirstVisit(false);
+  };
+
+  const profileUrl = profile.slug ? `${window.location.origin}/u/${profile.slug}` : '';
+  const qrUrl = profile.slug ? `https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${encodeURIComponent(profileUrl)}` : '';
+
+  const handleDownloadQR = async () => {
+    if (!qrUrl) return;
+    try {
+      const res = await fetch(qrUrl);
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `qr-${profile.slug}.png`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error('Download failed', err);
+    }
+  };
+
   const copyLink = () => {
     navigator.clipboard.writeText(`${window.location.origin}/u/${profile.slug}`);
     setCopied(true);
