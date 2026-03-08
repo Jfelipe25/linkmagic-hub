@@ -265,7 +265,7 @@ const ProfileEditorForm = ({ profile, onChange, onPublish, publishLabel = 'Pagar
         </button>
       </FormSection>
 
-      {onPublish && (
+      {onPublish && pricingOptions && pricingOptions.length > 0 && (
         <FormSection title="País y precio" description="Selecciona tu país para ver el precio">
           <select
             value={selectedPricing?.country_code || ''}
