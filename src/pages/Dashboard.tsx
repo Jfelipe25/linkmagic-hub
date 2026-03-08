@@ -99,6 +99,11 @@ const Dashboard = () => {
           setActiveProfileId(data[0].id);
           setProfile(profileFromRow(data[0]));
         }
+        // Show first-visit banner if never dismissed
+        const dismissed = localStorage.getItem('linkbio_welcome_dismissed');
+        if (!dismissed) {
+          setShowFirstVisit(true);
+        }
       } else {
         // No profiles yet — show demo
         setProfiles(DEMO_PROFILES);
