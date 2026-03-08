@@ -22,6 +22,7 @@ export type Database = {
           bio: string | null
           created_at: string | null
           font_color: string | null
+          font_family: string | null
           id: string
           links: Json | null
           name: string | null
@@ -31,6 +32,7 @@ export type Database = {
           social_links: Json | null
           template: string | null
           user_id: string | null
+          views: number
         }
         Insert: {
           accent_color?: string | null
@@ -39,6 +41,7 @@ export type Database = {
           bio?: string | null
           created_at?: string | null
           font_color?: string | null
+          font_family?: string | null
           id?: string
           links?: Json | null
           name?: string | null
@@ -48,6 +51,7 @@ export type Database = {
           social_links?: Json | null
           template?: string | null
           user_id?: string | null
+          views?: number
         }
         Update: {
           accent_color?: string | null
@@ -56,6 +60,7 @@ export type Database = {
           bio?: string | null
           created_at?: string | null
           font_color?: string | null
+          font_family?: string | null
           id?: string
           links?: Json | null
           name?: string | null
@@ -65,6 +70,7 @@ export type Database = {
           social_links?: Json | null
           template?: string | null
           user_id?: string | null
+          views?: number
         }
         Relationships: []
       }
@@ -97,6 +103,10 @@ export type Database = {
           _user_id: string
         }
         Returns: boolean
+      }
+      increment_profile_views: {
+        Args: { profile_slug: string }
+        Returns: undefined
       }
     }
     Enums: {

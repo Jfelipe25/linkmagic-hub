@@ -1,4 +1,4 @@
-import { ProfileData } from '@/types/profile';
+import { ProfileData, FontFamily } from '@/types/profile';
 
 export function generateSlug(name: string): string {
   return name
@@ -19,7 +19,8 @@ export function profileFromRow(row: any): ProfileData {
     slug: row.slug || '',
     template: row.template || 'minimal',
     accent_color: row.accent_color || '#d4a432',
-    font_color: row.font_color || '#ffffff',
+    font_color: row.font_color || '#000000',
+    font_family: (row.font_family as FontFamily) || 'Inter',
     background_image: row.background_image || '',
     social_links: (typeof row.social_links === 'object' && row.social_links) ? row.social_links : {},
     links: Array.isArray(row.links) ? row.links : [],
@@ -27,5 +28,6 @@ export function profileFromRow(row: any): ProfileData {
     session_id: row.session_id || '',
     user_id: row.user_id || '',
     created_at: row.created_at || '',
+    views: row.views ?? 0,
   };
 }

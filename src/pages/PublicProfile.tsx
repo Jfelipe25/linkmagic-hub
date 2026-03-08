@@ -22,11 +22,60 @@ const PublicProfile = () => {
         .maybeSingle();
 
       if (error || !data) { setNotFound(true); }
-      else { setProfile(profileFromRow(data)); }
+      else {
+        setProfile(profileFromRow(data));
+        // Increment view counter
+        supabase.rpc('increment_profile_views', { profile_slug: slug });
+      }
       setLoading(false);
     };
     fetchProfile();
   }, [slug]);
+
+  // Dynamic OG meta tags
+  useEffect(() => {
+    if (!profile) return;
+    document.title = `${profile.name || 'Perfil'} | LinkBio Pro`;
+    
+    const setMeta = (property: string, content: string) => {
+      let el = document.querySelector(`meta[property="${property}"]`) as HTMLMetaElement;
+      if (!el) {
+        el = document.createElement('meta');
+        el.setAttribute('property', property);
+        document.head.appendChild(el);
+      }
+      el.setAttribute('content', content);
+    };
+
+    const setMetaName = (name: string, content: string) => {
+      let el = document.querySelector(`meta[name="${name}"]`) as HTMLMetaElement;
+      if (!el) {
+        el = document.createElement('meta');
+        el.setAttribute('name', name);
+        document.head.appendChild(el);
+      }
+      el.setAttribute('content', content);
+    };
+
+    const title = `${profile.name} | LinkBio Pro`;
+    const description = profile.bio || `Visita el perfil de ${profile.name} y encuentra todos sus links en un solo lugar.`;
+
+    setMeta('og:title', title);
+    setMeta('og:description', description);
+    setMeta('og:type', 'profile');
+    setMeta('og:url', window.location.href);
+    if (profile.avatar) setMeta('og:image', profile.avatar);
+
+    setMetaName('twitter:card', 'summary');
+    setMetaName('twitter:title', title);
+    setMetaName('twitter:description', description);
+    if (profile.avatar) setMetaName('twitter:image', profile.avatar);
+    setMetaName('description', description);
+
+    return () => {
+      document.title = 'LinkBio Pro';
+    };
+  }, [profile]);
 
   if (loading) {
     return (

@@ -24,7 +24,7 @@ serve(async (req) => {
 
   try {
     const body = await req.json();
-    const { name, bio, avatar, template, accent_color, social_links, links, slug: customSlug, background_image } = body;
+    const { name, bio, avatar, template, accent_color, social_links, links, slug: customSlug, background_image, font_family } = body;
 
     if (!name || !name.trim()) {
       return new Response(JSON.stringify({ error: 'Name is required' }), {
@@ -73,12 +73,14 @@ serve(async (req) => {
       avatar: avatar || '',
       template: template || 'minimal',
       accent_color: accent_color || '#d4a432',
-      font_color: body.font_color || '#ffffff',
+      font_color: body.font_color || '#000000',
+      font_family: font_family || 'Inter',
       background_image: background_image || '',
       social_links: social_links || {},
       links: links || [],
       paid: false,
       session_id,
+      user_id: body.user_id || null,
     });
 
     if (insertError) {

@@ -20,6 +20,15 @@ export interface CustomLink {
 
 export type TemplateType = 'minimal' | 'dark' | 'gradient' | 'background';
 
+export type FontFamily = 'Inter' | 'Playfair Display' | 'Space Mono' | 'Poppins';
+
+export const FONT_FAMILIES: { key: FontFamily; label: string }[] = [
+  { key: 'Inter', label: 'Inter (Moderna)' },
+  { key: 'Playfair Display', label: 'Playfair (Elegante)' },
+  { key: 'Space Mono', label: 'Space Mono (Técnica)' },
+  { key: 'Poppins', label: 'Poppins (Redondeada)' },
+];
+
 export interface ProfileData {
   name: string;
   bio: string;
@@ -28,6 +37,7 @@ export interface ProfileData {
   template: TemplateType;
   accent_color: string;
   font_color: string;
+  font_family: FontFamily;
   background_image: string;
   social_links: SocialLinks;
   links: CustomLink[];
@@ -35,6 +45,7 @@ export interface ProfileData {
   session_id?: string;
   user_id?: string;
   created_at?: string;
+  views?: number;
 }
 
 export const ACCENT_COLORS = [
@@ -67,6 +78,7 @@ export const DEFAULT_PROFILE: ProfileData = {
   template: 'minimal',
   accent_color: '#d4a432',
   font_color: '#000000',
+  font_family: 'Inter',
   background_image: '',
   social_links: {},
   links: [],

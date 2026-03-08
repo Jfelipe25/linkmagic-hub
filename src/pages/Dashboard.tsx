@@ -53,6 +53,7 @@ const Dashboard = () => {
         template: profile.template,
         accent_color: profile.accent_color,
         font_color: profile.font_color,
+        font_family: profile.font_family,
         background_image: profile.background_image,
         social_links: profile.social_links as any,
         links: profile.links as any,
@@ -110,6 +111,10 @@ const Dashboard = () => {
           <div>
             <p className="text-xs text-muted-foreground">Template</p>
             <p className="text-sm text-foreground capitalize">{profile.template}</p>
+          </div>
+          <div>
+            <p className="text-xs text-muted-foreground">Visitas</p>
+            <p className="text-sm text-foreground font-semibold">{profile.views ?? 0}</p>
           </div>
           <div>
             <p className="text-xs text-muted-foreground">Creado</p>
