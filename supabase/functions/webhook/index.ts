@@ -59,45 +59,53 @@ serve(async (req) => {
           console.error('Error updating profile:', updateError);
         }
 
-        // Get profile to create user
+        // Get profile to check if user is already linked
         const { data: profile } = await supabase
           .from('profiles')
           .select('*')
           .eq('session_id', sessionId)
           .maybeSingle();
 
-        if (profile && !profile.user_id && payment.payer?.email) {
-          // Create user with temp password
-          const tempPassword = crypto.randomUUID().slice(0, 12);
-          const { data: authData, error: authError } = await supabase.auth.admin.createUser({
-            email: payment.payer.email,
-            password: tempPassword,
-            email_confirm: true,
-          });
+        if (profile) {
+          console.log(`Profile ${profile.slug} activated. user_id: ${profile.user_id || 'none'}`);
+          
+          // Only create user if profile has no user_id (fallback for edge cases)
+          if (!profile.user_id && payment.payer?.email) {
+            // Check if user already exists
+            const { data: existingUsers } = await supabase.auth.admin.listUsers();
+            const existingUser = existingUsers?.users?.find(u => u.email === payment.payer.email);
 
-          if (authData?.user && !authError) {
-            await supabase
-              .from('profiles')
-              .update({ user_id: authData.user.id })
-              .eq('session_id', sessionId);
+            if (existingUser) {
+              // Link existing user to profile
+              await supabase
+                .from('profiles')
+                .update({ user_id: existingUser.id })
+                .eq('session_id', sessionId);
+              console.log(`Linked existing user ${payment.payer.email} to profile ${profile.slug}`);
+            } else {
+              // Create user with temp password as last resort
+              const tempPassword = crypto.randomUUID().slice(0, 12);
+              const { data: authData, error: authError } = await supabase.auth.admin.createUser({
+                email: payment.payer.email,
+                password: tempPassword,
+                email_confirm: true,
+              });
 
-            // Send password reset email so user can set their own password
-            const appUrl = Deno.env.get('PUBLIC_APP_URL') || 'https://linkbio.pro';
-            await supabase.auth.admin.generateLink({
-              type: 'recovery',
-              email: payment.payer.email,
-              options: {
-                redirectTo: `${appUrl}/reset-password`,
-              },
-            });
+              if (authData?.user && !authError) {
+                await supabase
+                  .from('profiles')
+                  .update({ user_id: authData.user.id })
+                  .eq('session_id', sessionId);
 
-            // Also try the public method which actually sends the email
-            const publicSupabase = createClient(supabaseUrl, Deno.env.get('SUPABASE_ANON_KEY')!);
-            await publicSupabase.auth.resetPasswordForEmail(payment.payer.email, {
-              redirectTo: `${appUrl}/reset-password`,
-            });
-
-            console.log(`User created for ${payment.payer.email}, recovery email sent`);
+                // Send password reset so user can set their own password
+                const appUrl = Deno.env.get('PUBLIC_APP_URL') || 'https://linkbio.pro';
+                const publicSupabase = createClient(supabaseUrl, Deno.env.get('SUPABASE_ANON_KEY')!);
+                await publicSupabase.auth.resetPasswordForEmail(payment.payer.email, {
+                  redirectTo: `${appUrl}/reset-password`,
+                });
+                console.log(`User created for ${payment.payer.email}, recovery email sent`);
+              }
+            }
           }
         }
       }
