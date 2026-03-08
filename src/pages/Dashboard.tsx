@@ -233,6 +233,13 @@ const Dashboard = () => {
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <h1 className="text-lg font-bold gold-text">LinkBio Pro</h1>
           <div className="flex items-center gap-3">
+            <button
+              onClick={() => setDarkMode(!darkMode)}
+              className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground transition-colors"
+              title={darkMode ? 'Modo claro' : 'Modo oscuro'}
+            >
+              {darkMode ? <Sun size={16} /> : <Moon size={16} />}
+            </button>
             <span className="text-xs text-muted-foreground">{user?.email}</span>
             <button onClick={signOut} className="text-muted-foreground hover:text-foreground transition-colors">
               <LogOut size={16} />
