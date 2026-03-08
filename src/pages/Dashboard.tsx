@@ -10,8 +10,9 @@ import TemplateRenderer from '@/components/templates/TemplateRenderer';
 import QRCodeCard from '@/components/QRCodeCard';
 import { useLinkClicks } from '@/hooks/useLinkClicks';
 import { usePricing } from '@/hooks/usePricing';
-import { Copy, Check, Loader2, ExternalLink, LogOut, MousePointerClick, Plus, ChevronDown, Download, QrCode, X, Moon, Sun } from 'lucide-react';
+import { Copy, Check, Loader2, ExternalLink, LogOut, MousePointerClick, Plus, ChevronDown, Download, QrCode, X } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
+import ThemeToggle from '@/components/ThemeToggle';
 import { toast } from 'sonner';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -73,14 +74,8 @@ const Dashboard = () => {
   const [newProfile, setNewProfile] = useState<ProfileData>({ ...DEFAULT_PROFILE });
   const [isDemo, setIsDemo] = useState(false);
   const [showFirstVisit, setShowFirstVisit] = useState(false);
-  const [darkMode, setDarkMode] = useState(() => {
-    return localStorage.getItem('linkbio_dark_mode') === 'true';
-  });
 
-  useEffect(() => {
-    document.documentElement.classList.toggle('dark', darkMode);
-    localStorage.setItem('linkbio_dark_mode', String(darkMode));
-  }, [darkMode]);
+
 
   const { stats: clickStats, totalClicks } = useLinkClicks(isDemo ? null : (activeProfileId || null));
   const { options: pricingOptions, selected: selectedPricing, setSelected: setSelectedPricing } = usePricing();
@@ -233,13 +228,7 @@ const Dashboard = () => {
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <h1 className="text-lg font-bold gold-text">LinkBio Pro</h1>
           <div className="flex items-center gap-3">
-            <button
-              onClick={() => setDarkMode(!darkMode)}
-              className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground transition-colors"
-              title={darkMode ? 'Modo claro' : 'Modo oscuro'}
-            >
-              {darkMode ? <Sun size={16} /> : <Moon size={16} />}
-            </button>
+            <ThemeToggle />
             <span className="text-xs text-muted-foreground">{user?.email}</span>
             <button onClick={signOut} className="text-muted-foreground hover:text-foreground transition-colors">
               <LogOut size={16} />
