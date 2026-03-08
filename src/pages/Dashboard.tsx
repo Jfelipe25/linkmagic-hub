@@ -73,6 +73,14 @@ const Dashboard = () => {
   const [newProfile, setNewProfile] = useState<ProfileData>({ ...DEFAULT_PROFILE });
   const [isDemo, setIsDemo] = useState(false);
   const [showFirstVisit, setShowFirstVisit] = useState(false);
+  const [darkMode, setDarkMode] = useState(() => {
+    return localStorage.getItem('linkbio_dark_mode') === 'true';
+  });
+
+  useEffect(() => {
+    document.documentElement.classList.toggle('dark', darkMode);
+    localStorage.setItem('linkbio_dark_mode', String(darkMode));
+  }, [darkMode]);
 
   const { stats: clickStats, totalClicks } = useLinkClicks(isDemo ? null : (activeProfileId || null));
   const { options: pricingOptions, selected: selectedPricing, setSelected: setSelectedPricing } = usePricing();
