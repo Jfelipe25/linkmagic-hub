@@ -331,7 +331,7 @@ const Dashboard = () => {
               </div>
               <div>
                 <p className="text-xs text-muted-foreground flex items-center gap-1"><MousePointerClick size={12} /> Clics</p>
-                <p className="text-sm text-foreground font-semibold">{totalClicks}</p>
+                <p className="text-sm text-foreground font-semibold">{effectiveTotalClicks}</p>
               </div>
               <div>
                 <p className="text-xs text-muted-foreground">Creado</p>
