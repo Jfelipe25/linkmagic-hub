@@ -16,7 +16,7 @@ interface TemplateProps {
 
 const MinimalTemplate = ({ profile, accentColor }: TemplateProps) => {
   const socialEntries = Object.entries(profile.social_links || {}).filter(([, v]) => v);
-  const fontColor = profile.font_color || '#111111';
+  const fontColor = profile.font_color || '#000000';
 
   return (
     <div className="min-h-full flex flex-col items-center px-6 py-12" style={{ backgroundColor: '#ffffff', color: fontColor }}>
@@ -32,7 +32,7 @@ const MinimalTemplate = ({ profile, accentColor }: TemplateProps) => {
       <p className="text-sm mt-1 text-center max-w-[220px]" style={{ color: fontColor, opacity: 0.6 }}>{profile.bio || 'Tu biografía aquí'}</p>
 
       {socialEntries.length > 0 && (
-        <div className="flex gap-3 mt-4">
+        <div className="flex flex-wrap justify-center gap-3 mt-4" style={{ maxWidth: '220px' }}>
           {socialEntries.map(([key, url]) => {
             const platform = SOCIAL_PLATFORMS.find(p => p.key === key);
             const Icon = platform ? iconMap[platform.icon] : ExternalLink;

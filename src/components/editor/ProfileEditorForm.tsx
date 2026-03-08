@@ -24,7 +24,7 @@ interface ProfileEditorFormProps {
 
 const IMGBB_API_KEY = '6adb05b927a84a01cc6266417c3198dd';
 
-const ProfileEditorForm = ({ profile, onChange, onPublish, publishLabel = 'Publicar · $5 USD', isPublishing }: ProfileEditorFormProps) => {
+const ProfileEditorForm = ({ profile, onChange, onPublish, publishLabel = 'Pagar y publicar', isPublishing }: ProfileEditorFormProps) => {
   const [uploading, setUploading] = useState(false);
   const [uploadingBg, setUploadingBg] = useState(false);
   const [slugInput, setSlugInput] = useState(profile.slug);
@@ -184,7 +184,10 @@ const ProfileEditorForm = ({ profile, onChange, onPublish, publishLabel = 'Publi
       <FormSection title="Template" description="Elige el diseño de tu página">
         <div className="flex gap-3 flex-wrap">
           {(['minimal', 'dark', 'gradient', 'background'] as TemplateType[]).map((t) => (
-            <TemplateCard key={t} type={t} selected={profile.template === t} onClick={() => update('template', t)} />
+            <TemplateCard key={t} type={t} selected={profile.template === t} onClick={() => {
+              const defaultFontColor = t === 'dark' ? '#ffffff' : '#000000';
+              onChange({ ...profile, template: t, font_color: defaultFontColor });
+            }} />
           ))}
         </div>
       </FormSection>

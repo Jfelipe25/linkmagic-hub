@@ -66,7 +66,7 @@ export const DEFAULT_PROFILE: ProfileData = {
   slug: '',
   template: 'minimal',
   accent_color: '#d4a432',
-  font_color: '#ffffff',
+  font_color: '#000000',
   background_image: '',
   social_links: {},
   links: [],
