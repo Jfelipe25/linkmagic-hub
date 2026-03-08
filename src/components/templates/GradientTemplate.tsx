@@ -25,7 +25,7 @@ function darkenHex(hex: string, amount: number): string {
 const GradientTemplate = ({ profile, accentColor }: TemplateProps) => {
   const socialEntries = Object.entries(profile.social_links || {}).filter(([, v]) => v);
   const darkColor = darkenHex(accentColor, 80);
-  const fontColor = profile.font_color || '#ffffff';
+  const fontColor = profile.font_color || '#000000';
 
   return (
     <div className="min-h-full flex flex-col items-center px-6 py-12"
@@ -51,7 +51,7 @@ const GradientTemplate = ({ profile, accentColor }: TemplateProps) => {
       </p>
 
       {socialEntries.length > 0 && (
-        <div className="flex gap-3 mt-4">
+        <div className="flex flex-wrap justify-center gap-3 mt-4" style={{ maxWidth: '220px' }}>
           {socialEntries.map(([key, url]) => {
             const platform = SOCIAL_PLATFORMS.find(p => p.key === key);
             const Icon = platform ? iconMap[platform.icon] : ExternalLink;

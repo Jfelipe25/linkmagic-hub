@@ -34,7 +34,7 @@ const DarkTemplate = ({ profile, accentColor }: TemplateProps) => {
       <p className="text-sm mt-1 text-center max-w-[220px]" style={{ color: fontColor, opacity: 0.7 }}>{profile.bio || 'Tu biografía aquí'}</p>
 
       {socialEntries.length > 0 && (
-        <div className="flex gap-3 mt-4">
+        <div className="flex flex-wrap justify-center gap-3 mt-4" style={{ maxWidth: '220px' }}>
           {socialEntries.map(([key, url]) => {
             const platform = SOCIAL_PLATFORMS.find(p => p.key === key);
             const Icon = platform ? iconMap[platform.icon] : ExternalLink;

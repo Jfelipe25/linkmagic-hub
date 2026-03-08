@@ -17,7 +17,7 @@ interface TemplateProps {
 const BackgroundTemplate = ({ profile, accentColor }: TemplateProps) => {
   const socialEntries = Object.entries(profile.social_links || {}).filter(([, v]) => v);
   const bgImage = profile.background_image;
-  const fontColor = profile.font_color || '#ffffff';
+  const fontColor = profile.font_color || '#000000';
 
   return (
     <div
@@ -49,7 +49,7 @@ const BackgroundTemplate = ({ profile, accentColor }: TemplateProps) => {
         </p>
 
         {socialEntries.length > 0 && (
-          <div className="flex gap-3 mt-4">
+          <div className="flex flex-wrap justify-center gap-3 mt-4" style={{ maxWidth: '220px' }}>
             {socialEntries.map(([key, url]) => {
               const platform = SOCIAL_PLATFORMS.find(p => p.key === key);
               const Icon = platform ? iconMap[platform.icon] : ExternalLink;
