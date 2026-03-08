@@ -1,33 +1,76 @@
-import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
 import { Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { motion } from 'framer-motion';
 
 const Login = () => {
-  const { signIn, signUp, resetPassword } = useAuth();
+  const { signIn, signUp, resetPassword, user } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [mode, setMode] = useState<'login' | 'register' | 'reset'>('login');
 
+  const redirectTarget = searchParams.get('redirect');
+
+  // If user is already logged in and there's a pending publish, handle it
+  useEffect(() => {
+    if (user && redirectTarget === 'publish') {
+      handlePendingPublish();
+    } else if (user && !redirectTarget) {
+      navigate('/dashboard');
+    }
+  }, [user]);
+
+  const handlePendingPublish = async () => {
+    const pending = sessionStorage.getItem('pending_profile');
+    if (!pending || !user) return;
+
+    setLoading(true);
+    try {
+      const profile = JSON.parse(pending);
+      const { data, error } = await supabase.functions.invoke('create-payment', {
+        body: { ...profile, user_id: user.id },
+      });
+      if (error) throw error;
+      if (data?.init_point) {
+        sessionStorage.removeItem('pending_profile');
+        window.location.href = data.init_point;
+      } else {
+        toast.error('Error al crear el pago');
+        navigate('/');
+      }
+    } catch (err: any) {
+      toast.error(err.message || 'Error al procesar el pago');
+      navigate('/');
+    }
+    setLoading(false);
+  };
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     const { error } = await signIn(email, password);
-    if (error) toast.error(error.message);
-    else navigate('/dashboard');
-    setLoading(false);
+    if (error) {
+      toast.error(error.message);
+      setLoading(false);
+    }
+    // Navigation handled by useEffect when user state changes
   };
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     const { error } = await signUp(email, password);
-    if (error) toast.error(error.message);
-    else toast.success('¡Registro exitoso! Revisa tu email para confirmar tu cuenta.');
+    if (error) {
+      toast.error(error.message);
+    } else {
+      toast.success('¡Registro exitoso! Revisa tu email para confirmar tu cuenta.');
+    }
     setLoading(false);
   };
 
@@ -45,6 +88,8 @@ const Login = () => {
   const title = mode === 'login' ? 'Inicia sesión' : mode === 'register' ? 'Crea tu cuenta' : 'Restablecer contraseña';
   const btnText = mode === 'login' ? 'Iniciar sesión' : mode === 'register' ? 'Registrarme' : 'Enviar enlace';
 
+  const showPublishNote = redirectTarget === 'publish';
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-background px-6">
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
@@ -52,6 +97,11 @@ const Login = () => {
         <div className="text-center">
           <h1 className="text-2xl font-bold gold-text mb-1">LinkBio Pro</h1>
           <p className="text-sm text-muted-foreground">{title}</p>
+          {showPublishNote && (
+            <p className="text-xs text-primary mt-2 bg-primary/10 rounded-md px-3 py-2">
+              Regístrate o inicia sesión para publicar tu perfil
+            </p>
+          )}
         </div>
 
         <form onSubmit={onSubmit} className="space-y-4">
