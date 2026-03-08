@@ -39,7 +39,7 @@ const Index = () => {
     setPublishing(true);
     try {
       const { data, error } = await supabase.functions.invoke('create-payment', {
-        body: { ...profile, user_id: user.id },
+        body: { ...profile, user_id: user.id, country_code: selectedPricing?.country_code },
       });
       if (error) throw error;
       if (data?.init_point) {
