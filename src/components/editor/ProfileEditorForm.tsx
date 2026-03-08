@@ -267,21 +267,20 @@ const ProfileEditorForm = ({ profile, onChange, onPublish, publishLabel = 'Pagar
 
       {onPublish && (
         <FormSection title="País y precio" description="Selecciona tu país para ver el precio">
-          <div className="flex flex-wrap gap-2">
+          <select
+            value={selectedPricing?.country_code || ''}
+            onChange={(e) => {
+              const opt = pricingOptions.find(p => p.country_code === e.target.value);
+              if (opt) onPricingChange?.(opt);
+            }}
+            className="w-full h-10 rounded-md border border-input bg-background px-3 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-ring"
+          >
             {pricingOptions.map((opt) => (
-              <button
-                key={opt.country_code}
-                onClick={() => onPricingChange?.(opt)}
-                className={`px-3 py-2 rounded-lg border text-sm transition-colors ${
-                  selectedPricing?.country_code === opt.country_code
-                    ? 'border-primary bg-primary/10 text-primary font-semibold'
-                    : 'border-border bg-card text-muted-foreground hover:border-primary/50'
-                }`}
-              >
+              <option key={opt.country_code} value={opt.country_code}>
                 {opt.country_name} — {opt.display_price}
-              </button>
+              </option>
             ))}
-          </div>
+          </select>
         </FormSection>
       )}
 
