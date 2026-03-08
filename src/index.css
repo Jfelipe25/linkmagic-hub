@@ -139,4 +139,11 @@
     backdrop-filter: blur(12px);
     border: 1px solid hsl(30 25% 18%);
   }
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
 }
