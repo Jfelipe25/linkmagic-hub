@@ -35,7 +35,7 @@ const PublicProfile = () => {
   // Dynamic OG meta tags
   useEffect(() => {
     if (!profile) return;
-    document.title = `${profile.name || 'Perfil'} | LinkBio Pro`;
+    document.title = `${profile.name || 'Perfil'} | LinkOne`;
     
     const setMeta = (property: string, content: string) => {
       let el = document.querySelector(`meta[property="${property}"]`) as HTMLMetaElement;
