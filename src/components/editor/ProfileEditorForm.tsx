@@ -48,7 +48,7 @@ const ProfileEditorForm = ({ profile, onChange, onPublish, publishLabel = 'Pagar
     onChange({ ...profile, links: [...profile.links, newLink] });
   }, [profile, onChange]);
 
-  const updateLink = useCallback((id: string, field: 'label' | 'url', value: string) => {
+  const updateLink = useCallback((id: string, field: 'label' | 'url' | 'schedule_start' | 'schedule_end', value: string) => {
     onChange({
       ...profile,
       links: profile.links.map(l => l.id === id ? { ...l, [field]: value } : l),
