@@ -57,7 +57,7 @@ const PublicProfile = () => {
       el.setAttribute('content', content);
     };
 
-    const title = `${profile.name} | LinkBio Pro`;
+    const title = `${profile.name} | LinkOne`;
     const description = profile.bio || `Visita el perfil de ${profile.name} y encuentra todos sus links en un solo lugar.`;
 
     setMeta('og:title', title);
