@@ -1,5 +1,6 @@
-import { ProfileData, SocialLinks, SOCIAL_PLATFORMS } from '@/types/profile';
+import { ProfileData, SocialLinks, SOCIAL_PLATFORMS, getVisibleLinks } from '@/types/profile';
 import { trackLinkClick } from '@/hooks/useLinkClicks';
+import ContactForm from '@/components/ContactForm';
 import {
   Facebook, Twitter, Instagram, Github, Send, Linkedin,
   Mail, MessageCircle, Youtube, Music, ExternalLink
@@ -13,11 +14,13 @@ const iconMap: Record<string, React.ElementType> = {
 interface TemplateProps {
   profile: ProfileData;
   accentColor: string;
+  profileId?: string;
 }
 
-const MinimalTemplate = ({ profile, accentColor }: TemplateProps) => {
+const MinimalTemplate = ({ profile, accentColor, profileId }: TemplateProps) => {
   const socialEntries = Object.entries(profile.social_links || {}).filter(([, v]) => v);
   const fontColor = profile.font_color || '#000000';
+  const visibleLinks = getVisibleLinks(profile.links || []);
 
   return (
     <div className="min-h-full flex flex-col items-center px-6 py-12" style={{ backgroundColor: '#ffffff', color: fontColor }}>
@@ -49,7 +52,7 @@ const MinimalTemplate = ({ profile, accentColor }: TemplateProps) => {
       )}
 
       <div className="w-full mt-6 space-y-3">
-        {profile.links?.map((link) => (
+        {visibleLinks.map((link) => (
           <a key={link.id} href={link.url} target="_blank" rel="noopener noreferrer"
             className="block w-full text-center py-3 rounded-full text-sm font-medium transition-all"
             style={{
@@ -64,6 +67,10 @@ const MinimalTemplate = ({ profile, accentColor }: TemplateProps) => {
           </a>
         ))}
       </div>
+
+      {profile.enable_contact_form && profileId && (
+        <ContactForm profileId={profileId} accentColor={accentColor} fontColor={fontColor} />
+      )}
     </div>
   );
 };
