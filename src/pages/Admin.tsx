@@ -84,7 +84,7 @@ const Admin = () => {
     <div className="min-h-screen bg-background">
       <header className="border-b border-border px-6 py-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <h1 className="text-lg font-bold gold-text">LinkBio Pro · Admin</h1>
+          <h1 className="text-lg font-bold gold-text">LinkOne · Admin</h1>
           <div className="flex items-center gap-3">
             <span className="text-xs text-muted-foreground">{user?.email}</span>
             <button onClick={signOut} className="text-muted-foreground hover:text-foreground transition-colors">

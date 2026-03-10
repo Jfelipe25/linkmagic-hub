@@ -73,7 +73,7 @@ const PublicProfile = () => {
     setMetaName('description', description);
 
     return () => {
-      document.title = 'LinkBio Pro';
+      document.title = 'LinkOne';
     };
   }, [profile]);
 

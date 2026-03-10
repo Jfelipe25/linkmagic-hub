@@ -124,11 +124,11 @@ const Index = () => {
       </section>
 
       <div id="editor" className="max-w-7xl mx-auto px-6 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
           <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="flex items-start justify-center lg:order-2 lg:sticky lg:top-8"
+            className="flex items-start justify-center lg:order-2 lg:sticky lg:top-8 self-start"
           >
             <PhoneMockup>
               <TemplateRenderer profile={profile} />
