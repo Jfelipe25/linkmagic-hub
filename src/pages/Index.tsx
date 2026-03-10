@@ -7,28 +7,24 @@ import PhoneMockup from '@/components/editor/PhoneMockup';
 import TemplateRenderer from '@/components/templates/TemplateRenderer';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { toast } from 'sonner';
 import { usePricing } from '@/hooks/usePricing';
 import ThemeToggle from '@/components/ThemeToggle';
+import LanguageToggle from '@/components/LanguageToggle';
 
 const Index = () => {
   const [profile, setProfile] = useState<ProfileData>({ ...DEFAULT_PROFILE });
   const [publishing, setPublishing] = useState(false);
   const { user } = useAuth();
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const { options: pricingOptions, selected: selectedPricing, setSelected: setSelectedPricing, loading: pricingLoading } = usePricing();
 
   const handlePublish = async () => {
-    if (!profile.name.trim()) {
-      toast.error('Por favor ingresa tu nombre');
-      return;
-    }
-    if (!profile.slug || profile.slug.length < 3) {
-      toast.error('Por favor elige una URL personalizada válida');
-      return;
-    }
+    if (!profile.name.trim()) { toast.error('Por favor ingresa tu nombre'); return; }
+    if (!profile.slug || profile.slug.length < 3) { toast.error('Por favor elige una URL personalizada válida'); return; }
 
-    // If not logged in, save profile to sessionStorage and redirect to login
     if (!user) {
       sessionStorage.setItem('pending_profile', JSON.stringify({ ...profile, country_code: selectedPricing?.country_code }));
       toast.info('Primero debes crear una cuenta para publicar');
@@ -36,18 +32,14 @@ const Index = () => {
       return;
     }
 
-    // User is logged in, proceed to payment
     setPublishing(true);
     try {
       const { data, error } = await supabase.functions.invoke('create-payment', {
         body: { ...profile, user_id: user.id, country_code: selectedPricing?.country_code },
       });
       if (error) throw error;
-      if (data?.init_point) {
-        window.location.href = data.init_point;
-      } else {
-        toast.error('Error al crear el pago');
-      }
+      if (data?.init_point) window.location.href = data.init_point;
+      else toast.error('Error al crear el pago');
     } catch (err: any) {
       toast.error(err.message || 'Error al procesar');
     }
@@ -60,58 +52,47 @@ const Index = () => {
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <h1 className="text-lg font-bold gold-text">LinkOne</h1>
           <div className="flex items-center gap-3">
+            <LanguageToggle />
             <ThemeToggle />
             {user ? (
               <button onClick={() => navigate('/dashboard')} className="text-xs text-primary hover:underline">
-                Mi Dashboard
+                {t('nav.dashboard')}
               </button>
             ) : (
               <button onClick={() => navigate('/login')} className="text-xs text-primary hover:underline">
-                Iniciar sesión
+                {t('nav.login')}
               </button>
             )}
           </div>
         </div>
       </header>
 
-      {/* Hero Banner */}
       <section className="relative overflow-hidden bg-gradient-to-br from-primary/5 via-background to-accent/10 border-b border-border">
         <div className="max-w-7xl mx-auto px-6 py-16 md:py-24 text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="max-w-3xl mx-auto space-y-6"
-          >
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} className="max-w-3xl mx-auto space-y-6">
             <span className="inline-block px-4 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-semibold tracking-wide uppercase">
-              Tu identidad digital en un solo link
+              {t('hero.badge')}
             </span>
             <h2 className="text-3xl md:text-5xl font-extrabold text-foreground leading-tight">
-              Todas tus redes, contenido y links<br className="hidden md:block" />
-              <span className="gold-text">en una sola página personalizada</span>
+              {t('hero.title1')}<br className="hidden md:block" />
+              <span className="gold-text">{t('hero.title2')}</span>
             </h2>
             <p className="text-muted-foreground text-base md:text-lg max-w-2xl mx-auto leading-relaxed">
-              Un <strong className="text-foreground">Link in Bio</strong> es la página que pones en tu perfil de Instagram, TikTok o cualquier red social. 
-              En lugar de elegir un solo enlace, compartes <strong className="text-foreground">todos tus links</strong> — redes sociales, tienda, portafolio, WhatsApp y más — en un diseño profesional con tu marca personal.
+              {t('hero.desc1')} <strong className="text-foreground">{t('hero.linkInBio')}</strong> {t('hero.desc2')} <strong className="text-foreground">{t('hero.allLinks')}</strong> {t('hero.desc3')}
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
               <a href="#editor" className="px-6 py-3 rounded-lg bg-primary text-primary-foreground font-semibold text-sm hover:opacity-90 transition-opacity">
-                Crea tu LinkOne gratis ↓
+                {t('hero.cta')}
               </a>
-              <span className="text-xs text-muted-foreground">Solo pagas al publicar • {selectedPricing ? `Desde ${selectedPricing.display_price}` : 'Desde $20.000 COP'}</span>
+              <span className="text-xs text-muted-foreground">{t('hero.onlyPay')} • {selectedPricing ? `${t('hero.from')} ${selectedPricing.display_price}` : `${t('hero.from')} $20.000 COP`}</span>
             </div>
           </motion.div>
           
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.3 }}
-            className="mt-12 grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-2xl mx-auto"
-          >
+          <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.3 }} className="mt-12 grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-2xl mx-auto">
             {[
-              { icon: '🎨', title: 'Personalizable', desc: 'Elige plantillas, colores y fuentes' },
-              { icon: '🔗', title: 'Links ilimitados', desc: 'Agrega todos los enlaces que quieras' },
-              { icon: '📱', title: 'Optimizado para móvil', desc: 'Se ve perfecto en cualquier dispositivo' },
+              { icon: '🎨', title: t('feat.custom'), desc: t('feat.customDesc') },
+              { icon: '🔗', title: t('feat.links'), desc: t('feat.linksDesc') },
+              { icon: '📱', title: t('feat.mobile'), desc: t('feat.mobileDesc') },
             ].map((item, i) => (
               <div key={i} className="flex flex-col items-center gap-2 p-4 rounded-xl bg-card border border-border">
                 <span className="text-2xl">{item.icon}</span>
@@ -125,21 +106,12 @@ const Index = () => {
 
       <div id="editor" className="max-w-7xl mx-auto px-6 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="flex items-start justify-center lg:order-2 lg:sticky lg:top-8 self-start"
-          >
+          <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="flex items-start justify-center lg:order-2 lg:sticky lg:top-8 self-start">
             <PhoneMockup>
               <TemplateRenderer profile={profile} />
             </PhoneMockup>
           </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            className="space-y-5 lg:order-1"
-          >
+          <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} className="space-y-5 lg:order-1">
             <ProfileEditorForm
               profile={profile}
               onChange={setProfile}
