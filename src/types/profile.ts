@@ -16,6 +16,8 @@ export interface CustomLink {
   label: string;
   url: string;
   icon?: string;
+  schedule_start?: string;
+  schedule_end?: string;
 }
 
 export type TemplateType = 'minimal' | 'dark' | 'gradient' | 'background';
@@ -46,6 +48,7 @@ export interface ProfileData {
   user_id?: string;
   created_at?: string;
   views?: number;
+  enable_contact_form?: boolean;
 }
 
 export const ACCENT_COLORS = [
@@ -82,4 +85,15 @@ export const DEFAULT_PROFILE: ProfileData = {
   background_image: '',
   social_links: {},
   links: [],
+  enable_contact_form: false,
 };
+
+/** Filter links based on their schedule */
+export function getVisibleLinks(links: CustomLink[]): CustomLink[] {
+  const now = new Date();
+  return links.filter(link => {
+    if (link.schedule_start && new Date(link.schedule_start) > now) return false;
+    if (link.schedule_end && new Date(link.schedule_end) < now) return false;
+    return true;
+  });
+}
