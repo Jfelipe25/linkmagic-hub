@@ -20,8 +20,10 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
     localStorage.setItem('linkone_lang', l);
   }, []);
 
-  const t = useCallback((key: TranslationKey, params?: Record<string, string>) => {
-    let text = translations[lang][key] || translations.es[key] || key;
+  const t = useCallback((key: string, params?: Record<string, string>): string => {
+    const dict = translations[lang] as Record<string, string>;
+    const fallback = translations.es as Record<string, string>;
+    let text = dict[key] || fallback[key] || key;
     if (params) {
       Object.entries(params).forEach(([k, v]) => {
         text = text.replace(`{${k}}`, v);
