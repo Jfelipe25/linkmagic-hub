@@ -1,5 +1,6 @@
-import { ProfileData, SOCIAL_PLATFORMS } from '@/types/profile';
+import { ProfileData, SOCIAL_PLATFORMS, getVisibleLinks } from '@/types/profile';
 import { trackLinkClick } from '@/hooks/useLinkClicks';
+import ContactForm from '@/components/ContactForm';
 import {
   Facebook, Twitter, Instagram, Github, Send, Linkedin,
   Mail, MessageCircle, Youtube, Music, ExternalLink
@@ -13,6 +14,7 @@ const iconMap: Record<string, React.ElementType> = {
 interface TemplateProps {
   profile: ProfileData;
   accentColor: string;
+  profileId?: string;
 }
 
 function darkenHex(hex: string, amount: number): string {
@@ -23,10 +25,11 @@ function darkenHex(hex: string, amount: number): string {
   return `#${(r << 16 | g << 8 | b).toString(16).padStart(6, '0')}`;
 }
 
-const GradientTemplate = ({ profile, accentColor }: TemplateProps) => {
+const GradientTemplate = ({ profile, accentColor, profileId }: TemplateProps) => {
   const socialEntries = Object.entries(profile.social_links || {}).filter(([, v]) => v);
   const darkColor = darkenHex(accentColor, 80);
   const fontColor = profile.font_color || '#000000';
+  const visibleLinks = getVisibleLinks(profile.links || []);
 
   return (
     <div className="min-h-full flex flex-col items-center px-6 py-12"
@@ -68,7 +71,7 @@ const GradientTemplate = ({ profile, accentColor }: TemplateProps) => {
       )}
 
       <div className="w-full mt-6 space-y-3">
-        {profile.links?.map((link) => (
+        {visibleLinks.map((link) => (
           <a key={link.id} href={link.url} target="_blank" rel="noopener noreferrer"
             className="block w-full text-center py-3 rounded-full text-sm font-semibold transition-all hover:opacity-90"
             style={{ backgroundColor: `${fontColor}f2`, color: accentColor }}
@@ -77,6 +80,10 @@ const GradientTemplate = ({ profile, accentColor }: TemplateProps) => {
           </a>
         ))}
       </div>
+
+      {profile.enable_contact_form && profileId && (
+        <ContactForm profileId={profileId} accentColor={accentColor} fontColor={fontColor} />
+      )}
     </div>
   );
 };

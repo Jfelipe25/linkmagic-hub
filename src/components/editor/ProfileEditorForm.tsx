@@ -48,7 +48,7 @@ const ProfileEditorForm = ({ profile, onChange, onPublish, publishLabel = 'Pagar
     onChange({ ...profile, links: [...profile.links, newLink] });
   }, [profile, onChange]);
 
-  const updateLink = useCallback((id: string, field: 'label' | 'url', value: string) => {
+  const updateLink = useCallback((id: string, field: 'label' | 'url' | 'schedule_start' | 'schedule_end', value: string) => {
     onChange({
       ...profile,
       links: profile.links.map(l => l.id === id ? { ...l, [field]: value } : l),
@@ -263,6 +263,21 @@ const ProfileEditorForm = ({ profile, onChange, onPublish, publishLabel = 'Pagar
         >
           <Plus size={14} /> Agregar link
         </button>
+      </FormSection>
+
+      <FormSection title="Captura de datos" description="Recibe mensajes de tus visitantes">
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-sm text-foreground font-medium">Formulario de contacto</p>
+            <p className="text-xs text-muted-foreground">Los visitantes podrán enviarte sus datos</p>
+          </div>
+          <label className="relative inline-flex items-center cursor-pointer">
+            <input type="checkbox" checked={profile.enable_contact_form || false}
+              onChange={(e) => update('enable_contact_form', e.target.checked)}
+              className="sr-only peer" />
+            <div className="w-9 h-5 bg-muted peer-checked:bg-primary rounded-full transition-colors after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-full" />
+          </label>
+        </div>
       </FormSection>
 
       {onPublish && pricingOptions && pricingOptions.length > 0 && (

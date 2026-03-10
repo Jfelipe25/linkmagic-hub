@@ -14,6 +14,44 @@ export type Database = {
   }
   public: {
     Tables: {
+      contacts: {
+        Row: {
+          created_at: string
+          email: string | null
+          id: string
+          message: string | null
+          name: string
+          phone: string | null
+          profile_id: string
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          id?: string
+          message?: string | null
+          name: string
+          phone?: string | null
+          profile_id: string
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          id?: string
+          message?: string | null
+          name?: string
+          phone?: string | null
+          profile_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contacts_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       link_clicks: {
         Row: {
           clicked_at: string
@@ -83,6 +121,7 @@ export type Database = {
           background_image: string | null
           bio: string | null
           created_at: string | null
+          enable_contact_form: boolean
           font_color: string | null
           font_family: string | null
           id: string
@@ -102,6 +141,7 @@ export type Database = {
           background_image?: string | null
           bio?: string | null
           created_at?: string | null
+          enable_contact_form?: boolean
           font_color?: string | null
           font_family?: string | null
           id?: string
@@ -121,6 +161,7 @@ export type Database = {
           background_image?: string | null
           bio?: string | null
           created_at?: string | null
+          enable_contact_form?: boolean
           font_color?: string | null
           font_family?: string | null
           id?: string

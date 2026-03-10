@@ -29,5 +29,6 @@ export function profileFromRow(row: any): ProfileData {
     user_id: row.user_id || '',
     created_at: row.created_at || '',
     views: row.views ?? 0,
+    enable_contact_form: row.enable_contact_form ?? false,
   };
 }
