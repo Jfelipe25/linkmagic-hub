@@ -278,6 +278,7 @@ const ProfileEditorForm = ({ profile, onChange, onPublish, publishLabel = 'Pagar
             <div className="w-9 h-5 bg-muted peer-checked:bg-primary rounded-full transition-colors after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-full" />
           </label>
         </div>
+      </FormSection>
 
       {onPublish && pricingOptions && pricingOptions.length > 0 && (
         <FormSection title="País y precio" description="Selecciona tu país para ver el precio">
