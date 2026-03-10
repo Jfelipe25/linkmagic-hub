@@ -169,7 +169,7 @@ const ProfileEditorForm = ({ profile, onChange, onPublish, publishLabel = 'Pagar
         <div>
           <label className="text-xs text-muted-foreground block mb-1">URL personalizada</label>
           <div className="flex items-center gap-2">
-            <span className="text-xs text-muted-foreground whitespace-nowrap">linkbio.pro/u/</span>
+            <span className="text-xs text-muted-foreground whitespace-nowrap">linkone.pro/u/</span>
             <input
               type="text" value={slugInput} onChange={(e) => handleSlugChange(e.target.value)}
               placeholder="tu-nombre" maxLength={30}

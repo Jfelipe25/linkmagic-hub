@@ -35,7 +35,7 @@ const PublicProfile = () => {
   // Dynamic OG meta tags
   useEffect(() => {
     if (!profile) return;
-    document.title = `${profile.name || 'Perfil'} | LinkBio Pro`;
+    document.title = `${profile.name || 'Perfil'} | LinkOne`;
     
     const setMeta = (property: string, content: string) => {
       let el = document.querySelector(`meta[property="${property}"]`) as HTMLMetaElement;
@@ -57,7 +57,7 @@ const PublicProfile = () => {
       el.setAttribute('content', content);
     };
 
-    const title = `${profile.name} | LinkBio Pro`;
+    const title = `${profile.name} | LinkOne`;
     const description = profile.bio || `Visita el perfil de ${profile.name} y encuentra todos sus links en un solo lugar.`;
 
     setMeta('og:title', title);
@@ -73,7 +73,7 @@ const PublicProfile = () => {
     setMetaName('description', description);
 
     return () => {
-      document.title = 'LinkBio Pro';
+      document.title = 'LinkOne';
     };
   }, [profile]);
 

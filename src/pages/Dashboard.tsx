@@ -226,7 +226,7 @@ const Dashboard = () => {
     <div className="min-h-screen bg-background">
       <header className="border-b border-border px-6 py-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <h1 className="text-lg font-bold gold-text">LinkBio Pro</h1>
+          <h1 className="text-lg font-bold gold-text">LinkOne</h1>
           <div className="flex items-center gap-3">
             <ThemeToggle />
             <span className="text-xs text-muted-foreground">{user?.email}</span>

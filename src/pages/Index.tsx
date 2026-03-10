@@ -58,7 +58,7 @@ const Index = () => {
     <div className="min-h-screen bg-background">
       <header className="border-b border-border px-6 py-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <h1 className="text-lg font-bold gold-text">LinkBio Pro</h1>
+          <h1 className="text-lg font-bold gold-text">LinkOne</h1>
           <div className="flex items-center gap-3">
             <ThemeToggle />
             {user ? (
@@ -96,7 +96,7 @@ const Index = () => {
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
               <a href="#editor" className="px-6 py-3 rounded-lg bg-primary text-primary-foreground font-semibold text-sm hover:opacity-90 transition-opacity">
-                Crea tu LinkBio gratis ↓
+                Crea tu LinkOne gratis ↓
               </a>
               <span className="text-xs text-muted-foreground">Solo pagas al publicar • {selectedPricing ? `Desde ${selectedPricing.display_price}` : 'Desde $20.000 COP'}</span>
             </div>
@@ -124,11 +124,11 @@ const Index = () => {
       </section>
 
       <div id="editor" className="max-w-7xl mx-auto px-6 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
           <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="flex items-start justify-center lg:order-2 lg:sticky lg:top-8"
+            className="flex items-start justify-center lg:order-2 lg:sticky lg:top-8 self-start"
           >
             <PhoneMockup>
               <TemplateRenderer profile={profile} />
