@@ -96,7 +96,7 @@ const Index = () => {
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
               <a href="#editor" className="px-6 py-3 rounded-lg bg-primary text-primary-foreground font-semibold text-sm hover:opacity-90 transition-opacity">
-                Crea tu LinkBio gratis ↓
+                Crea tu LinkOne gratis ↓
               </a>
               <span className="text-xs text-muted-foreground">Solo pagas al publicar • {selectedPricing ? `Desde ${selectedPricing.display_price}` : 'Desde $20.000 COP'}</span>
             </div>
