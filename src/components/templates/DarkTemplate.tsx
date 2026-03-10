@@ -1,5 +1,6 @@
-import { ProfileData, SOCIAL_PLATFORMS } from '@/types/profile';
+import { ProfileData, SOCIAL_PLATFORMS, getVisibleLinks } from '@/types/profile';
 import { trackLinkClick } from '@/hooks/useLinkClicks';
+import ContactForm from '@/components/ContactForm';
 import {
   Facebook, Twitter, Instagram, Github, Send, Linkedin,
   Mail, MessageCircle, Youtube, Music, ExternalLink
@@ -13,11 +14,13 @@ const iconMap: Record<string, React.ElementType> = {
 interface TemplateProps {
   profile: ProfileData;
   accentColor: string;
+  profileId?: string;
 }
 
-const DarkTemplate = ({ profile, accentColor }: TemplateProps) => {
+const DarkTemplate = ({ profile, accentColor, profileId }: TemplateProps) => {
   const socialEntries = Object.entries(profile.social_links || {}).filter(([, v]) => v);
   const fontColor = profile.font_color || '#ffffff';
+  const visibleLinks = getVisibleLinks(profile.links || []);
 
   return (
     <div className="min-h-full flex flex-col items-center px-6 py-12" style={{ backgroundColor: '#0f0f0f', color: fontColor }}>
@@ -51,7 +54,7 @@ const DarkTemplate = ({ profile, accentColor }: TemplateProps) => {
       )}
 
       <div className="w-full mt-6 space-y-3">
-        {profile.links?.map((link) => (
+        {visibleLinks.map((link) => (
           <a key={link.id} href={link.url} target="_blank" rel="noopener noreferrer"
             className="block w-full text-center py-3 rounded-full text-sm font-semibold transition-all hover:opacity-90"
             style={{ backgroundColor: fontColor, color: '#0f0f0f' }}
@@ -60,6 +63,10 @@ const DarkTemplate = ({ profile, accentColor }: TemplateProps) => {
           </a>
         ))}
       </div>
+
+      {profile.enable_contact_form && profileId && (
+        <ContactForm profileId={profileId} accentColor={accentColor} fontColor={fontColor} />
+      )}
     </div>
   );
 };

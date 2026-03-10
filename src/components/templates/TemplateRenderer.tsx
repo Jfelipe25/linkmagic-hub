@@ -6,21 +6,22 @@ import BackgroundTemplate from './BackgroundTemplate';
 
 interface TemplateRendererProps {
   profile: ProfileData;
+  profileId?: string;
 }
 
-const TemplateRenderer = ({ profile }: TemplateRendererProps) => {
+const TemplateRenderer = ({ profile, profileId }: TemplateRendererProps) => {
   const accentColor = profile.accent_color || '#d4a432';
 
   switch (profile.template) {
     case 'dark':
-      return <DarkTemplate profile={profile} accentColor={accentColor} />;
+      return <DarkTemplate profile={profile} accentColor={accentColor} profileId={profileId} />;
     case 'gradient':
-      return <GradientTemplate profile={profile} accentColor={accentColor} />;
+      return <GradientTemplate profile={profile} accentColor={accentColor} profileId={profileId} />;
     case 'background':
-      return <BackgroundTemplate profile={profile} accentColor={accentColor} />;
+      return <BackgroundTemplate profile={profile} accentColor={accentColor} profileId={profileId} />;
     case 'minimal':
     default:
-      return <MinimalTemplate profile={profile} accentColor={accentColor} />;
+      return <MinimalTemplate profile={profile} accentColor={accentColor} profileId={profileId} />;
   }
 };
 
