@@ -6,16 +6,54 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+async function validateSignature(req: Request, rawBody: string): Promise<boolean> {
+  const secret = Deno.env.get('MP_WEBHOOK_SECRET');
+  if (!secret) return true;
+
+  const xSignature = req.headers.get('x-signature');
+  const xRequestId = req.headers.get('x-request-id');
+  if (!xSignature) return false;
+
+  const parts = Object.fromEntries(xSignature.split(',').map(p => p.split('=')));
+  const ts = parts['ts'];
+  const v1 = parts['v1'];
+  if (!ts || !v1) return false;
+
+  let dataId = '';
+  try {
+    const body = JSON.parse(rawBody);
+    dataId = body?.data?.id?.toString() || '';
+  } catch { return false; }
+
+  const manifest = `id:${dataId};request-id:${xRequestId || ''};ts:${ts};`;
+  const encoder = new TextEncoder();
+  const key = await crypto.subtle.importKey(
+    'raw', encoder.encode(secret), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']
+  );
+  const signature = await crypto.subtle.sign('HMAC', key, encoder.encode(manifest));
+  const hexSignature = Array.from(new Uint8Array(signature))
+    .map(b => b.toString(16).padStart(2, '0')).join('');
+
+  return hexSignature === v1;
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const body = await req.json();
+    const rawBody = await req.text();
+
+    const isValid = await validateSignature(req, rawBody);
+    if (!isValid) {
+      console.error('Invalid webhook signature');
+      return new Response('Unauthorized', { status: 401, headers: corsHeaders });
+    }
+
+    const body = JSON.parse(rawBody);
     console.log('Webhook received:', JSON.stringify(body));
 
-    // MercadoPago sends notifications with type and data
     if (body.type === 'payment' || body.action === 'payment.updated') {
       const paymentId = body.data?.id;
       if (!paymentId) {
@@ -30,7 +68,6 @@ serve(async (req) => {
         return new Response('Config error', { status: 500, headers: corsHeaders });
       }
 
-      // Verify payment with MercadoPago
       const paymentRes = await fetch(`https://api.mercadopago.com/v1/payments/${paymentId}`, {
         headers: { 'Authorization': `Bearer ${mpAccessToken}` },
       });
@@ -49,17 +86,13 @@ serve(async (req) => {
         const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
         const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-        // Update profile as paid
         const { error: updateError } = await supabase
           .from('profiles')
           .update({ paid: true })
           .eq('session_id', sessionId);
 
-        if (updateError) {
-          console.error('Error updating profile:', updateError);
-        }
+        if (updateError) console.error('Error updating profile:', updateError);
 
-        // Get profile to check if user is already linked
         const { data: profile } = await supabase
           .from('profiles')
           .select('*')
@@ -68,22 +101,15 @@ serve(async (req) => {
 
         if (profile) {
           console.log(`Profile ${profile.slug} activated. user_id: ${profile.user_id || 'none'}`);
-          
-          // Only create user if profile has no user_id (fallback for edge cases)
+
           if (!profile.user_id && payment.payer?.email) {
-            // Check if user already exists
             const { data: existingUsers } = await supabase.auth.admin.listUsers();
             const existingUser = existingUsers?.users?.find(u => u.email === payment.payer.email);
 
             if (existingUser) {
-              // Link existing user to profile
-              await supabase
-                .from('profiles')
-                .update({ user_id: existingUser.id })
-                .eq('session_id', sessionId);
+              await supabase.from('profiles').update({ user_id: existingUser.id }).eq('session_id', sessionId);
               console.log(`Linked existing user ${payment.payer.email} to profile ${profile.slug}`);
             } else {
-              // Create user with temp password as last resort
               const tempPassword = crypto.randomUUID().slice(0, 12);
               const { data: authData, error: authError } = await supabase.auth.admin.createUser({
                 email: payment.payer.email,
@@ -92,13 +118,8 @@ serve(async (req) => {
               });
 
               if (authData?.user && !authError) {
-                await supabase
-                  .from('profiles')
-                  .update({ user_id: authData.user.id })
-                  .eq('session_id', sessionId);
-
-                // Send password reset so user can set their own password
-                const appUrl = Deno.env.get('PUBLIC_APP_URL') || 'https://linkbio.pro';
+                await supabase.from('profiles').update({ user_id: authData.user.id }).eq('session_id', sessionId);
+                const appUrl = Deno.env.get('PUBLIC_APP_URL') || 'https://www.linkone.bio';
                 const publicSupabase = createClient(supabaseUrl, Deno.env.get('SUPABASE_ANON_KEY')!);
                 await publicSupabase.auth.resetPasswordForEmail(payment.payer.email, {
                   redirectTo: `${appUrl}/reset-password`,
