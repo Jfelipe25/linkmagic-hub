@@ -30,27 +30,8 @@ interface ProfileRow {
   [key: string]: any;
 }
 
-const DEMO_PROFILES: ProfileRow[] = [
-  {
-    id: 'demo-1', slug: 'felipe-rodriguez', name: 'Felipe Rodriguez',
-    bio: 'Ingeniero Mecánico | MBA', avatar: '', paid: true, views: 342,
-    created_at: '2025-01-15T10:00:00Z', template: 'minimal', accent_color: '#d4a432',
-    font_color: '#000000', font_family: 'Inter', background_image: '',
-    social_links: { instagram: 'https://instagram.com/felipe', linkedin: 'https://linkedin.com/in/felipe' },
-    links: [
-      { id: '1', label: 'Mi portafolio', url: 'https://example.com' },
-      { id: '2', label: 'Agendar reunión', url: 'https://calendly.com' },
-      { id: '3', label: 'Mi empresa', url: 'https://miempresa.com' },
-    ],
-    user_id: 'demo', session_id: null, enable_contact_form: false,
-  },
-];
-
-const DEMO_CLICK_STATS = [
-  { link_id: '1', clicks: 87 },
-  { link_id: '2', clicks: 54 },
-  { link_id: '3', clicks: 31 },
-];
+const DEMO_PROFILES: ProfileRow[] = [];
+const DEMO_CLICK_STATS: { link_id: string; clicks: number }[] = [];
 
 const Dashboard = () => {
   const { user, loading: authLoading, signOut } = useAuth();
@@ -94,10 +75,8 @@ const Dashboard = () => {
         const dismissed = localStorage.getItem('linkbio_welcome_dismissed');
         if (!dismissed) setShowFirstVisit(true);
       } else {
-        setProfiles(DEMO_PROFILES);
-        setActiveProfileId(DEMO_PROFILES[0].id);
-        setProfile(profileFromRow(DEMO_PROFILES[0]));
-        setIsDemo(true);
+        setIsDemo(false);
+        setProfiles([]);
       }
       setLoading(false);
     };
@@ -178,14 +157,17 @@ const Dashboard = () => {
       </header>
 
       <div className="max-w-7xl mx-auto px-6 py-8">
-        {/* Demo banner */}
-        {isDemo && (
-          <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="rounded-xl border border-accent/30 bg-accent/10 p-4 mb-4 flex items-center gap-3">
-            <span className="text-lg">👀</span>
-            <div>
-              <p className="text-sm font-semibold text-foreground">{t('dash.demo')}</p>
-              <p className="text-xs text-muted-foreground">{t('dash.demoDesc')}</p>
-            </div>
+        {/* Empty state - sin perfiles */}
+        {!isDemo && profiles.length === 0 && !showNewForm && (
+          <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}
+            className="rounded-xl border-2 border-dashed border-primary/30 bg-primary/5 p-10 mb-6 text-center">
+            <div className="text-4xl mb-3">🔗</div>
+            <h2 className="text-lg font-bold text-foreground mb-1">Crea tu primera página</h2>
+            <p className="text-sm text-muted-foreground mb-4">Diseña tu perfil y comparte todos tus links en un solo lugar</p>
+            <button onClick={() => { setShowNewForm(true); setNewProfile({ ...DEFAULT_PROFILE }); }}
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-primary text-primary-foreground text-sm font-semibold hover:opacity-90 transition-opacity">
+              <Plus size={16} /> Crear mi página
+            </button>
           </motion.div>
         )}
 

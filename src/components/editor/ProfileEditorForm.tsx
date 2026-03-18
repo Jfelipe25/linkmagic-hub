@@ -192,8 +192,11 @@ const ProfileEditorForm = ({ profile, onChange, onPublish, publishLabel = 'Pagar
         <div className="flex gap-3 flex-wrap">
           {(['minimal', 'dark', 'gradient', 'background'] as TemplateType[]).map((t) => (
             <TemplateCard key={t} type={t} selected={profile.template === t} onClick={() => {
-              const defaultFontColor = (t === 'dark' || t === 'background') ? '#ffffff' : '#000000';
-              onChange({ ...profile, template: t, font_color: defaultFontColor });
+              // Solo resetear font_color si es el color por defecto del template anterior
+              const prevDefault = (profile.template === 'dark' || profile.template === 'background') ? '#ffffff' : '#000000';
+              const newDefault = (t === 'dark' || t === 'background') ? '#ffffff' : '#000000';
+              const shouldReset = profile.font_color === prevDefault;
+              onChange({ ...profile, template: t, font_color: shouldReset ? newDefault : profile.font_color });
             }} />
           ))}
         </div>
@@ -279,12 +282,16 @@ const ProfileEditorForm = ({ profile, onChange, onPublish, publishLabel = 'Pagar
             role="switch"
             aria-checked={profile.enable_contact_form || false}
             onClick={() => update('enable_contact_form', !(profile.enable_contact_form || false))}
-            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${
-              profile.enable_contact_form ? 'bg-primary' : 'bg-muted border border-border'
+            className={`relative inline-flex h-6 w-11 flex-shrink-0 items-center rounded-full border-2 transition-colors focus:outline-none ${
+              profile.enable_contact_form
+                ? 'bg-primary border-primary'
+                : 'bg-transparent border-foreground/30'
             }`}
           >
-            <span className={`inline-block h-4 w-4 transform rounded-full bg-white shadow-sm transition-transform ${
-              profile.enable_contact_form ? 'translate-x-6' : 'translate-x-1'
+            <span className={`inline-block h-4 w-4 transform rounded-full transition-transform shadow-sm ${
+              profile.enable_contact_form
+                ? 'translate-x-5 bg-white'
+                : 'translate-x-0.5 bg-foreground/40'
             }`} />
           </button>
         </div>

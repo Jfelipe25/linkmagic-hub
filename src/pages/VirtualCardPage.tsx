@@ -1,29 +1,25 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { ProfileData } from '@/types/profile';
 import { profileFromRow } from '@/lib/profile-utils';
-import { downloadVCard } from '@/lib/vcard';
-import { Loader2, Download, Share2 } from 'lucide-react';
-import { useLanguage } from '@/contexts/LanguageContext';
+import { Loader2, Share2, ExternalLink, Copy, Check } from 'lucide-react';
 
 const VirtualCardPage = () => {
   const { slug } = useParams<{ slug: string }>();
-  const { t } = useLanguage();
   const [profile, setProfile] = useState<ProfileData | null>(null);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
-  const cardRef = useRef<HTMLDivElement>(null);
+  const [copied, setCopied] = useState(false);
+  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
+  const [canInstall, setCanInstall] = useState(false);
+  const [installed, setInstalled] = useState(false);
 
   useEffect(() => {
     const fetchProfile = async () => {
       if (!slug) { setNotFound(true); setLoading(false); return; }
       const { data } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('slug', slug)
-        .eq('paid', true)
-        .maybeSingle();
+        .from('profiles').select('*').eq('slug', slug).eq('paid', true).maybeSingle();
       if (!data) setNotFound(true);
       else setProfile(profileFromRow(data));
       setLoading(false);
@@ -31,77 +27,178 @@ const VirtualCardPage = () => {
     fetchProfile();
   }, [slug]);
 
+  // PWA install prompt
+  useEffect(() => {
+    const handler = (e: Event) => {
+      e.preventDefault();
+      setDeferredPrompt(e);
+      setCanInstall(true);
+    };
+    window.addEventListener('beforeinstallprompt', handler);
+    window.addEventListener('appinstalled', () => setInstalled(true));
+    return () => window.removeEventListener('beforeinstallprompt', handler);
+  }, []);
+
+  const handleInstall = async () => {
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    if (outcome === 'accepted') setInstalled(true);
+    setDeferredPrompt(null);
+    setCanInstall(false);
+  };
+
   const profileUrl = `${window.location.origin}/u/${slug}`;
-  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(profileUrl)}&color=d4a432`;
+  const qrUrl = profile?.slug
+    ? `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(profileUrl)}&color=${(profile.accent_color || '#d4a432').replace('#', '')}&bgcolor=111111`
+    : '';
 
   const handleShare = async () => {
     if (navigator.share) {
-      await navigator.share({ title: `${profile?.name} - LinkOne`, url: profileUrl });
+      await navigator.share({ title: `${profile?.name} | LinkOne`, url: profileUrl });
     } else {
       navigator.clipboard.writeText(profileUrl);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
     }
   };
 
-  if (loading) return <div className="min-h-screen flex items-center justify-center bg-neutral-950"><Loader2 className="animate-spin text-primary" size={32} /></div>;
-  if (notFound || !profile) return <div className="min-h-screen flex items-center justify-center bg-neutral-950 text-white"><p>{t('profile.notFound')}</p></div>;
+  const handleCopy = () => {
+    navigator.clipboard.writeText(profileUrl);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  if (loading) return (
+    <div className="min-h-screen flex items-center justify-center" style={{ background: '#0a0a0a' }}>
+      <Loader2 className="animate-spin" size={32} style={{ color: '#d4a432' }} />
+    </div>
+  );
+
+  if (notFound || !profile) return (
+    <div className="min-h-screen flex items-center justify-center" style={{ background: '#0a0a0a' }}>
+      <p className="text-neutral-400">Perfil no encontrado</p>
+    </div>
+  );
+
+  const accent = profile.accent_color || '#d4a432';
 
   return (
-    <div className="min-h-screen bg-neutral-950 flex flex-col items-center justify-center p-6">
-      {/* Virtual Card */}
-      <div ref={cardRef} className="relative w-full max-w-sm rounded-2xl overflow-hidden shadow-2xl" style={{ aspectRatio: '1.6/1' }}>
-        {/* Card background */}
-        <div className="absolute inset-0 bg-gradient-to-br from-neutral-900 via-neutral-800 to-neutral-900" />
-        <div className="absolute inset-0 opacity-20" style={{
-          backgroundImage: `radial-gradient(circle at 20% 80%, ${profile.accent_color}44 0%, transparent 50%), radial-gradient(circle at 80% 20%, ${profile.accent_color}22 0%, transparent 50%)`
+    <div className="min-h-screen flex flex-col" style={{ background: '#0a0a0a' }}>
+      {/* Hero section */}
+      <div className="flex-1 flex flex-col items-center justify-center px-6 pt-12 pb-6 relative overflow-hidden">
+        {/* Background glow */}
+        <div className="absolute inset-0 pointer-events-none" style={{
+          background: `radial-gradient(ellipse at 50% 0%, ${accent}18 0%, transparent 60%)`
         }} />
-        
-        {/* Card content */}
-        <div className="relative h-full flex p-6 gap-4">
-          {/* Left side */}
-          <div className="flex-1 flex flex-col justify-between">
-            <div>
-              {profile.avatar ? (
-                <img src={profile.avatar} alt={profile.name} className="w-12 h-12 rounded-full object-cover border-2" style={{ borderColor: profile.accent_color }} />
-              ) : (
-                <div className="w-12 h-12 rounded-full flex items-center justify-center text-lg font-bold" style={{ backgroundColor: profile.accent_color + '33', color: profile.accent_color }}>
-                  {profile.name?.charAt(0)?.toUpperCase()}
+
+        {/* Card container */}
+        <div className="w-full max-w-sm relative z-10">
+          {/* Main card */}
+          <div className="rounded-3xl overflow-hidden shadow-2xl border" style={{
+            background: 'linear-gradient(135deg, #1a1a1a 0%, #111 50%, #1a1a1a 100%)',
+            borderColor: `${accent}30`
+          }}>
+            {/* Top accent line */}
+            <div className="h-1 w-full" style={{ background: `linear-gradient(90deg, transparent, ${accent}, transparent)` }} />
+
+            {/* Card body */}
+            <div className="p-7">
+              {/* Avatar + Name */}
+              <div className="flex items-center gap-4 mb-6">
+                {profile.avatar ? (
+                  <img src={profile.avatar} alt={profile.name}
+                    className="w-20 h-20 rounded-2xl object-cover flex-shrink-0"
+                    style={{ border: `2px solid ${accent}50` }} />
+                ) : (
+                  <div className="w-20 h-20 rounded-2xl flex items-center justify-center text-3xl font-bold flex-shrink-0"
+                    style={{ background: `${accent}20`, color: accent, border: `2px solid ${accent}30` }}>
+                    {profile.name?.charAt(0)?.toUpperCase()}
+                  </div>
+                )}
+                <div className="flex-1 min-w-0">
+                  <h1 className="text-white text-xl font-bold leading-tight truncate">{profile.name}</h1>
+                  {profile.bio && (
+                    <p className="text-neutral-400 text-sm mt-1 line-clamp-2">{profile.bio}</p>
+                  )}
+                  <div className="flex items-center gap-1.5 mt-2">
+                    <div className="w-1.5 h-1.5 rounded-full" style={{ background: accent }} />
+                    <span className="text-xs font-mono" style={{ color: `${accent}99` }}>linkone.bio/u/{profile.slug}</span>
+                  </div>
                 </div>
-              )}
-              <h2 className="text-white text-lg font-bold mt-2 leading-tight">{profile.name}</h2>
-              {profile.bio && <p className="text-neutral-400 text-xs mt-1 line-clamp-2">{profile.bio}</p>}
+              </div>
+
+              {/* Divider */}
+              <div className="h-px w-full mb-6" style={{ background: `linear-gradient(90deg, transparent, ${accent}30, transparent)` }} />
+
+              {/* QR Code */}
+              <div className="flex flex-col items-center gap-3">
+                <div className="rounded-2xl p-3" style={{ background: '#111', border: `1px solid ${accent}20` }}>
+                  <img src={qrUrl} alt="QR Code" className="w-48 h-48 rounded-xl" />
+                </div>
+                <p className="text-xs text-neutral-500">Escanea para abrir mi perfil</p>
+              </div>
             </div>
-            <div className="flex items-center gap-1.5">
-              <span className="text-xs font-bold" style={{ color: profile.accent_color }}>LinkOne</span>
-              <span className="text-neutral-600 text-[10px]">/{profile.slug}</span>
+
+            {/* Bottom accent line */}
+            <div className="h-px w-full" style={{ background: `linear-gradient(90deg, transparent, ${accent}20, transparent)` }} />
+
+            {/* Footer */}
+            <div className="px-7 py-4 flex items-center justify-between" style={{ background: '#0d0d0d' }}>
+              <span className="text-xs font-bold" style={{ color: accent }}>LinkOne</span>
+              <span className="text-xs text-neutral-600">Tarjeta digital</span>
             </div>
           </div>
-          
-          {/* Right side - QR */}
-          <div className="flex flex-col items-center justify-center gap-2">
-            <div className="bg-white rounded-lg p-2">
-              <img src={qrUrl} alt="QR" className="w-20 h-20" />
-            </div>
-            <p className="text-[9px] text-neutral-500 text-center max-w-[100px]">{t('card.scan')}</p>
+
+          {/* Action buttons */}
+          <div className="mt-5 grid grid-cols-2 gap-3">
+            <button onClick={handleShare}
+              className="flex items-center justify-center gap-2 py-3 rounded-2xl text-sm font-semibold transition-opacity hover:opacity-90"
+              style={{ background: accent, color: '#000' }}>
+              {copied ? <Check size={16} /> : <Share2 size={16} />}
+              {copied ? 'Copiado' : 'Compartir'}
+            </button>
+            <a href={profileUrl} target="_blank" rel="noopener noreferrer"
+              className="flex items-center justify-center gap-2 py-3 rounded-2xl text-sm font-semibold border transition-colors hover:bg-white/5"
+              style={{ borderColor: `${accent}40`, color: accent }}>
+              <ExternalLink size={16} />
+              Ver perfil
+            </a>
           </div>
+
+          {/* Copy link */}
+          <button onClick={handleCopy}
+            className="mt-3 w-full flex items-center justify-center gap-2 py-2.5 rounded-2xl text-sm border transition-colors hover:bg-white/5"
+            style={{ borderColor: '#ffffff15', color: '#666' }}>
+            {copied ? <Check size={14} className="text-green-400" /> : <Copy size={14} />}
+            <span className="font-mono text-xs truncate">{profileUrl}</span>
+          </button>
+
+          {/* PWA Install button */}
+          {canInstall && !installed && (
+            <button onClick={handleInstall}
+              className="mt-3 w-full flex items-center justify-center gap-2 py-3 rounded-2xl text-sm font-semibold border transition-colors hover:bg-white/5"
+              style={{ borderColor: `${accent}30`, color: accent }}>
+              <span>📲</span>
+              Agregar a pantalla de inicio
+            </button>
+          )}
+          {installed && (
+            <div className="mt-3 w-full flex items-center justify-center gap-2 py-3 rounded-2xl text-sm"
+              style={{ color: '#4ade80' }}>
+              <Check size={14} /> Instalado en tu teléfono
+            </div>
+          )}
+
+          {/* iOS install hint */}
+          <p className="mt-4 text-center text-xs text-neutral-600">
+            En iPhone: toca <span className="text-neutral-400">Compartir →</span> <span className="text-neutral-400">"Agregar a inicio"</span>
+          </p>
         </div>
       </div>
 
-      {/* Actions */}
-      <div className="flex gap-3 mt-6">
-        <button
-          onClick={() => downloadVCard(profile)}
-          className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold text-white transition-opacity hover:opacity-90"
-          style={{ backgroundColor: profile.accent_color }}
-        >
-          <Download size={14} /> {t('dash.downloadVcard')}
-        </button>
-        <button
-          onClick={handleShare}
-          className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold border border-neutral-700 text-neutral-300 hover:text-white transition-colors"
-        >
-          <Share2 size={14} /> Compartir
-        </button>
-      </div>
+      {/* Bottom safe area */}
+      <div className="h-6" />
     </div>
   );
 };
