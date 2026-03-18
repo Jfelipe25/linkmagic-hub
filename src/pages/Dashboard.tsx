@@ -35,7 +35,7 @@ const DEMO_PROFILES: ProfileRow[] = [
     id: 'demo-1', slug: 'felipe-rodriguez', name: 'Felipe Rodriguez',
     bio: 'Ingeniero Mecánico | MBA', avatar: '', paid: true, views: 342,
     created_at: '2025-01-15T10:00:00Z', template: 'minimal', accent_color: '#d4a432',
-    font_color: '#ffffff', font_family: 'Inter', background_image: '',
+    font_color: '#000000', font_family: 'Inter', background_image: '',
     social_links: { instagram: 'https://instagram.com/felipe', linkedin: 'https://linkedin.com/in/felipe' },
     links: [
       { id: '1', label: 'Mi portafolio', url: 'https://example.com' },
@@ -67,7 +67,7 @@ const Dashboard = () => {
   const [newProfile, setNewProfile] = useState<ProfileData>({ ...DEFAULT_PROFILE });
   const [isDemo, setIsDemo] = useState(false);
   const [showFirstVisit, setShowFirstVisit] = useState(false);
-  const [activeTab, setActiveTab] = useState<'editor' | 'analytics' | 'contacts'>('editor');
+  const [activeTab, setActiveTab] = useState<'editor' | 'analytics' | 'qr' | 'contacts'>('editor');
 
   const { stats: clickStats, totalClicks } = useLinkClicks(isDemo ? null : (activeProfileId || null));
   const { options: pricingOptions, selected: selectedPricing, setSelected: setSelectedPricing } = usePricing();
@@ -288,29 +288,27 @@ const Dashboard = () => {
               <div><p className="text-xs text-muted-foreground">{t('dash.clicks')}</p><p className="text-sm text-foreground font-semibold">{effectiveTotalClicks}</p></div>
               <div><p className="text-xs text-muted-foreground">{t('dash.created')}</p><p className="text-sm text-foreground">{profile.created_at ? new Date(profile.created_at).toLocaleDateString() : '—'}</p></div>
               <div className="flex gap-2">
-                <button onClick={() => downloadVCard(profile)} className="flex items-center gap-1.5 px-3 py-1.5 rounded-md border border-border bg-background text-xs font-medium text-foreground hover:bg-muted transition-colors">
-                  <Contact size={12} /> vCard
-                </button>
-                <a href={`/card/${profile.slug}`} target="_blank" rel="noopener noreferrer"
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-md border border-border bg-background text-xs font-medium text-foreground hover:bg-muted transition-colors">
-                  <CreditCard size={12} /> {t('dash.virtualCard')}
-                </a>
               </div>
             </motion.div>
 
             {/* Dashboard tabs */}
-            <div className="flex gap-2 mb-6">
-              {(['editor', 'analytics', 'contacts'] as const).map(tab => (
-                <button key={tab} onClick={() => setActiveTab(tab)}
+            <div className="flex gap-2 mb-6 flex-wrap">
+              {([
+                { key: 'editor', label: '✏️ Editor' },
+                { key: 'analytics', label: `📊 ${t('dash.analytics')}` },
+                { key: 'qr', label: '🪪 QR & Tarjeta' },
+                { key: 'contacts', label: `👥 ${t('dash.contacts')}` },
+              ] as const).map(tab => (
+                <button key={tab.key} onClick={() => setActiveTab(tab.key)}
                   className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                    activeTab === tab ? 'bg-primary text-primary-foreground' : 'border border-border bg-card text-muted-foreground hover:text-foreground'
+                    activeTab === tab.key ? 'bg-primary text-primary-foreground' : 'border border-border bg-card text-muted-foreground hover:text-foreground'
                   }`}>
-                  {tab === 'editor' ? '✏️ Editor' : tab === 'analytics' ? `📊 ${t('dash.analytics')}` : `👥 ${t('dash.contacts')}`}
+                  {tab.label}
                 </button>
               ))}
             </div>
 
-            {/* Tab content */}
+            {/* Tab analytics */}
             {activeTab === 'analytics' && (
               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
                 <AnalyticsCharts
@@ -319,6 +317,90 @@ const Dashboard = () => {
                   clickStats={effectiveClickStats}
                   links={profile.links}
                 />
+                {/* Clics por link */}
+                <div className="rounded-lg border border-border bg-card p-4 mt-4">
+                  <p className="text-sm font-semibold text-foreground mb-3">{t('dash.clicksByLink')}</p>
+                  {profile.links.length === 0 ? (
+                    <p className="text-xs text-muted-foreground">{t('dash.noLinks')}</p>
+                  ) : (
+                    <div className="space-y-2">
+                      {profile.links.map(link => {
+                        const clicks = effectiveClickStats.find(s => s.link_id === link.id)?.clicks || 0;
+                        return (
+                          <div key={link.id} className="flex items-center justify-between text-sm">
+                            <span className="text-foreground truncate max-w-[200px]">{link.label || 'Sin nombre'}</span>
+                            <span className="text-primary font-semibold">{clicks}</span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              </motion.div>
+            )}
+
+            {/* Tab QR & Tarjeta Virtual */}
+            {activeTab === 'qr' && (
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
+                {/* QR Code */}
+                <div className="rounded-lg border border-border bg-card p-6">
+                  <p className="text-sm font-semibold text-foreground mb-4">Código QR</p>
+                  <div className="flex flex-col sm:flex-row items-center gap-6">
+                    <div className="rounded-xl border border-border bg-white p-4">
+                      <img src={qrUrl} alt="QR" className="w-48 h-48" />
+                    </div>
+                    <div className="space-y-3">
+                      <p className="text-sm text-muted-foreground">Comparte este QR para que tus visitantes lleguen directo a tu perfil.</p>
+                      <div className="flex flex-col gap-2">
+                        <button onClick={handleDownloadQR}
+                          className="flex items-center gap-2 px-4 py-2 rounded-md bg-primary text-primary-foreground text-sm font-semibold hover:opacity-90 transition-opacity w-fit">
+                          <Download size={14} /> Descargar QR
+                        </button>
+                        <a href={`/u/${profile.slug}`} target="_blank" rel="noopener noreferrer"
+                          className="flex items-center gap-2 px-4 py-2 rounded-md border border-border bg-background text-sm font-medium text-foreground hover:bg-muted transition-colors w-fit">
+                          <ExternalLink size={14} /> Ver perfil público
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                {/* Tarjeta Virtual */}
+                <div className="rounded-lg border border-border bg-card p-6">
+                  <p className="text-sm font-semibold text-foreground mb-4">Tarjeta virtual</p>
+                  <div className="flex flex-col sm:flex-row items-center gap-6">
+                    <div className="w-full max-w-sm">
+                      <a href={`/card/${profile.slug}`} target="_blank" rel="noopener noreferrer"
+                        className="block rounded-2xl overflow-hidden shadow-xl relative" style={{ aspectRatio: '1.6/1' }}>
+                        <div className="absolute inset-0 bg-gradient-to-br from-neutral-900 via-neutral-800 to-neutral-900" />
+                        <div className="relative h-full flex p-5 gap-4 items-center justify-between">
+                          <div className="flex flex-col gap-2">
+                            {profile.avatar
+                              ? <img src={profile.avatar} alt={profile.name} className="w-12 h-12 rounded-full object-cover border-2" style={{ borderColor: profile.accent_color }} />
+                              : <div className="w-12 h-12 rounded-full flex items-center justify-center text-lg font-bold" style={{ backgroundColor: profile.accent_color + '33', color: profile.accent_color }}>{profile.name?.charAt(0)?.toUpperCase()}</div>
+                            }
+                            <p className="text-white font-bold text-base leading-tight">{profile.name}</p>
+                            {profile.bio && <p className="text-neutral-400 text-xs line-clamp-2">{profile.bio}</p>}
+                            <span className="text-xs font-bold" style={{ color: profile.accent_color }}>LinkOne /{profile.slug}</span>
+                          </div>
+                          <div className="bg-white rounded-lg p-2">
+                            <img src={`https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=${encodeURIComponent(`${window.location.origin}/u/${profile.slug}`)}`} alt="QR" className="w-20 h-20" />
+                          </div>
+                        </div>
+                      </a>
+                    </div>
+                    <div className="space-y-2">
+                      <p className="text-sm text-muted-foreground">Tu tarjeta digital. Compártela o descarga el contacto.</p>
+                      <button onClick={() => downloadVCard(profile)}
+                        className="flex items-center gap-2 px-4 py-2 rounded-md bg-primary text-primary-foreground text-sm font-semibold hover:opacity-90 transition-opacity w-fit">
+                        <Download size={14} /> Descargar contacto (vCard)
+                      </button>
+                      <a href={`/card/${profile.slug}`} target="_blank" rel="noopener noreferrer"
+                        className="flex items-center gap-2 px-4 py-2 rounded-md border border-border bg-background text-sm font-medium text-foreground hover:bg-muted transition-colors w-fit">
+                        <ExternalLink size={14} /> Ver tarjeta completa
+                      </a>
+                    </div>
+                  </div>
+                </div>
               </motion.div>
             )}
 
@@ -336,29 +418,6 @@ const Dashboard = () => {
 
             {activeTab === 'editor' && (
               <>
-                {/* QR */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                  <QRCodeCard slug={profile.slug} />
-                  <div className="rounded-lg border border-border bg-card p-4">
-                    <p className="text-sm font-semibold text-foreground mb-3">{t('dash.clicksByLink')}</p>
-                    {profile.links.length === 0 ? (
-                      <p className="text-xs text-muted-foreground">{t('dash.noLinks')}</p>
-                    ) : (
-                      <div className="space-y-2">
-                        {profile.links.map(link => {
-                          const clicks = effectiveClickStats.find(s => s.link_id === link.id)?.clicks || 0;
-                          return (
-                            <div key={link.id} className="flex items-center justify-between text-sm">
-                              <span className="text-foreground truncate max-w-[200px]">{link.label || 'Sin nombre'}</span>
-                              <span className="text-primary font-semibold">{clicks}</span>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    )}
-                  </div>
-                </div>
-
                 {/* Editor + Preview */}
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                   <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} className="space-y-5 lg:order-1">

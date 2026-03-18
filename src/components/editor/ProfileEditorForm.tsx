@@ -62,6 +62,9 @@ const ProfileEditorForm = ({ profile, onChange, onPublish, publishLabel = 'Pagar
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    // Preview inmediato con URL local
+    const localUrl = URL.createObjectURL(file);
+    update('avatar', localUrl);
     setUploading(true);
     try {
       const form = new FormData();
@@ -271,12 +274,19 @@ const ProfileEditorForm = ({ profile, onChange, onPublish, publishLabel = 'Pagar
             <p className="text-sm text-foreground font-medium">Formulario de contacto</p>
             <p className="text-xs text-muted-foreground">Los visitantes podrán enviarte sus datos</p>
           </div>
-          <label className="relative inline-flex items-center cursor-pointer">
-            <input type="checkbox" checked={profile.enable_contact_form || false}
-              onChange={(e) => update('enable_contact_form', e.target.checked)}
-              className="sr-only peer" />
-            <div className="w-9 h-5 bg-muted peer-checked:bg-primary rounded-full transition-colors after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-full" />
-          </label>
+          <button
+            type="button"
+            role="switch"
+            aria-checked={profile.enable_contact_form || false}
+            onClick={() => update('enable_contact_form', !(profile.enable_contact_form || false))}
+            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${
+              profile.enable_contact_form ? 'bg-primary' : 'bg-muted border border-border'
+            }`}
+          >
+            <span className={`inline-block h-4 w-4 transform rounded-full bg-white shadow-sm transition-transform ${
+              profile.enable_contact_form ? 'translate-x-6' : 'translate-x-1'
+            }`} />
+          </button>
         </div>
       </FormSection>
 
