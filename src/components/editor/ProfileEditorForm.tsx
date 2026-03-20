@@ -59,16 +59,35 @@ const ProfileEditorForm = ({ profile, onChange, onPublish, publishLabel = 'Pagar
     onChange({ ...profile, links: profile.links.filter(l => l.id !== id) });
   }, [profile, onChange]);
 
+  // Comprime imagen antes de subir
+  const compressImage = (file: File, maxWidth: number, quality: number): Promise<Blob> => {
+    return new Promise((resolve) => {
+      const img = new window.Image();
+      const url = URL.createObjectURL(file);
+      img.onload = () => {
+        URL.revokeObjectURL(url);
+        const scale = Math.min(1, maxWidth / Math.max(img.width, img.height));
+        const canvas = document.createElement('canvas');
+        canvas.width = Math.round(img.width * scale);
+        canvas.height = Math.round(img.height * scale);
+        const ctx = canvas.getContext('2d')!;
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        canvas.toBlob((blob) => resolve(blob || file), 'image/jpeg', quality);
+      };
+      img.src = url;
+    });
+  };
+
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    // Preview inmediato con URL local
     const localUrl = URL.createObjectURL(file);
     update('avatar', localUrl);
     setUploading(true);
     try {
+      const compressed = await compressImage(file, 400, 0.85);
       const form = new FormData();
-      form.append('image', file);
+      form.append('image', compressed, 'avatar.jpg');
       const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, { method: 'POST', body: form });
       const data = await res.json();
       if (data.success) update('avatar', data.data.url);
@@ -81,10 +100,14 @@ const ProfileEditorForm = ({ profile, onChange, onPublish, publishLabel = 'Pagar
   const handleBgUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    // Preview inmediato
+    const localUrl = URL.createObjectURL(file);
+    update('background_image', localUrl);
     setUploadingBg(true);
     try {
+      const compressed = await compressImage(file, 1200, 0.80);
       const form = new FormData();
-      form.append('image', file);
+      form.append('image', compressed, 'background.jpg');
       const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, { method: 'POST', body: form });
       const data = await res.json();
       if (data.success) update('background_image', data.data.url);
