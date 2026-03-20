@@ -19,4 +19,4 @@ export default defineConfig(({ mode }) => ({
     },
   },
 }));
-// cache bust: v2
+//// v3 - log_profile_view active
