@@ -418,10 +418,7 @@ const Dashboard = () => {
                     </div>
                     <div className="space-y-2">
                       <p className="text-sm text-muted-foreground">Tu tarjeta digital. Compártela o descarga el contacto.</p>
-                      <button onClick={() => downloadVCard(profile)}
-                        className="flex items-center gap-2 px-4 py-2 rounded-md bg-primary text-primary-foreground text-sm font-semibold hover:opacity-90 transition-opacity w-fit">
-                        <Download size={14} /> Descargar contacto (vCard)
-                      </button>
+                      
                       <a href={`/card/${profile.slug}`} target="_blank" rel="noopener noreferrer"
                         className="flex items-center gap-2 px-4 py-2 rounded-md border border-border bg-background text-sm font-medium text-foreground hover:bg-muted transition-colors w-fit">
                         <ExternalLink size={14} /> Ver tarjeta completa
