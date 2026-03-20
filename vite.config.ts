@@ -19,3 +19,4 @@ export default defineConfig(({ mode }) => ({
     },
   },
 }));
+// cache bust: v2
