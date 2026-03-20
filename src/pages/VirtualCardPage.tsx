@@ -48,7 +48,37 @@ const VirtualCardPage = () => {
     setCanInstall(false);
   };
 
-  const profileUrl = `${window.location.origin}/u/${slug}`;
+  // Set OG meta tags para compartir en WhatsApp/redes
+  useEffect(() => {
+    if (!profile) return;
+    const setMeta = (property: string, content: string) => {
+      let el = document.querySelector(`meta[property="${property}"]`) as HTMLMetaElement;
+      if (!el) { el = document.createElement('meta'); el.setAttribute('property', property); document.head.appendChild(el); }
+      el.setAttribute('content', content);
+    };
+    const setMetaName = (name: string, content: string) => {
+      let el = document.querySelector(`meta[name="${name}"]`) as HTMLMetaElement;
+      if (!el) { el = document.createElement('meta'); el.setAttribute('name', name); document.head.appendChild(el); }
+      el.setAttribute('content', content);
+    };
+    const cardUrl = `${window.location.origin}/card/${slug}`;
+    document.title = `${profile.name} | Tarjeta Digital`;
+    setMeta('og:title', `${profile.name} | LinkOne`);
+    setMeta('og:description', profile.bio || `Tarjeta digital de ${profile.name}`);
+    setMeta('og:type', 'profile');
+    setMeta('og:url', cardUrl);
+    setMeta('og:site_name', 'LinkOne');
+    if (profile.avatar) {
+      setMeta('og:image', profile.avatar);
+      setMeta('og:image:width', '400');
+      setMeta('og:image:height', '400');
+      setMetaName('twitter:image', profile.avatar);
+    }
+    setMetaName('twitter:card', 'summary');
+    setMetaName('twitter:title', `${profile.name} | LinkOne`);
+    setMetaName('twitter:description', profile.bio || `Tarjeta digital de ${profile.name}`);
+    return () => { document.title = 'LinkOne'; };
+  }, [profile]);
   const qrUrl = profile?.slug
     ? `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(profileUrl)}&color=${(profile.accent_color || '#d4a432').replace('#', '')}&bgcolor=111111`
     : '';

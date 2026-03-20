@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { Send, Loader2, CheckCircle } from 'lucide-react';
+import { Send, Loader2, CheckCircle, ChevronDown } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 interface ContactFormProps {
@@ -11,6 +11,7 @@ interface ContactFormProps {
 
 const ContactForm = ({ profileId, accentColor = '#d4a432', fontColor = '#ffffff' }: ContactFormProps) => {
   const { t } = useLanguage();
+  const [open, setOpen] = useState(false);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
@@ -36,51 +37,79 @@ const ContactForm = ({ profileId, accentColor = '#d4a432', fontColor = '#ffffff'
     }
   };
 
-  if (sent) {
-    return (
-      <div className="w-full mt-6 p-4 rounded-xl text-center space-y-2" style={{ backgroundColor: accentColor + '22' }}>
-        <CheckCircle size={28} className="mx-auto" style={{ color: accentColor }} />
-        <p className="text-sm font-semibold" style={{ color: fontColor }}>{t('contact.sent')}</p>
-      </div>
-    );
-  }
-
   return (
-    <form onSubmit={handleSubmit} className="w-full mt-6 space-y-2">
-      <p className="text-sm font-semibold text-center mb-3" style={{ color: fontColor }}>{t('contact.title')}</p>
-      <input
-        type="text" value={name} onChange={e => setName(e.target.value)} required
-        placeholder={t('contact.name')}
-        className="w-full h-9 rounded-lg px-3 text-sm bg-white/10 border border-white/20 placeholder:opacity-50 focus:outline-none focus:ring-1"
-        style={{ color: fontColor, borderColor: fontColor + '33', ['--tw-ring-color' as any]: accentColor }}
-      />
-      <input
-        type="email" value={email} onChange={e => setEmail(e.target.value)}
-        placeholder={t('contact.email')}
-        className="w-full h-9 rounded-lg px-3 text-sm bg-white/10 border border-white/20 placeholder:opacity-50 focus:outline-none focus:ring-1"
-        style={{ color: fontColor, borderColor: fontColor + '33' }}
-      />
-      <input
-        type="tel" value={phone} onChange={e => setPhone(e.target.value)}
-        placeholder={t('contact.phone')}
-        className="w-full h-9 rounded-lg px-3 text-sm bg-white/10 border border-white/20 placeholder:opacity-50 focus:outline-none focus:ring-1"
-        style={{ color: fontColor, borderColor: fontColor + '33' }}
-      />
-      <textarea
-        value={message} onChange={e => setMessage(e.target.value)}
-        placeholder={t('contact.message')} rows={2}
-        className="w-full rounded-lg px-3 py-2 text-sm bg-white/10 border border-white/20 placeholder:opacity-50 focus:outline-none focus:ring-1 resize-none"
-        style={{ color: fontColor, borderColor: fontColor + '33' }}
-      />
+    <div className="w-full mt-6">
+      {/* Toggle button */}
       <button
-        type="submit" disabled={sending}
-        className="w-full h-9 rounded-lg text-sm font-semibold flex items-center justify-center gap-2 transition-opacity hover:opacity-90 disabled:opacity-50"
-        style={{ backgroundColor: accentColor, color: '#fff' }}
+        type="button"
+        onClick={() => setOpen(!open)}
+        className="w-full flex items-center justify-between py-3 px-4 rounded-xl text-sm font-semibold transition-all"
+        style={{
+          backgroundColor: open ? accentColor + '22' : accentColor + '15',
+          color: fontColor,
+          border: `1px solid ${accentColor}44`,
+        }}
       >
-        {sending ? <Loader2 size={14} className="animate-spin" /> : <Send size={14} />}
-        {t('contact.send')}
+        <span>{t('contact.title')}</span>
+        <ChevronDown
+          size={16}
+          style={{
+            color: accentColor,
+            transform: open ? 'rotate(180deg)' : 'rotate(0deg)',
+            transition: 'transform 0.2s ease',
+          }}
+        />
       </button>
-    </form>
+
+      {/* Collapsible form */}
+      <div style={{
+        overflow: 'hidden',
+        maxHeight: open ? '500px' : '0px',
+        transition: 'max-height 0.35s ease',
+      }}>
+        {sent ? (
+          <div className="pt-4 pb-2 text-center space-y-2">
+            <CheckCircle size={28} className="mx-auto" style={{ color: accentColor }} />
+            <p className="text-sm font-semibold" style={{ color: fontColor }}>{t('contact.sent')}</p>
+          </div>
+        ) : (
+          <form onSubmit={handleSubmit} className="space-y-2 pt-3">
+            <input
+              type="text" value={name} onChange={e => setName(e.target.value)} required
+              placeholder={t('contact.name')}
+              className="w-full h-9 rounded-lg px-3 text-sm bg-white/10 border border-white/20 placeholder:opacity-50 focus:outline-none focus:ring-1"
+              style={{ color: fontColor, borderColor: fontColor + '33', ['--tw-ring-color' as any]: accentColor }}
+            />
+            <input
+              type="email" value={email} onChange={e => setEmail(e.target.value)}
+              placeholder={t('contact.email')}
+              className="w-full h-9 rounded-lg px-3 text-sm bg-white/10 border border-white/20 placeholder:opacity-50 focus:outline-none focus:ring-1"
+              style={{ color: fontColor, borderColor: fontColor + '33' }}
+            />
+            <input
+              type="tel" value={phone} onChange={e => setPhone(e.target.value)}
+              placeholder={t('contact.phone')}
+              className="w-full h-9 rounded-lg px-3 text-sm bg-white/10 border border-white/20 placeholder:opacity-50 focus:outline-none focus:ring-1"
+              style={{ color: fontColor, borderColor: fontColor + '33' }}
+            />
+            <textarea
+              value={message} onChange={e => setMessage(e.target.value)}
+              placeholder={t('contact.message')} rows={2}
+              className="w-full rounded-lg px-3 py-2 text-sm bg-white/10 border border-white/20 placeholder:opacity-50 focus:outline-none focus:ring-1 resize-none"
+              style={{ color: fontColor, borderColor: fontColor + '33' }}
+            />
+            <button
+              type="submit" disabled={sending}
+              className="w-full h-9 rounded-lg text-sm font-semibold flex items-center justify-center gap-2 transition-opacity hover:opacity-90 disabled:opacity-50"
+              style={{ backgroundColor: accentColor, color: '#fff' }}
+            >
+              {sending ? <Loader2 size={14} className="animate-spin" /> : <Send size={14} />}
+              {t('contact.send')}
+            </button>
+          </form>
+        )}
+      </div>
+    </div>
   );
 };
 

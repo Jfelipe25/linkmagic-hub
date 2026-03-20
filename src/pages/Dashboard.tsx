@@ -14,7 +14,7 @@ import AnalyticsCharts from '@/components/AnalyticsCharts';
 import ContactsList from '@/components/ContactsList';
 import { useLinkClicks } from '@/hooks/useLinkClicks';
 import { usePricing } from '@/hooks/usePricing';
-import { Copy, Check, Loader2, ExternalLink, LogOut, Plus, Download, X, CreditCard, Contact } from 'lucide-react';
+import { Copy, Check, Loader2, ExternalLink, LogOut, Plus, Download, X, Trash2, CreditCard } from 'lucide-react';
 import ThemeToggle from '@/components/ThemeToggle';
 import LanguageToggle from '@/components/LanguageToggle';
 import { toast } from 'sonner';
@@ -86,6 +86,33 @@ const Dashboard = () => {
   const switchProfile = (id: string) => {
     const row = profiles.find(p => p.id === id);
     if (row) { setActiveProfileId(id); setProfile(profileFromRow(row)); setShowNewForm(false); }
+  };
+
+  const handleDeleteProfile = async (id: string) => {
+    if (!confirm('¿Eliminar este perfil? Esta acción no se puede deshacer.')) return;
+    await supabase.from('profiles').delete().eq('id', id);
+    const remaining = profiles.filter(p => p.id !== id);
+    setProfiles(remaining);
+    if (activeProfileId === id) {
+      if (remaining.length > 0) {
+        setActiveProfileId(remaining[0].id);
+        setProfile(profileFromRow(remaining[0]));
+      } else {
+        setActiveProfileId('');
+      }
+    }
+  };
+
+  const handlePayPending = async (profileId: string) => {
+    const row = profiles.find(p => p.id === profileId);
+    if (!row) return;
+    try {
+      const { data, error } = await supabase.functions.invoke('create-payment', {
+        body: { ...profileFromRow(row), user_id: user!.id, slug: row.slug, country_code: selectedPricing?.country_code },
+      });
+      if (error) throw error;
+      if (data?.init_point) window.location.href = data.init_point;
+    } catch (err: any) { toast.error(err.message || 'Error'); }
   };
 
   const handleSave = async () => {
@@ -224,14 +251,27 @@ const Dashboard = () => {
           </div>
           <div className="flex gap-2 flex-wrap">
             {profiles.map(p => (
-              <button key={p.id} onClick={() => switchProfile(p.id)}
-                className={`px-3 py-2 rounded-md text-sm font-medium transition-colors border ${
-                  p.id === activeProfileId && !showNewForm ? 'border-primary bg-primary/10 text-primary' : 'border-border bg-background text-muted-foreground hover:text-foreground hover:border-foreground/20'
-                }`}>
-                <span className="block truncate max-w-[140px]">{p.name || p.slug}</span>
-                <span className="text-[10px] opacity-60 font-mono">/u/{p.slug}</span>
-              </button>
+              <div key={p.id} className="flex items-center gap-1">
+                <button onClick={() => switchProfile(p.id)}
+                  className={`px-3 py-2 rounded-md text-sm font-medium transition-colors border ${
+                    p.id === activeProfileId && !showNewForm ? 'border-primary bg-primary/10 text-primary' : 'border-border bg-background text-muted-foreground hover:text-foreground hover:border-foreground/20'
+                  }`}>
+                  <span className="block truncate max-w-[140px]">{p.name || p.slug}</span>
+                  <span className="text-[10px] opacity-60 font-mono">/u/{p.slug}</span>
+                </button>
+                {!p.paid && (
+                  <button onClick={() => handlePayPending(p.id)} title="Pagar para activar"
+                    className="px-2 py-1 rounded-md text-xs bg-yellow-500/20 text-yellow-600 hover:bg-yellow-500/30 transition-colors font-medium">
+                    Pagar
+                  </button>
+                )}
+                <button onClick={() => handleDeleteProfile(p.id)} title="Eliminar perfil"
+                  className="p-1.5 rounded-md text-muted-foreground hover:text-red-500 hover:bg-red-500/10 transition-colors">
+                  <Trash2 size={13} />
+                </button>
+              </div>
             ))}
+          </div>
           </div>
         </motion.div>
 
@@ -372,7 +412,10 @@ const Dashboard = () => {
                     </div>
                     <div className="space-y-2">
                       <p className="text-sm text-muted-foreground">Tu tarjeta digital. Compártela o descarga el contacto.</p>
-                     
+                      <button onClick={() => downloadVCard(profile)}
+                        className="flex items-center gap-2 px-4 py-2 rounded-md bg-primary text-primary-foreground text-sm font-semibold hover:opacity-90 transition-opacity w-fit">
+                        <Download size={14} /> Descargar contacto (vCard)
+                      </button>
                       <a href={`/card/${profile.slug}`} target="_blank" rel="noopener noreferrer"
                         className="flex items-center gap-2 px-4 py-2 rounded-md border border-border bg-background text-sm font-medium text-foreground hover:bg-muted transition-colors w-fit">
                         <ExternalLink size={14} /> Ver tarjeta completa
