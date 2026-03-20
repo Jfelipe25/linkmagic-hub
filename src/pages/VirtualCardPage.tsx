@@ -48,6 +48,8 @@ const VirtualCardPage = () => {
     setCanInstall(false);
   };
 
+  const profileUrl = `${window.location.origin}/u/${slug}`;
+
   // Set OG meta tags para compartir en WhatsApp/redes
   useEffect(() => {
     if (!profile) return;
