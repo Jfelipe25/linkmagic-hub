@@ -48,6 +48,9 @@ const VirtualCardPage = () => {
     setCanInstall(false);
   };
 
+  const profileUrl = `${window.location.origin}/u/${slug}`;
+  const shareUrl = `${window.location.origin}/api/card/${slug}`;
+
   // Set OG meta tags para compartir en WhatsApp/redes
   useEffect(() => {
     if (!profile) return;
@@ -82,8 +85,6 @@ const VirtualCardPage = () => {
   const qrUrl = profile?.slug
     ? `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(profileUrl)}&color=${(profile.accent_color || '#d4a432').replace('#', '')}&bgcolor=111111`
     : '';
-
-  const shareUrl = `${window.location.origin}/api/card/${slug}`;
 
   const handleShare = async () => {
     if (navigator.share) {
