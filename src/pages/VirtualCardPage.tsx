@@ -48,8 +48,6 @@ const VirtualCardPage = () => {
     setCanInstall(false);
   };
 
-  const profileUrl = `${window.location.origin}/u/${slug}`;
-
   // Set OG meta tags para compartir en WhatsApp/redes
   useEffect(() => {
     if (!profile) return;
@@ -85,18 +83,20 @@ const VirtualCardPage = () => {
     ? `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(profileUrl)}&color=${(profile.accent_color || '#d4a432').replace('#', '')}&bgcolor=111111`
     : '';
 
+  const shareUrl = `${window.location.origin}/api/card/${slug}`;
+
   const handleShare = async () => {
     if (navigator.share) {
-      await navigator.share({ title: `${profile?.name} | LinkOne`, url: profileUrl });
+      await navigator.share({ title: `${profile?.name} | LinkOne`, url: shareUrl });
     } else {
-      navigator.clipboard.writeText(profileUrl);
+      navigator.clipboard.writeText(shareUrl);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     }
   };
 
   const handleCopy = () => {
-    navigator.clipboard.writeText(profileUrl);
+    navigator.clipboard.writeText(shareUrl);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
@@ -203,7 +203,7 @@ const VirtualCardPage = () => {
             className="mt-3 w-full flex items-center justify-center gap-2 py-2.5 rounded-2xl text-sm border transition-colors hover:bg-white/5"
             style={{ borderColor: '#ffffff15', color: '#666' }}>
             {copied ? <Check size={14} className="text-green-400" /> : <Copy size={14} />}
-            <span className="font-mono text-xs truncate">{profileUrl}</span>
+            <span className="font-mono text-xs truncate">{shareUrl}</span>
           </button>
 
           {/* PWA Install button */}
