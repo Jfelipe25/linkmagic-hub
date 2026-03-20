@@ -28,7 +28,7 @@ const PublicProfile = () => {
       else {
         setProfile(profileFromRow(data));
         setProfileId(data.id);
-        await supabase.rpc('log_profile_view', { profile_slug: slug }).catch(() => {});
+        supabase.rpc('log_profile_view', { profile_slug: slug }).then(() => {}).catch(() => {});
       }
       setLoading(false);
     };
