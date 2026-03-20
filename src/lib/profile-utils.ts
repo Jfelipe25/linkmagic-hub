@@ -32,3 +32,10 @@ export function profileFromRow(row: any): ProfileData {
     enable_contact_form: row.enable_contact_form ?? false,
   };
 }
+
+/** Normaliza una URL asegurando que tenga protocolo https:// */
+export function normalizeUrl(url: string): string {
+  if (!url) return '';
+  if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('mailto:') || url.startsWith('tel:')) return url;
+  return `https://${url}`;
+}
