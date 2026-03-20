@@ -49,7 +49,7 @@ const VirtualCardPage = () => {
   };
 
   const profileUrl = `${window.location.origin}/u/${slug}`;
-  const shareUrl = `${window.location.origin}/api/card/${slug}`;
+  const cardUrl = `${window.location.origin}/card/${slug}`;
 
   // Set OG meta tags para compartir en WhatsApp/redes
   useEffect(() => {
@@ -88,16 +88,16 @@ const VirtualCardPage = () => {
 
   const handleShare = async () => {
     if (navigator.share) {
-      await navigator.share({ title: `${profile?.name} | LinkOne`, url: shareUrl });
+      await navigator.share({ title: `${profile?.name} | LinkOne`, url: cardUrl });
     } else {
-      navigator.clipboard.writeText(shareUrl);
+      navigator.clipboard.writeText(cardUrl);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     }
   };
 
   const handleCopy = () => {
-    navigator.clipboard.writeText(shareUrl);
+    navigator.clipboard.writeText(cardUrl);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
@@ -204,7 +204,7 @@ const VirtualCardPage = () => {
             className="mt-3 w-full flex items-center justify-center gap-2 py-2.5 rounded-2xl text-sm border transition-colors hover:bg-white/5"
             style={{ borderColor: '#ffffff15', color: '#666' }}>
             {copied ? <Check size={14} className="text-green-400" /> : <Copy size={14} />}
-            <span className="font-mono text-xs truncate">{shareUrl}</span>
+            <span className="font-mono text-xs truncate">{cardUrl}</span>
           </button>
 
           {/* PWA Install button */}
