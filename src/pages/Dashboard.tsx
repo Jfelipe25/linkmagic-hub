@@ -272,7 +272,6 @@ const Dashboard = () => {
               </div>
             ))}
           </div>
-          </div>
         </motion.div>
 
         {/* New profile form */}
