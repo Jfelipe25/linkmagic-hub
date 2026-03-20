@@ -28,7 +28,11 @@ const PublicProfile = () => {
       else {
         setProfile(profileFromRow(data));
         setProfileId(data.id);
-        supabase.rpc('log_profile_view', { profile_slug: slug }).then(() => {}).catch(() => {});
+        const viewKey = `viewed_${slug}`;
+        if (!sessionStorage.getItem(viewKey)) {
+          sessionStorage.setItem(viewKey, '1');
+          supabase.rpc('log_profile_view', { profile_slug: slug }).then(() => {}).catch(() => {});
+        }
       }
       setLoading(false);
     };
