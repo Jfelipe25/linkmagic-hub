@@ -1,12 +1,5 @@
 {
-  "routes": [
-    {
-      "src": "/card/(?<slug>[^/]+)",
-      "dest": "/api/card/$slug"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/index.html"
-    }
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/index.html" }
   ]
 }
