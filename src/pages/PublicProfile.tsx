@@ -97,3 +97,4 @@ const PublicProfile = () => {
 };
 
 export default PublicProfile;
+// v2 - log_profile_view
