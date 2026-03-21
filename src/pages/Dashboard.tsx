@@ -445,13 +445,17 @@ const Dashboard = () => {
             {activeTab === 'editor' && (
               <>
                 {/* Editor + Preview */}
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                  <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} className="space-y-5 lg:order-1">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+                  <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}
+                    className="hidden lg:flex items-start justify-center lg:order-1 lg:sticky lg:top-8">
+                    <PhoneMockup><TemplateRenderer profile={profile} profileId={activeProfileId} /></PhoneMockup>
+                  </motion.div>
+                  <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-5 lg:order-2">
                     <ProfileEditorForm profile={profile} onChange={setProfile} onPublish={handleSave}
                       publishLabel={t('dash.save')} isPublishing={saving} />
                   </motion.div>
-                  <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}
-                    className="flex items-start justify-center lg:order-2 lg:sticky lg:top-8">
+                  <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+                    className="flex items-start justify-center lg:hidden">
                     <PhoneMockup><TemplateRenderer profile={profile} profileId={activeProfileId} /></PhoneMockup>
                   </motion.div>
                 </div>

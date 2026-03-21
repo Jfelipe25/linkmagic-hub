@@ -1,5 +1,4 @@
 import { ProfileData, SocialLinks, SOCIAL_PLATFORMS, getVisibleLinks } from '@/types/profile';
-import { normalizeUrl } from '@/lib/profile-utils';
 import { trackLinkClick } from '@/hooks/useLinkClicks';
 import ContactForm from '@/components/ContactForm';
 import {
@@ -26,14 +25,14 @@ const MinimalTemplate = ({ profile, accentColor, profileId }: TemplateProps) => 
   return (
     <div className="min-h-full flex flex-col items-center px-6 py-12" style={{ backgroundColor: '#ffffff', color: fontColor }}>
       {profile.avatar && (
-        <img src={profile.avatar} alt={profile.name} className="w-28 h-28 rounded-full object-cover mb-4" />
+        <img src={profile.avatar} alt={profile.name} className="w-20 h-20 rounded-full object-cover mb-4" />
       )}
       {!profile.avatar && (
         <div className="w-20 h-20 rounded-full mb-4 flex items-center justify-center text-2xl font-bold" style={{ backgroundColor: fontColor + '22', color: fontColor }}>
           {profile.name?.charAt(0)?.toUpperCase() || '?'}
         </div>
       )}
-      <h1 className="text-xl font-bold" style={{ color: fontColor }}>{profile.name || 'Tu Nombre'}</h1>
+      <h1 className="text-xl font-bold text-center" style={{ color: fontColor }}>{profile.name || 'Tu Nombre'}</h1>
       <p className="text-sm mt-1 text-center max-w-[220px]" style={{ color: fontColor, opacity: 0.6 }}>{profile.bio || 'Tu biografía aquí'}</p>
 
       {socialEntries.length > 0 && (
@@ -42,7 +41,7 @@ const MinimalTemplate = ({ profile, accentColor, profileId }: TemplateProps) => 
             const platform = SOCIAL_PLATFORMS.find(p => p.key === key);
             const Icon = platform ? iconMap[platform.icon] : ExternalLink;
             return (
-              <a key={key} href={normalizeUrl(url as string)} target="_blank" rel="noopener noreferrer"
+              <a key={key} href={url as string} target="_blank" rel="noopener noreferrer"
                 className="w-8 h-8 flex items-center justify-center rounded-full transition-colors hover:opacity-80"
                 style={{ color: fontColor }}>
                 <Icon size={18} />
@@ -54,7 +53,7 @@ const MinimalTemplate = ({ profile, accentColor, profileId }: TemplateProps) => 
 
       <div className="w-full mt-6 space-y-3">
         {visibleLinks.map((link) => (
-          <a key={link.id} href={normalizeUrl(link.url)} target="_blank" rel="noopener noreferrer"
+          <a key={link.id} href={link.url} target="_blank" rel="noopener noreferrer"
             className="block w-full text-center py-3 rounded-full text-sm font-medium transition-all"
             style={{
               border: `2px solid ${fontColor}`,
