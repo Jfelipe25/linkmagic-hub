@@ -199,7 +199,7 @@ const VirtualCardPage = () => {
               <div className="flex items-center gap-4 mb-6">
                 {profile.avatar ? (
                   <img src={profile.avatar} alt={profile.name}
-                    className="w-24 h-24 rounded-2xl object-cover flex-shrink-0"
+                    className="w-28 h-28 rounded-2xl object-cover flex-shrink-0"
                     style={{ border: `2px solid ${accent}50` }} />
                 ) : (
                   <div className="w-20 h-20 rounded-2xl flex items-center justify-center text-3xl font-bold flex-shrink-0"
@@ -236,7 +236,7 @@ const VirtualCardPage = () => {
 
             {/* Footer */}
             <div className="px-7 py-4 flex items-center justify-between" style={{ background: footerBg }}>
-              <span className="text-xs font-bold" style={{ color: accent }}>LinkOne.bio</span>
+              <span className="text-xs font-bold" style={{ color: accent }}>Linkone.bio</span>
               <span className="text-xs" style={{ color: footerText }}>Tarjeta digital</span>
             </div>
           </div>
