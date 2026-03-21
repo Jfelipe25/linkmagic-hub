@@ -50,7 +50,7 @@ const GradientTemplate = ({ profile, accentColor, profileId }: TemplateProps) =>
           {profile.name?.charAt(0)?.toUpperCase() || '?'}
         </div>
       )}
-      <h1 className="text-xl font-bold drop-shadow-md" style={{ color: fontColor }}>{profile.name || 'Tu Nombre'}</h1>
+      <h1 className="text-xl font-bold text-center drop-shadow-md" style={{ color: fontColor }}>{profile.name || 'Tu Nombre'}</h1>
       <p className="text-sm mt-1 text-center max-w-[220px] drop-shadow-sm" style={{ color: fontColor, opacity: 0.85 }}>
         {profile.bio || 'Tu biografía aquí'}
       </p>

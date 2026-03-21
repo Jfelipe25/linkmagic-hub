@@ -35,7 +35,7 @@ const DarkTemplate = ({ profile, accentColor, profileId }: TemplateProps) => {
           {profile.name?.charAt(0)?.toUpperCase() || '?'}
         </div>
       )}
-      <h1 className="text-xl font-bold" style={{ color: fontColor }}>{profile.name || 'Tu Nombre'}</h1>
+      <h1 className="text-xl font-bold text-center" style={{ color: fontColor }}>{profile.name || 'Tu Nombre'}</h1>
       <p className="text-sm mt-1 text-center max-w-[220px]" style={{ color: fontColor, opacity: 0.7 }}>{profile.bio || 'Tu biografía aquí'}</p>
 
       {socialEntries.length > 0 && (
