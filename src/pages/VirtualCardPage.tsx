@@ -109,11 +109,31 @@ const VirtualCardPage = () => {
     if (!cardRef.current || !profile) return;
     setDownloading(true);
     try {
+      // Convertir imagen de avatar a base64 para evitar CORS
+      if (profile.avatar) {
+        const imgs = cardRef.current.querySelectorAll('img');
+        await Promise.all(Array.from(imgs).map(async (img) => {
+          try {
+            const res = await fetch(img.src);
+            const blob = await res.blob();
+            const b64 = await new Promise<string>((resolve) => {
+              const reader = new FileReader();
+              reader.onload = () => resolve(reader.result as string);
+              reader.readAsDataURL(blob);
+            });
+            img.src = b64;
+          } catch {}
+        }));
+        // Esperar que carguen
+        await new Promise(r => setTimeout(r, 300));
+      }
+
       const canvas = await html2canvas(cardRef.current, {
         scale: 3,
-        backgroundColor: null,
+        backgroundColor: '#111111',
         useCORS: true,
         allowTaint: true,
+        logging: false,
       });
       const url = canvas.toDataURL('image/png');
       const a = document.createElement('a');
@@ -174,9 +194,9 @@ const VirtualCardPage = () => {
                   </div>
                 )}
                 <div className="flex-1 min-w-0">
-                  <h1 className="text-white text-xl font-bold leading-tight truncate">{profile.name}</h1>
+                  <h1 className="text-white text-xl font-bold leading-tight">{profile.name}</h1>
                   {profile.bio && (
-                    <p className="text-neutral-400 text-sm mt-1 line-clamp-2">{profile.bio}</p>
+                    <p className="text-neutral-400 text-sm mt-1">{profile.bio}</p>
                   )}
                   <div className="flex items-center gap-1.5 mt-2">
                     <div className="w-1.5 h-1.5 rounded-full" style={{ background: accent }} />
