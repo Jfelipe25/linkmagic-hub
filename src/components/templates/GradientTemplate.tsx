@@ -33,7 +33,7 @@ const GradientTemplate = ({ profile, accentColor, profileId }: TemplateProps) =>
   const visibleLinks = getVisibleLinks(profile.links || []);
 
   return (
-    <div className="min-h-full flex flex-col items-center px-6 py-12"
+    <div className="min-h-full flex flex-col items-center px-6 py-12 mx-auto w-full max-w-md"
       style={{
         background: `linear-gradient(160deg, ${accentColor}, ${darkColor})`,
         backgroundSize: '200% 200%',

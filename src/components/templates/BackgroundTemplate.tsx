@@ -26,7 +26,7 @@ const BackgroundTemplate = ({ profile, accentColor, profileId }: TemplateProps) 
 
   return (
     <div
-      className="min-h-full flex flex-col items-center px-6 py-12 relative"
+      className="min-h-full flex flex-col items-center px-6 py-12 relative max-w-md mx-auto w-full"
       style={{
         backgroundImage: bgImage ? `url(${bgImage})` : undefined,
         backgroundSize: 'cover',
