@@ -6,13 +6,14 @@ const SUPABASE_KEY = process.env.VITE_SUPABASE_PUBLISHABLE_KEY!;
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   const { slug } = req.query;
   const userAgent = req.headers['user-agent'] || '';
-
-  // Solo servir HTML con OG tags si es un bot/scraper
-  const isBotOrScraper = /whatsapp|facebook|twitter|telegram|linkedin|slack|discord|bot|crawler|scraper/i.test(userAgent);
+  const isBotOrScraper = /whatsapp|facebook|facebookexternalhit|twitterbot|telegrambot|linkedinbot|slackbot|discordbot|bot|crawler|scraper/i.test(userAgent);
 
   if (!isBotOrScraper) {
-    // Usuario real — redirigir al SPA normal
-    res.redirect(302, `https://www.linkone.bio/u/${slug}`);
+    // Usuario real — servir el index.html del SPA directamente
+    const spaResponse = await fetch('https://www.linkone.bio/index.html');
+    const html = await spaResponse.text();
+    res.setHeader('Content-Type', 'text/html');
+    res.status(200).send(html);
     return;
   }
 
