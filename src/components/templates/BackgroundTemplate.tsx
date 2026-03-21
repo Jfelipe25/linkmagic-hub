@@ -25,19 +25,14 @@ const BackgroundTemplate = ({ profile, accentColor, profileId }: TemplateProps) 
   const visibleLinks = getVisibleLinks(profile.links || []);
 
   return (
-    <div
-      className="min-h-screen flex flex-col items-center px-6 py-12 relative max-w-md mx-auto w-full"
-      style={{
+    <div className="min-h-screen w-full relative" style={{
         backgroundImage: bgImage ? `url(${bgImage})` : undefined,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundColor: bgImage ? undefined : '#ffffff',
-        color: fontColor,
-      }}
-    >
+      }}>
       <div className="absolute inset-0" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }} />
-
-      <div className="relative z-10 flex flex-col items-center w-full">
+      <div className="min-h-screen relative z-10 flex flex-col items-center px-6 py-12 mx-auto max-w-md" style={{ color: fontColor }}>
         {profile.avatar ? (
           <img src={profile.avatar} alt={profile.name}
             className="w-28 h-28 rounded-full object-cover mb-4"

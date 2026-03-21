@@ -33,13 +33,12 @@ const GradientTemplate = ({ profile, accentColor, profileId }: TemplateProps) =>
   const visibleLinks = getVisibleLinks(profile.links || []);
 
   return (
-    <div className="min-h-screen flex flex-col items-center px-6 py-12 mx-auto w-full max-w-md"
-      style={{
+    <div className="min-h-screen w-full" style={{
         background: `linear-gradient(160deg, ${accentColor}, ${darkColor})`,
         backgroundSize: '200% 200%',
         animation: 'gradient-shift 6s ease infinite',
-        color: fontColor,
       }}>
+      <div className="min-h-screen flex flex-col items-center px-6 py-12 mx-auto max-w-md" style={{ color: fontColor }}>
       {profile.avatar ? (
         <img src={profile.avatar} alt={profile.name}
           className="w-28 h-28 rounded-full object-cover mb-4"
@@ -85,6 +84,8 @@ const GradientTemplate = ({ profile, accentColor, profileId }: TemplateProps) =>
       {profile.enable_contact_form && profileId && (
         <ContactForm profileId={profileId} accentColor={accentColor} fontColor={fontColor} />
       )}
+    </div>
+      </div>
     </div>
   );
 };
