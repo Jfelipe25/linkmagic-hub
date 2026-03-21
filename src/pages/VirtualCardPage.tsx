@@ -159,22 +159,36 @@ const VirtualCardPage = () => {
   );
 
   const accent = profile.accent_color || '#d4a432';
+  const isLight = profile.template === 'minimal';
+  const cardBg = isLight
+    ? 'linear-gradient(135deg, #ffffff 0%, #f5f5f5 50%, #ffffff 100%)'
+    : profile.template === 'gradient'
+      ? `linear-gradient(135deg, ${accent}22 0%, #111 50%, ${accent}11 100%)`
+      : 'linear-gradient(135deg, #1a1a1a 0%, #111 50%, #1a1a1a 100%)';
+  const cardBorder = isLight ? `${accent}40` : `${accent}30`;
+  const nameColor = isLight ? '#111111' : '#ffffff';
+  const bioColor = isLight ? '#555555' : '#9ca3af';
+  const footerBg = isLight ? '#f0f0f0' : '#0d0d0d';
+  const footerText = isLight ? '#888888' : '#525252';
+  const qrBg = isLight ? '#f5f5f5' : '#111';
+  const scanText = isLight ? '#888888' : '#525252';
+  const pageGlow = isLight ? `${accent}10` : `${accent}18`;
 
   return (
-    <div className="min-h-screen flex flex-col" style={{ background: '#0a0a0a' }}>
+    <div className="min-h-screen flex flex-col" style={{ background: isLight ? '#f8f8f8' : '#0a0a0a' }}>
       {/* Hero section */}
       <div className="flex-1 flex flex-col items-center justify-center px-6 pt-12 pb-6 relative overflow-hidden">
         {/* Background glow */}
         <div className="absolute inset-0 pointer-events-none" style={{
-          background: `radial-gradient(ellipse at 50% 0%, ${accent}18 0%, transparent 60%)`
+          background: `radial-gradient(ellipse at 50% 0%, ${pageGlow} 0%, transparent 60%)`
         }} />
 
         {/* Card container */}
         <div className="w-full max-w-sm relative z-10">
           {/* Main card */}
           <div ref={cardRef} className="rounded-3xl overflow-hidden shadow-2xl border" style={{
-            background: 'linear-gradient(135deg, #1a1a1a 0%, #111 50%, #1a1a1a 100%)',
-            borderColor: `${accent}30`
+            background: cardBg,
+            borderColor: cardBorder
           }}>
             {/* Top accent line */}
             <div className="h-1 w-full" style={{ background: `linear-gradient(90deg, transparent, ${accent}, transparent)` }} />
@@ -194,9 +208,9 @@ const VirtualCardPage = () => {
                   </div>
                 )}
                 <div className="flex-1 min-w-0">
-                  <h1 className="text-white text-xl font-bold leading-tight">{profile.name}</h1>
+                  <h1 className="text-xl font-bold leading-tight" style={{ color: nameColor }}>{profile.name}</h1>
                   {profile.bio && (
-                    <p className="text-neutral-400 text-sm mt-1">{profile.bio}</p>
+                    <p className="text-sm mt-1" style={{ color: bioColor }}>{profile.bio}</p>
                   )}
                   <div className="flex items-center gap-1.5 mt-2">
                     <div className="w-1.5 h-1.5 rounded-full" style={{ background: accent }} />
@@ -210,10 +224,10 @@ const VirtualCardPage = () => {
 
               {/* QR Code */}
               <div className="flex flex-col items-center gap-3">
-                <div className="rounded-2xl p-3" style={{ background: '#111', border: `1px solid ${accent}20` }}>
+                <div className="rounded-2xl p-3" style={{ background: qrBg, border: `1px solid ${accent}20` }}>
                   <img src={qrUrl} alt="QR Code" className="w-48 h-48 rounded-xl" />
                 </div>
-                <p className="text-xs text-neutral-500">Escanea para abrir mi perfil</p>
+                <p className="text-xs" style={{ color: scanText }}>Escanea para abrir mi perfil</p>
               </div>
             </div>
 
@@ -221,9 +235,9 @@ const VirtualCardPage = () => {
             <div className="h-px w-full" style={{ background: `linear-gradient(90deg, transparent, ${accent}20, transparent)` }} />
 
             {/* Footer */}
-            <div className="px-7 py-4 flex items-center justify-between" style={{ background: '#0d0d0d' }}>
+            <div className="px-7 py-4 flex items-center justify-between" style={{ background: footerBg }}>
               <span className="text-xs font-bold" style={{ color: accent }}>LinkOne</span>
-              <span className="text-xs text-neutral-600">Tarjeta digital</span>
+              <span className="text-xs" style={{ color: footerText }}>Tarjeta digital</span>
             </div>
           </div>
 
