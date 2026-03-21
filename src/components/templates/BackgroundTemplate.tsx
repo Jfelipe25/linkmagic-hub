@@ -25,7 +25,7 @@ const BackgroundTemplate = ({ profile, accentColor, profileId }: TemplateProps) 
   const visibleLinks = getVisibleLinks(profile.links || []);
 
   return (
-    <div className="min-h-screen w-full relative" style={{
+    <div className="w-full relative" style={{
         backgroundImage: bgImage ? `url(${bgImage})` : undefined,
         backgroundSize: 'cover',
         backgroundPosition: 'center',

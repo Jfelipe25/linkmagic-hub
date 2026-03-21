@@ -24,7 +24,7 @@ const DarkTemplate = ({ profile, accentColor, profileId }: TemplateProps) => {
   const visibleLinks = getVisibleLinks(profile.links || []);
 
   return (
-    <div className="min-h-screen w-full" style={{ backgroundColor: '#0f0f0f' }}>
+    <div className="w-full" style={{ backgroundColor: '#0f0f0f' }}>
       <div className="min-h-screen flex flex-col items-center px-6 py-12 mx-auto max-w-md" style={{ color: fontColor }}>
       {profile.avatar ? (
         <img src={profile.avatar} alt={profile.name}
