@@ -25,7 +25,7 @@ const MinimalTemplate = ({ profile, accentColor, profileId }: TemplateProps) => 
   return (
     <div className="min-h-full flex flex-col items-center px-6 py-12" style={{ backgroundColor: '#ffffff', color: fontColor }}>
       {profile.avatar && (
-        <img src={profile.avatar} alt={profile.name} className="w-24 h-24 rounded-full object-cover mb-4" />
+        <img src={profile.avatar} alt={profile.name} className="w-28 h-28 rounded-full object-cover mb-4" />
       )}
       {!profile.avatar && (
         <div className="w-20 h-20 rounded-full mb-4 flex items-center justify-center text-2xl font-bold" style={{ backgroundColor: fontColor + '22', color: fontColor }}>
