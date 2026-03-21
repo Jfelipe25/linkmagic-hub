@@ -1,9 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { ProfileData } from '@/types/profile';
 import { profileFromRow } from '@/lib/profile-utils';
-import { Loader2, Share2, ExternalLink, Copy, Check } from 'lucide-react';
+import { Loader2, Share2, ExternalLink, Copy, Check, Download } from 'lucide-react';
+import html2canvas from 'html2canvas';
 
 const VirtualCardPage = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -11,7 +12,9 @@ const VirtualCardPage = () => {
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [downloading, setDownloading] = useState(false);
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
+  const cardRef = useRef<HTMLDivElement>(null);
   const [canInstall, setCanInstall] = useState(false);
   const [installed, setInstalled] = useState(false);
 
@@ -88,18 +91,39 @@ const VirtualCardPage = () => {
 
   const handleShare = async () => {
     if (navigator.share) {
-      await navigator.share({ title: `${profile?.name} | LinkOne`, url: cardUrl });
+      await navigator.share({ title: `${profile?.name} | LinkOne`, url: profileUrl });
     } else {
-      navigator.clipboard.writeText(cardUrl);
+      navigator.clipboard.writeText(profileUrl);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     }
   };
 
   const handleCopy = () => {
-    navigator.clipboard.writeText(cardUrl);
+    navigator.clipboard.writeText(profileUrl);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
+  };
+
+  const handleDownloadImage = async () => {
+    if (!cardRef.current || !profile) return;
+    setDownloading(true);
+    try {
+      const canvas = await html2canvas(cardRef.current, {
+        scale: 3,
+        backgroundColor: null,
+        useCORS: true,
+        allowTaint: true,
+      });
+      const url = canvas.toDataURL('image/png');
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `tarjeta-${profile.slug}.png`;
+      a.click();
+    } catch (err) {
+      console.error('Download failed', err);
+    }
+    setDownloading(false);
   };
 
   if (loading) return (
@@ -128,7 +152,7 @@ const VirtualCardPage = () => {
         {/* Card container */}
         <div className="w-full max-w-sm relative z-10">
           {/* Main card */}
-          <div className="rounded-3xl overflow-hidden shadow-2xl border" style={{
+          <div ref={cardRef} className="rounded-3xl overflow-hidden shadow-2xl border" style={{
             background: 'linear-gradient(135deg, #1a1a1a 0%, #111 50%, #1a1a1a 100%)',
             borderColor: `${accent}30`
           }}>
@@ -191,12 +215,12 @@ const VirtualCardPage = () => {
               {copied ? <Check size={16} /> : <Share2 size={16} />}
               {copied ? 'Copiado' : 'Compartir'}
             </button>
-            <a href={profileUrl} target="_blank" rel="noopener noreferrer"
-              className="flex items-center justify-center gap-2 py-3 rounded-2xl text-sm font-semibold border transition-colors hover:bg-white/5"
+            <button onClick={handleDownloadImage} disabled={downloading}
+              className="flex items-center justify-center gap-2 py-3 rounded-2xl text-sm font-semibold border transition-colors hover:bg-white/5 disabled:opacity-50"
               style={{ borderColor: `${accent}40`, color: accent }}>
-              <ExternalLink size={16} />
-              Ver perfil
-            </a>
+              {downloading ? <Loader2 size={16} className="animate-spin" /> : <Download size={16} />}
+              {downloading ? 'Generando...' : 'Descargar'}
+            </button>
           </div>
 
           {/* Copy link */}
@@ -204,7 +228,7 @@ const VirtualCardPage = () => {
             className="mt-3 w-full flex items-center justify-center gap-2 py-2.5 rounded-2xl text-sm border transition-colors hover:bg-white/5"
             style={{ borderColor: '#ffffff15', color: '#666' }}>
             {copied ? <Check size={14} className="text-green-400" /> : <Copy size={14} />}
-            <span className="font-mono text-xs truncate">{cardUrl}</span>
+            <span className="font-mono text-xs truncate">{profileUrl}</span>
           </button>
 
           {/* PWA Install button */}
