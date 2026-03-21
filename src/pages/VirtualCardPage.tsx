@@ -14,7 +14,6 @@ const VirtualCardPage = () => {
   const [copied, setCopied] = useState(false);
   const [downloading, setDownloading] = useState(false);
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
-  const [cardColor, setCardColor] = useState<string>('');
   const cardRef = useRef<HTMLDivElement>(null);
   const [canInstall, setCanInstall] = useState(false);
   const [installed, setInstalled] = useState(false);
@@ -159,19 +158,7 @@ const VirtualCardPage = () => {
     </div>
   );
 
-  useEffect(() => {
-    if (slug) {
-      const saved = localStorage.getItem(`card_color_${slug}`);
-      if (saved) setCardColor(saved);
-    }
-  }, [slug]);
-
-  const handleColorChange = (color: string) => {
-    setCardColor(color);
-    if (slug) localStorage.setItem(`card_color_${slug}`, color);
-  };
-
-  const accent = cardColor || (profile ? profile.accent_color : '#d4a432') || '#d4a432';
+  const accent = profile.accent_color || '#d4a432';
 
   return (
     <div className="min-h-screen flex flex-col" style={{ background: '#0a0a0a' }}>
@@ -198,10 +185,10 @@ const VirtualCardPage = () => {
               <div className="flex items-center gap-4 mb-6">
                 {profile.avatar ? (
                   <img src={profile.avatar} alt={profile.name}
-                    className="w-24 h-24 rounded-2xl object-cover flex-shrink-0"
+                    className="w-20 h-20 rounded-2xl object-cover flex-shrink-0"
                     style={{ border: `2px solid ${accent}50` }} />
                 ) : (
-                  <div className="w-24 h-24 rounded-2xl flex items-center justify-center text-3xl font-bold flex-shrink-0"
+                  <div className="w-20 h-20 rounded-2xl flex items-center justify-center text-3xl font-bold flex-shrink-0"
                     style={{ background: `${accent}20`, color: accent, border: `2px solid ${accent}30` }}>
                     {profile.name?.charAt(0)?.toUpperCase()}
                   </div>
@@ -237,33 +224,6 @@ const VirtualCardPage = () => {
             <div className="px-7 py-4 flex items-center justify-between" style={{ background: '#0d0d0d' }}>
               <span className="text-xs font-bold" style={{ color: accent }}>LinkOne</span>
               <span className="text-xs text-neutral-600">Tarjeta digital</span>
-            </div>
-          </div>
-
-          {/* Color picker */}
-          <div className="mt-4 flex items-center gap-3">
-            <span className="text-xs text-neutral-500">Color de tarjeta:</span>
-            <div className="flex gap-2 flex-wrap">
-              {['#d4a432', '#a78bfa', '#60a5fa', '#f87171', '#4ade80', '#fb923c', '#f472b6', '#ffffff'].map(color => (
-                <button
-                  key={color}
-                  onClick={() => handleColorChange(color)}
-                  className="w-6 h-6 rounded-full transition-transform hover:scale-110 flex-shrink-0"
-                  style={{
-                    background: color,
-                    border: accent === color ? '2px solid white' : '2px solid transparent',
-                    boxShadow: accent === color ? '0 0 0 1px rgba(255,255,255,0.3)' : 'none'
-                  }}
-                />
-              ))}
-              <input
-                type="color"
-                value={cardColor || profile?.accent_color || '#d4a432'}
-                onChange={e => handleColorChange(e.target.value)}
-                className="w-6 h-6 rounded-full cursor-pointer border-0 p-0"
-                style={{ background: 'transparent' }}
-                title="Color personalizado"
-              />
             </div>
           </div>
 
