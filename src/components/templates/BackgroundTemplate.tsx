@@ -40,10 +40,10 @@ const BackgroundTemplate = ({ profile, accentColor, profileId }: TemplateProps) 
       <div className="relative z-10 flex flex-col items-center w-full">
         {profile.avatar ? (
           <img src={profile.avatar} alt={profile.name}
-            className="w-24 h-24 rounded-full object-cover mb-4"
+            className="w-28 h-28 rounded-full object-cover mb-4"
             style={{ border: `3px solid ${fontColor}cc` }} />
         ) : (
-          <div className="w-20 h-20 rounded-full mb-4 flex items-center justify-center text-2xl font-bold"
+          <div className="w-28 h-28 rounded-full mb-4 flex items-center justify-center text-2xl font-bold"
             style={{ backgroundColor: `${fontColor}33`, border: `3px solid ${fontColor}cc` }}>
             {profile.name?.charAt(0)?.toUpperCase() || '?'}
           </div>

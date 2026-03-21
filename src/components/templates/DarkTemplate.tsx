@@ -27,10 +27,10 @@ const DarkTemplate = ({ profile, accentColor, profileId }: TemplateProps) => {
     <div className="min-h-full flex flex-col items-center px-6 py-12" style={{ backgroundColor: '#0f0f0f', color: fontColor }}>
       {profile.avatar ? (
         <img src={profile.avatar} alt={profile.name}
-          className="w-24 h-24 rounded-full object-cover mb-4"
+          className="w-28 h-28 rounded-full object-cover mb-4"
           style={{ boxShadow: `0 0 0 3px ${fontColor}` }} />
       ) : (
-        <div className="w-20 h-20 rounded-full mb-4 flex items-center justify-center text-2xl font-bold"
+        <div className="w-28 h-28 rounded-full mb-4 flex items-center justify-center text-2xl font-bold"
           style={{ backgroundColor: fontColor, color: '#0f0f0f', boxShadow: `0 0 0 3px ${fontColor}44` }}>
           {profile.name?.charAt(0)?.toUpperCase() || '?'}
         </div>

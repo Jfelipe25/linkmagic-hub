@@ -23,12 +23,12 @@ const MinimalTemplate = ({ profile, accentColor, profileId }: TemplateProps) => 
   const visibleLinks = getVisibleLinks(profile.links || []);
 
   return (
-    <div className="min-h-full flex flex-col items-center px-6 py-12" style={{ backgroundColor: '#ffffff', color: fontColor }}>
+    <div className="min-h-full flex flex-col items-center px-6 py-12 mx-auto w-full max-w-md" style={{ backgroundColor: '#ffffff', color: fontColor }}>
       {profile.avatar && (
         <img src={profile.avatar} alt={profile.name} className="w-28 h-28 rounded-full object-cover mb-4" />
       )}
       {!profile.avatar && (
-        <div className="w-20 h-20 rounded-full mb-4 flex items-center justify-center text-2xl font-bold" style={{ backgroundColor: fontColor + '22', color: fontColor }}>
+        <div className="w-28 h-28 rounded-full mb-4 flex items-center justify-center text-2xl font-bold" style={{ backgroundColor: fontColor + '22', color: fontColor }}>
           {profile.name?.charAt(0)?.toUpperCase() || '?'}
         </div>
       )}
