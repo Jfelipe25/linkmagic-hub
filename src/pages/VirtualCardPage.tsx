@@ -171,7 +171,7 @@ const VirtualCardPage = () => {
     if (slug) localStorage.setItem(`card_color_${slug}`, color);
   };
 
-  const accent = cardColor || profile?.accent_color || '#d4a432';
+  const accent = cardColor || (profile ? profile.accent_color : '#d4a432') || '#d4a432';
 
   return (
     <div className="min-h-screen flex flex-col" style={{ background: '#0a0a0a' }}>
