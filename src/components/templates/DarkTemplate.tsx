@@ -69,7 +69,6 @@ const DarkTemplate = ({ profile, accentColor, profileId }: TemplateProps) => {
       {profile.enable_contact_form && profileId && (
         <ContactForm profileId={profileId} accentColor={accentColor} fontColor={fontColor} />
       )}
-    </div>
       </div>
     </div>
   );
