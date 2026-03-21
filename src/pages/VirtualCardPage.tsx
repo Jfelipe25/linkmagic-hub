@@ -185,7 +185,7 @@ const VirtualCardPage = () => {
               <div className="flex items-center gap-4 mb-6">
                 {profile.avatar ? (
                   <img src={profile.avatar} alt={profile.name}
-                    className="w-20 h-20 rounded-2xl object-cover flex-shrink-0"
+                    className="w-24 h-24 rounded-2xl object-cover flex-shrink-0"
                     style={{ border: `2px solid ${accent}50` }} />
                 ) : (
                   <div className="w-20 h-20 rounded-2xl flex items-center justify-center text-3xl font-bold flex-shrink-0"
