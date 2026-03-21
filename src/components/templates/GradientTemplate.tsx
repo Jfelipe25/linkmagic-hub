@@ -42,7 +42,7 @@ const GradientTemplate = ({ profile, accentColor, profileId }: TemplateProps) =>
       }}>
       {profile.avatar ? (
         <img src={profile.avatar} alt={profile.name}
-          className="w-20 h-20 rounded-full object-cover mb-4"
+          className="w-24 h-24 rounded-full object-cover mb-4"
           style={{ border: `3px solid ${fontColor}cc` }} />
       ) : (
         <div className="w-20 h-20 rounded-full mb-4 flex items-center justify-center text-2xl font-bold"
