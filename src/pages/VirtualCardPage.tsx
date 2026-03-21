@@ -236,7 +236,7 @@ const VirtualCardPage = () => {
 
             {/* Footer */}
             <div className="px-7 py-4 flex items-center justify-between" style={{ background: footerBg }}>
-              <span className="text-xs font-bold" style={{ color: accent }}>LinkOne</span>
+              <span className="text-xs font-bold" style={{ color: accent }}>LinkOne.bio</span>
               <span className="text-xs" style={{ color: footerText }}>Tarjeta digital</span>
             </div>
           </div>
