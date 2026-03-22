@@ -15,10 +15,6 @@
       "dest": "/api/u/[slug]?slug=$slug"
     },
     {
-      "src": "/api/og/(?<slug>[^/]+)",
-      "dest": "/api/og/[slug]?slug=$slug"
-    },
-    {
       "handle": "filesystem"
     },
     {
