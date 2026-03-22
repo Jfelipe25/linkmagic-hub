@@ -1,4 +1,5 @@
 import { ProfileData, SocialLinks, SOCIAL_PLATFORMS, getVisibleLinks } from '@/types/profile';
+import { normalizeUrl } from '@/lib/profile-utils';
 import { trackLinkClick } from '@/hooks/useLinkClicks';
 import ContactForm from '@/components/ContactForm';
 import {
@@ -42,7 +43,7 @@ const MinimalTemplate = ({ profile, accentColor, profileId }: TemplateProps) => 
             const platform = SOCIAL_PLATFORMS.find(p => p.key === key);
             const Icon = platform ? iconMap[platform.icon] : ExternalLink;
             return (
-              <a key={key} href={url as string} target="_blank" rel="noopener noreferrer"
+              <a key={key} href={normalizeUrl(url as string)} target="_blank" rel="noopener noreferrer"
                 className="w-8 h-8 flex items-center justify-center rounded-full transition-colors hover:opacity-80"
                 style={{ color: fontColor }}>
                 <Icon size={18} />
@@ -54,7 +55,7 @@ const MinimalTemplate = ({ profile, accentColor, profileId }: TemplateProps) => 
 
       <div className="w-full mt-6 space-y-3">
         {visibleLinks.map((link) => (
-          <a key={link.id} href={link.url} target="_blank" rel="noopener noreferrer"
+          <a key={link.id} href={normalizeUrl(link.url)} target="_blank" rel="noopener noreferrer"
             className="block w-full text-center py-3 rounded-full text-sm font-medium transition-all"
             style={{
               border: `2px solid ${fontColor}`,

@@ -14,6 +14,7 @@ import SocialInput from './SocialInput';
 import LinkItem from './LinkItem';
 import ColorPicker from './ColorPicker';
 import TemplateCard from './TemplateCard';
+import { normalizeUrl } from '@/lib/profile-utils';
 
 interface ProfileEditorFormProps {
   profile: ProfileData;
@@ -49,9 +50,10 @@ const ProfileEditorForm = ({ profile, onChange, onPublish, publishLabel = 'Pagar
   }, [profile, onChange]);
 
   const updateLink = useCallback((id: string, field: 'label' | 'url' | 'schedule_start' | 'schedule_end', value: string) => {
+    const finalValue = field === 'url' ? normalizeUrl(value) : value;
     onChange({
       ...profile,
-      links: profile.links.map(l => l.id === id ? { ...l, [field]: value } : l),
+      links: profile.links.map(l => l.id === id ? { ...l, [field]: finalValue } : l),
     });
   }, [profile, onChange]);
 
