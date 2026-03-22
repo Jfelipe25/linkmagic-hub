@@ -4,10 +4,6 @@
   "framework": "vite",
   "routes": [
     {
-      "src": "/api/og/(?<slug>[^/]+)",
-      "dest": "/api/og/[slug]?slug=$slug"
-    },
-    {
       "src": "/u/(?<slug>[^/]+)",
       "has": [
         {
