@@ -1,8 +1,17 @@
 {
   "rewrites": [
-    { "source": "/u/:slug", "destination": "/api/u/:slug" },
+    {
+      "source": "/u/:slug",
+      "has": [
+        {
+          "type": "header",
+          "key": "user-agent",
+          "value": ".*(bot|crawl|slurp|spider|whatsapp|facebook|twitter|telegram|linkedin|slack|discord).*"
+        }
+      ],
+      "destination": "/api/u/:slug"
+    },
     { "source": "/card/:slug", "destination": "/api/card/:slug" },
-    { "source": "/api/(.*)", "destination": "/api/$1" },
-    { "source": "/((?!api/).*)", "destination": "/index.html" }
+    { "source": "/(.*)", "destination": "/index.html" }
   ]
 }
