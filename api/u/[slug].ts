@@ -4,7 +4,6 @@ const SUPABASE_URL = process.env.VITE_SUPABASE_URL!;
 const SUPABASE_KEY = process.env.VITE_SUPABASE_PUBLISHABLE_KEY!;
 const APP_URL = 'https://www.linkone.bio';
 
-// Bots que leen OG tags para previews
 const BOT_AGENTS = /whatsapp|facebookexternalhit|twitterbot|telegrambot|linkedinbot|slackbot|discordbot|googlebot|bingbot|yandex|baidu|duckduckbot|applebot|pinterest|vkshare|w3c_validator/i;
 
 function escapeHtml(str: string): string {
@@ -20,20 +19,16 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const userAgent = req.headers['user-agent'] || '';
   const isBot = BOT_AGENTS.test(userAgent);
 
-  // ── Usuario real → el SPA lo maneja. Servimos index.html del proyecto. ────
-  // Vercel compila el SPA a /index.html. Lo fetcheamos desde el mismo dominio.
+  // ── Usuario real → redirigir al SPA via index.html ────────────────────────
   if (!isBot) {
-    try {
-      const indexRes = await fetch(`${APP_URL}/index.html`);
-      const html = await indexRes.text();
-      res.setHeader('Content-Type', 'text/html; charset=utf-8');
-      res.setHeader('Cache-Control', 'no-store');
-      return res.status(200).send(html);
-    } catch (_) {
-      // fallback: redirect simple
-      res.setHeader('Location', APP_URL + '/u/' + slug + '?spa=1');
-      return res.status(302).end();
-    }
+    // Leemos el index.html compilado del mismo servidor y lo devolvemos.
+    // Vercel lo tiene en disco bajo /var/task o accesible via filesystem.
+    // La forma más simple y confiable: redirect 302 con header que evita loop.
+    // Como /u/:slug ya fue capturado por routes, usamos un path alternativo
+    // que cae en el catch-all "/(.*)" -> index.html
+    res.setHeader('Location', `${APP_URL}/?_u=${encodeURIComponent(slug)}`);
+    res.setHeader('Cache-Control', 'no-store');
+    return res.status(302).end();
   }
 
   // ── Bot → consultar Supabase y devolver HTML con OG tags ──────────────────
@@ -57,9 +52,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       bio    = data[0].bio    || bio;
       avatar = data[0].avatar || '';
     }
-  } catch (_) {
-    // silencioso — usamos defaults
-  }
+  } catch (_) {}
 
   const safeName   = escapeHtml(name);
   const safeBio    = escapeHtml(bio);
