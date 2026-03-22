@@ -5,11 +5,14 @@
   "routes": [
     {
       "src": "/u/(?<slug>[^/]+)",
+      "has": [
+        {
+          "type": "header",
+          "key": "user-agent",
+          "value": "(?i).*(whatsapp|facebookexternalhit|twitterbot|telegrambot|linkedinbot|slackbot|discordbot|googlebot|bingbot|yandex|duckduckbot|applebot|pinterest|vkshare|w3c_validator).*"
+        }
+      ],
       "dest": "/api/u/[slug]?slug=$slug"
-    },
-    {
-      "src": "/card/(?<slug>[^/]+)",
-      "dest": "/api/card/[slug]?slug=$slug"
     },
     {
       "handle": "filesystem"

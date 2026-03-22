@@ -1,12 +1,8 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { readFileSync } from 'fs';
-import { join } from 'path';
 
 const SUPABASE_URL = process.env.VITE_SUPABASE_URL!;
 const SUPABASE_KEY = process.env.VITE_SUPABASE_PUBLISHABLE_KEY!;
 const APP_URL = 'https://www.linkone.bio';
-
-const BOT_AGENTS = /whatsapp|facebookexternalhit|twitterbot|telegrambot|linkedinbot|slackbot|discordbot|googlebot|bingbot|yandex|baidu|duckduckbot|applebot|pinterest|vkshare|w3c_validator/i;
 
 function escapeHtml(str: string): string {
   return str
@@ -16,12 +12,10 @@ function escapeHtml(str: string): string {
     .replace(/>/g, '&gt;');
 }
 
+// Esta función SOLO recibe bots — el vercel.json filtra por user-agent
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   const slug = Array.isArray(req.query.slug) ? req.query.slug[0] : req.query.slug || '';
-  const userAgent = req.headers['user-agent'] || '';
-  const isBot = BOT_AGENTS.test(userAgent);
 
-  // Consultar perfil (siempre — tanto para bots como para inyectar en el SPA)
   let name = 'LinkOne';
   let bio = 'Tu identidad digital en un solo link';
   let avatar = '';
@@ -44,33 +38,30 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const safeAvatar = escapeHtml(avatar);
   const profileUrl = `${APP_URL}/u/${slug}`;
 
-  const ogTags = `
-  <meta name="description" content="${safeBio}" />
-  <meta property="og:type"         content="profile" />
-  <meta property="og:site_name"    content="LinkOne" />
-  <meta property="og:title"        content="${safeName} | LinkOne" />
-  <meta property="og:description"  content="${safeBio}" />
-  <meta property="og:url"          content="${profileUrl}" />${avatar ? `
+  const ogImage = avatar ? `
   <meta property="og:image"            content="${safeAvatar}" />
   <meta property="og:image:secure_url" content="${safeAvatar}" />
   <meta property="og:image:width"      content="400" />
   <meta property="og:image:height"     content="400" />
-  <meta name="twitter:image"           content="${safeAvatar}" />` : ''}
-  <meta name="twitter:card"        content="summary" />
-  <meta name="twitter:title"       content="${safeName} | LinkOne" />
-  <meta name="twitter:description" content="${safeBio}" />`;
+  <meta name="twitter:image"           content="${safeAvatar}" />` : '';
 
-  // ── Bot → HTML mínimo estático con OG tags (no necesita React) ────────────
-  if (isBot) {
-    res.setHeader('Content-Type', 'text/html; charset=utf-8');
-    res.setHeader('Cache-Control', 's-maxage=3600, stale-while-revalidate=86400');
-    return res.status(200).send(`<!DOCTYPE html>
+  res.setHeader('Content-Type', 'text/html; charset=utf-8');
+  res.setHeader('Cache-Control', 's-maxage=3600, stale-while-revalidate=86400');
+  return res.status(200).send(`<!DOCTYPE html>
 <html lang="es" prefix="og: https://ogp.me/ns#">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>${safeName} | LinkOne</title>
-  ${ogTags}
+  <meta name="description" content="${safeBio}" />
+  <meta property="og:type"         content="profile" />
+  <meta property="og:site_name"    content="LinkOne" />
+  <meta property="og:title"        content="${safeName} | LinkOne" />
+  <meta property="og:description"  content="${safeBio}" />
+  <meta property="og:url"          content="${profileUrl}" />${ogImage}
+  <meta name="twitter:card"        content="summary" />
+  <meta name="twitter:title"       content="${safeName} | LinkOne" />
+  <meta name="twitter:description" content="${safeBio}" />
 </head>
 <body>
   <h1>${safeName}</h1>
@@ -78,24 +69,4 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   <a href="${profileUrl}">Ver perfil en LinkOne</a>
 </body>
 </html>`);
-  }
-
-  // ── Usuario real → servir dist/index.html con OG tags inyectados ──────────
-  try {
-    const indexPath = join(process.cwd(), 'dist', 'index.html');
-    let html = readFileSync(indexPath, 'utf-8');
-
-    // Inyectar OG tags y título del perfil justo antes de </head>
-    html = html
-      .replace(/<title>[^<]*<\/title>/, `<title>${safeName} | LinkOne</title>`)
-      .replace('</head>', `${ogTags}\n</head>`);
-
-    res.setHeader('Content-Type', 'text/html; charset=utf-8');
-    res.setHeader('Cache-Control', 'no-store');
-    return res.status(200).send(html);
-  } catch (_) {
-    // Fallback si no se puede leer el disco
-    res.setHeader('Location', APP_URL);
-    return res.status(302).end();
-  }
 }
