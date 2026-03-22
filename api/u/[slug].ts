@@ -3,19 +3,12 @@ import type { VercelRequest, VercelResponse } from '@vercel/node';
 const SUPABASE_URL = process.env.VITE_SUPABASE_URL!;
 const SUPABASE_KEY = process.env.VITE_SUPABASE_PUBLISHABLE_KEY!;
 
+const BOT_AGENTS = /whatsapp|facebookexternalhit|twitterbot|telegrambot|linkedinbot|slackbot|discordbot|googlebot|bingbot|yandex|baidu|duckduck/i;
+
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   const { slug } = req.query;
   const userAgent = req.headers['user-agent'] || '';
-  const isBotOrScraper = /whatsapp|facebook|facebookexternalhit|twitterbot|telegrambot|linkedinbot|slackbot|discordbot|bot|crawler|scraper/i.test(userAgent);
-
-  if (!isBotOrScraper) {
-    // Usuario real — servir el index.html del SPA directamente
-    const spaResponse = await fetch('https://www.linkone.bio/index.html');
-    const html = await spaResponse.text();
-    res.setHeader('Content-Type', 'text/html');
-    res.status(200).send(html);
-    return;
-  }
+  const isBot = BOT_AGENTS.test(userAgent);
 
   let name = 'LinkOne';
   let bio = 'Tu identidad digital en un solo link';
@@ -36,7 +29,33 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   const profileUrl = `https://www.linkone.bio/u/${slug}`;
 
-  const html = `<!DOCTYPE html>
+  if (!isBot) {
+    // Usuario real — HTML que carga el SPA con script redirect
+    res.setHeader('Content-Type', 'text/html');
+    res.status(200).send(`<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>${name} | LinkOne</title>
+  <meta property="og:title" content="${name} | LinkOne" />
+  <meta property="og:description" content="${bio}" />
+  <meta property="og:image" content="${avatar}" />
+  <meta property="og:url" content="${profileUrl}" />
+  <script>
+    // Cargar el SPA completo
+    window.location.replace('${profileUrl}?_spa=1');
+  </script>
+</head>
+<body><p>Cargando...</p></body>
+</html>`);
+    return;
+  }
+
+  // Bot — devolver OG tags completos
+  res.setHeader('Content-Type', 'text/html');
+  res.setHeader('Cache-Control', 's-maxage=3600, stale-while-revalidate');
+  res.status(200).send(`<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
@@ -57,12 +76,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   <meta name="twitter:description" content="${bio}" />
   ${avatar ? `<meta name="twitter:image" content="${avatar}" />` : ''}
 </head>
-<body>
-  <p>${name} - ${bio}</p>
-</body>
-</html>`;
-
-  res.setHeader('Content-Type', 'text/html');
-  res.setHeader('Cache-Control', 's-maxage=3600, stale-while-revalidate');
-  res.status(200).send(html);
+<body><p>${name} - ${bio}</p></body>
+</html>`);
 }
