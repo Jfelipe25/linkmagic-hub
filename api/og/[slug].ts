@@ -1,4 +1,5 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
+import sharp from 'sharp';
 
 const SUPABASE_URL = process.env.VITE_SUPABASE_URL!;
 const SUPABASE_KEY = process.env.VITE_SUPABASE_PUBLISHABLE_KEY!;
@@ -54,45 +55,29 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       <stop offset="100%" stop-color="transparent"/>
     </linearGradient>
   </defs>
-
-  <!-- Fondo -->
   <rect width="1200" height="630" fill="#111111"/>
   <rect width="1200" height="630" fill="url(#bgGrad)"/>
   <rect x="0" y="0" width="1200" height="5" fill="url(#lineGrad)"/>
-
-  <!-- Círculo fondo avatar -->
   <circle cx="260" cy="315" r="170" fill="${accent}" opacity="0.06"/>
   <circle cx="260" cy="315" r="162" fill="#1a1a1a"/>
-
   ${avatarB64
     ? `<image href="${avatarB64}" x="105" y="160" width="310" height="310" clip-path="url(#avatarClip)" preserveAspectRatio="xMidYMid slice"/>`
     : `<text x="260" y="360" font-family="system-ui" font-size="120" font-weight="700" fill="${accent}" text-anchor="middle">${name.charAt(0).toUpperCase()}</text>`
   }
-
-  <!-- Borde círculo -->
   <circle cx="260" cy="315" r="158" fill="none" stroke="${accent}" stroke-width="3" opacity="0.5"/>
-
-  <!-- Línea divisoria -->
   <line x1="480" y1="160" x2="480" y2="470" stroke="${accent}" stroke-width="1" opacity="0.2"/>
-
-  <!-- Nombre -->
   <text x="545" y="270" font-family="system-ui, -apple-system, sans-serif" font-size="56" font-weight="700" fill="#ffffff">${safeName}</text>
-
-  <!-- Bio -->
   <text x="545" y="335" font-family="system-ui, -apple-system, sans-serif" font-size="30" fill="#9ca3af">${safeBio}</text>
-
-  <!-- Separador -->
   <rect x="545" y="375" width="500" height="1" fill="${accent}" opacity="0.25"/>
-
-  <!-- Link -->
   <circle cx="556" cy="418" r="6" fill="${accent}"/>
   <text x="578" y="427" font-family="monospace, system-ui" font-size="26" font-weight="600" fill="${accent}">linkone.bio/u/${slug}</text>
-
-  <!-- Branding -->
   <text x="1150" y="608" font-family="system-ui" font-size="20" font-weight="700" fill="${accent}" opacity="0.4" text-anchor="end">LinkOne</text>
 </svg>`;
 
-  res.setHeader('Content-Type', 'image/svg+xml');
+  // Convertir SVG a PNG con sharp
+  const png = await sharp(Buffer.from(svg)).png().toBuffer();
+
+  res.setHeader('Content-Type', 'image/png');
   res.setHeader('Cache-Control', 's-maxage=86400, stale-while-revalidate=604800');
-  return res.status(200).send(svg);
+  return res.status(200).send(png);
 }
