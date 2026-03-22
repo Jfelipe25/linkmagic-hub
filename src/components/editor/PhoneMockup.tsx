@@ -8,7 +8,7 @@ const MOBILE_WIDTH = 390;
 const MOCKUP_WIDTH = 260;
 const SCALE = MOCKUP_WIDTH / MOBILE_WIDTH;
 const MOCKUP_HEIGHT = 520;
-const CONTENT_HEIGHT = Math.ceil(MOCKUP_HEIGHT / SCALE); // 780px
+const CONTENT_HEIGHT = MOCKUP_HEIGHT / SCALE;
 
 const PhoneMockup = ({ children }: PhoneMockupProps) => {
   return (
@@ -18,23 +18,16 @@ const PhoneMockup = ({ children }: PhoneMockupProps) => {
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-24 h-5 bg-[#2a2a2a] rounded-b-xl z-10" />
         {/* Screen container */}
         <div style={{ height: MOCKUP_HEIGHT, overflow: 'hidden', position: 'relative' }}>
-          {/* Scaler - renderiza a tamaño real y escala visualmente */}
+          {/* Scaler */}
           <div style={{
             width: MOBILE_WIDTH,
             height: CONTENT_HEIGHT,
             transform: `scale(${SCALE})`,
             transformOrigin: 'top left',
             overflow: 'hidden',
-            position: 'absolute',
-            top: 0,
-            left: 0,
           }}>
-            {/* Wrapper que fuerza el fondo a llenar exactamente CONTENT_HEIGHT */}
-            <div style={{
-              width: '100%',
-              minHeight: CONTENT_HEIGHT,
-              height: CONTENT_HEIGHT,
-            }}>
+            {/* Inner wrapper con altura completa para que min-h-full funcione */}
+            <div style={{ minHeight: CONTENT_HEIGHT, display: 'flex', flexDirection: 'column' }}>
               {children}
             </div>
           </div>
