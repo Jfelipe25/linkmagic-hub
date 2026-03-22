@@ -2,80 +2,99 @@ import type { VercelRequest, VercelResponse } from '@vercel/node';
 
 const SUPABASE_URL = process.env.VITE_SUPABASE_URL!;
 const SUPABASE_KEY = process.env.VITE_SUPABASE_PUBLISHABLE_KEY!;
+const APP_URL = 'https://www.linkone.bio';
 
-const BOT_AGENTS = /whatsapp|facebookexternalhit|twitterbot|telegrambot|linkedinbot|slackbot|discordbot|googlebot|bingbot|yandex|baidu|duckduck/i;
+// Bots que leen OG tags para previews
+const BOT_AGENTS = /whatsapp|facebookexternalhit|twitterbot|telegrambot|linkedinbot|slackbot|discordbot|googlebot|bingbot|yandex|baidu|duckduckbot|applebot|pinterest|vkshare|w3c_validator/i;
+
+function escapeHtml(str: string): string {
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/"/g, '&quot;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+}
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  const { slug } = req.query;
+  const slug = Array.isArray(req.query.slug) ? req.query.slug[0] : req.query.slug || '';
   const userAgent = req.headers['user-agent'] || '';
   const isBot = BOT_AGENTS.test(userAgent);
 
+  // ── Usuario real → el SPA lo maneja. Servimos index.html del proyecto. ────
+  // Vercel compila el SPA a /index.html. Lo fetcheamos desde el mismo dominio.
+  if (!isBot) {
+    try {
+      const indexRes = await fetch(`${APP_URL}/index.html`);
+      const html = await indexRes.text();
+      res.setHeader('Content-Type', 'text/html; charset=utf-8');
+      res.setHeader('Cache-Control', 'no-store');
+      return res.status(200).send(html);
+    } catch (_) {
+      // fallback: redirect simple
+      res.setHeader('Location', APP_URL + '/u/' + slug + '?spa=1');
+      return res.status(302).end();
+    }
+  }
+
+  // ── Bot → consultar Supabase y devolver HTML con OG tags ──────────────────
   let name = 'LinkOne';
   let bio = 'Tu identidad digital en un solo link';
   let avatar = '';
 
   try {
-    const response = await fetch(
-      `${SUPABASE_URL}/rest/v1/profiles?select=name,bio,avatar,slug&slug=eq.${slug}&paid=eq.true`,
-      { headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` } }
+    const apiRes = await fetch(
+      `${SUPABASE_URL}/rest/v1/profiles?select=name,bio,avatar&slug=eq.${encodeURIComponent(slug)}&paid=eq.true`,
+      {
+        headers: {
+          apikey: SUPABASE_KEY,
+          Authorization: `Bearer ${SUPABASE_KEY}`,
+        },
+      }
     );
-    const data = await response.json();
+    const data = await apiRes.json();
     if (data?.[0]) {
-      name = data[0].name || name;
-      bio = data[0].bio || bio;
+      name   = data[0].name   || name;
+      bio    = data[0].bio    || bio;
       avatar = data[0].avatar || '';
     }
-  } catch {}
-
-  const profileUrl = `https://www.linkone.bio/u/${slug}`;
-
-  if (!isBot) {
-    // Usuario real — HTML que carga el SPA con script redirect
-    res.setHeader('Content-Type', 'text/html');
-    res.status(200).send(`<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>${name} | LinkOne</title>
-  <meta property="og:title" content="${name} | LinkOne" />
-  <meta property="og:description" content="${bio}" />
-  <meta property="og:image" content="${avatar}" />
-  <meta property="og:url" content="${profileUrl}" />
-  <script>
-    // Cargar el SPA completo
-    window.location.replace('${profileUrl}?_spa=1');
-  </script>
-</head>
-<body><p>Cargando...</p></body>
-</html>`);
-    return;
+  } catch (_) {
+    // silencioso — usamos defaults
   }
 
-  // Bot — devolver OG tags completos
-  res.setHeader('Content-Type', 'text/html');
-  res.setHeader('Cache-Control', 's-maxage=3600, stale-while-revalidate');
-  res.status(200).send(`<!DOCTYPE html>
-<html lang="es">
+  const safeName   = escapeHtml(name);
+  const safeBio    = escapeHtml(bio);
+  const safeAvatar = escapeHtml(avatar);
+  const profileUrl = `${APP_URL}/u/${slug}`;
+
+  const ogImage = avatar ? `
+  <meta property="og:image"            content="${safeAvatar}" />
+  <meta property="og:image:secure_url" content="${safeAvatar}" />
+  <meta property="og:image:width"      content="400" />
+  <meta property="og:image:height"     content="400" />
+  <meta name="twitter:image"           content="${safeAvatar}" />` : '';
+
+  res.setHeader('Content-Type', 'text/html; charset=utf-8');
+  res.setHeader('Cache-Control', 's-maxage=3600, stale-while-revalidate=86400');
+  return res.status(200).send(`<!DOCTYPE html>
+<html lang="es" prefix="og: https://ogp.me/ns#">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>${name} | LinkOne</title>
-  <meta name="description" content="${bio}" />
-  <meta property="og:title" content="${name} | LinkOne" />
-  <meta property="og:description" content="${bio}" />
-  <meta property="og:type" content="profile" />
-  <meta property="og:url" content="${profileUrl}" />
-  ${avatar ? `<meta property="og:image" content="${avatar}" />
-  <meta property="og:image:width" content="400" />
-  <meta property="og:image:height" content="400" />
-  <meta property="og:image:secure_url" content="${avatar}" />` : ''}
-  <meta property="og:site_name" content="LinkOne" />
-  <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="${name} | LinkOne" />
-  <meta name="twitter:description" content="${bio}" />
-  ${avatar ? `<meta name="twitter:image" content="${avatar}" />` : ''}
+  <title>${safeName} | LinkOne</title>
+  <meta name="description" content="${safeBio}" />
+  <meta property="og:type"         content="profile" />
+  <meta property="og:site_name"    content="LinkOne" />
+  <meta property="og:title"        content="${safeName} | LinkOne" />
+  <meta property="og:description"  content="${safeBio}" />
+  <meta property="og:url"          content="${profileUrl}" />${ogImage}
+  <meta name="twitter:card"        content="summary" />
+  <meta name="twitter:title"       content="${safeName} | LinkOne" />
+  <meta name="twitter:description" content="${safeBio}" />
 </head>
-<body><p>${name} - ${bio}</p></body>
+<body>
+  <h1>${safeName}</h1>
+  <p>${safeBio}</p>
+  <a href="${profileUrl}">Ver perfil en LinkOne</a>
+</body>
 </html>`);
 }
