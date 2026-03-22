@@ -8,7 +8,7 @@ const MOBILE_WIDTH = 390;
 const MOCKUP_WIDTH = 260;
 const SCALE = MOCKUP_WIDTH / MOBILE_WIDTH;
 const MOCKUP_HEIGHT = 520;
-const CONTENT_HEIGHT = Math.ceil(MOCKUP_HEIGHT / SCALE); // 780px
+const CONTENT_HEIGHT = MOCKUP_HEIGHT / SCALE; // 780px
 
 const PhoneMockup = ({ children }: PhoneMockupProps) => {
   return (
@@ -16,28 +16,21 @@ const PhoneMockup = ({ children }: PhoneMockupProps) => {
       <div className="relative rounded-[2rem] border-[5px] border-[#2a2a2a] bg-[#1a1a1a] shadow-2xl overflow-hidden">
         {/* Notch */}
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-24 h-5 bg-[#2a2a2a] rounded-b-xl z-10" />
-        {/* Screen container */}
+        {/* Screen container — tamaño visual */}
         <div style={{ height: MOCKUP_HEIGHT, overflow: 'hidden', position: 'relative' }}>
-          {/* Scaler */}
+          {/* Scaler — renderiza a 390px y escala a 260px */}
           <div style={{
             width: MOBILE_WIDTH,
-            height: CONTENT_HEIGHT,
             transform: `scale(${SCALE})`,
             transformOrigin: 'top left',
-            overflow: 'hidden',
+            overflowY: 'auto',
+            overflowX: 'hidden',
+            height: CONTENT_HEIGHT,
             position: 'absolute',
             top: 0,
             left: 0,
           }}>
-            {/* Wrapper con altura FIJA de 780px — ignora min-h-screen del template */}
-            <div style={{
-              width: '100%',
-              height: CONTENT_HEIGHT,
-              minHeight: CONTENT_HEIGHT,
-              overflow: 'hidden',
-            }}>
-              {children}
-            </div>
+            {children}
           </div>
         </div>
         {/* Home indicator */}
