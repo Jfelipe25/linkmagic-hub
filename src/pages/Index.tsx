@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ProfileData, DEFAULT_PROFILE } from '@/types/profile';
@@ -20,6 +20,15 @@ const Index = () => {
   const navigate = useNavigate();
   const { t } = useLanguage();
   const { options: pricingOptions, selected: selectedPricing, setSelected: setSelectedPricing, loading: pricingLoading } = usePricing();
+
+  // Redirigir perfiles que vienen de la función OG (/u/slug → /?_u=slug → /u/slug)
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const profileSlug = params.get('_u');
+    if (profileSlug) {
+      navigate(`/u/${profileSlug}`, { replace: true });
+    }
+  }, [navigate]);
 
   const handlePublish = async () => {
     if (!profile.name.trim()) { toast.error('Por favor ingresa tu nombre'); return; }
