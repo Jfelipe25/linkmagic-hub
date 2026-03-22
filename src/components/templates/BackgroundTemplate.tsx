@@ -32,7 +32,7 @@ const BackgroundTemplate = ({ profile, accentColor, profileId }: TemplateProps) 
         backgroundColor: bgImage ? undefined : '#ffffff',
       }}>
       <div className="absolute inset-0" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }} />
-      <div className="min-h-screen relative z-10 flex flex-col items-center px-6 py-12 mx-auto max-w-md" style={{ color: fontColor }}>
+      <div className="relative z-10 flex flex-col items-center px-6 py-12 mx-auto max-w-md" style={{ minHeight: '100%' }} style={{ color: fontColor }}>
         {profile.avatar ? (
           <img src={profile.avatar} alt={profile.name}
             className="w-28 h-28 rounded-full object-cover mb-4"
