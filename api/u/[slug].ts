@@ -1,4 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
+import { readFileSync } from 'fs';
+import { join } from 'path';
 
 const SUPABASE_URL = process.env.VITE_SUPABASE_URL!;
 const SUPABASE_KEY = process.env.VITE_SUPABASE_PUBLISHABLE_KEY!;
@@ -19,16 +21,20 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const userAgent = req.headers['user-agent'] || '';
   const isBot = BOT_AGENTS.test(userAgent);
 
-  // ── Usuario real → redirigir al SPA via index.html ────────────────────────
+  // ── Usuario real → servir index.html del disco (el SPA compilado) ─────────
   if (!isBot) {
-    // Leemos el index.html compilado del mismo servidor y lo devolvemos.
-    // Vercel lo tiene en disco bajo /var/task o accesible via filesystem.
-    // La forma más simple y confiable: redirect 302 con header que evita loop.
-    // Como /u/:slug ya fue capturado por routes, usamos un path alternativo
-    // que cae en el catch-all "/(.*)" -> index.html
-    res.setHeader('Location', `${APP_URL}/?_u=${encodeURIComponent(slug)}`);
-    res.setHeader('Cache-Control', 'no-store');
-    return res.status(302).end();
+    try {
+      // En Vercel, el output directory (dist/) está en /var/task/dist/
+      const indexPath = join(process.cwd(), 'dist', 'index.html');
+      const html = readFileSync(indexPath, 'utf-8');
+      res.setHeader('Content-Type', 'text/html; charset=utf-8');
+      res.setHeader('Cache-Control', 'no-store');
+      return res.status(200).send(html);
+    } catch (_) {
+      // Si falla leer del disco, redirect simple al home
+      res.setHeader('Location', APP_URL);
+      return res.status(302).end();
+    }
   }
 
   // ── Bot → consultar Supabase y devolver HTML con OG tags ──────────────────
