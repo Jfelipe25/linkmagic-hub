@@ -23,7 +23,7 @@ const MinimalTemplate = ({ profile, accentColor, profileId }: TemplateProps) => 
   const visibleLinks = getVisibleLinks(profile.links || []);
 
   return (
-    <div className="w-full" style={{ backgroundColor: '#ffffff' }}>
+    <div className="w-full" style={{ height: "100%", backgroundColor: '#ffffff' }}>
       <div className="min-h-screen flex flex-col items-center px-6 py-12 mx-auto max-w-md" style={{ color: fontColor }}>
       {profile.avatar && (
         <img src={profile.avatar} alt={profile.name} className="w-28 h-28 rounded-full object-cover mb-4" />

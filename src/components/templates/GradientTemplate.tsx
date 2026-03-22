@@ -33,7 +33,7 @@ const GradientTemplate = ({ profile, accentColor, profileId }: TemplateProps) =>
   const visibleLinks = getVisibleLinks(profile.links || []);
 
   return (
-    <div className="w-full" style={{
+    <div className="w-full" style={{ height: "100%",
         background: `linear-gradient(160deg, ${accentColor}, ${darkColor})`,
         backgroundSize: '200% 200%',
         animation: 'gradient-shift 6s ease infinite',
