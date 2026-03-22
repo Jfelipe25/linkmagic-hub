@@ -85,10 +85,6 @@ const VirtualCardPage = () => {
     setMetaName('twitter:description', profile.bio || `Tarjeta digital de ${profile.name}`);
     return () => { document.title = 'LinkOne'; };
   }, [profile]);
-  const qrUrl = profile?.slug
-    ? `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(profileUrl)}&color=${(profile.accent_color || '#d4a432').replace('#', '')}&bgcolor=111111`
-    : '';
-
   const handleShare = async () => {
     if (navigator.share) {
       await navigator.share({ title: `${profile?.name} | LinkOne`, url: profileUrl });
@@ -159,23 +155,76 @@ const VirtualCardPage = () => {
   );
 
   const accent = profile.accent_color || '#d4a432';
-  const isLight = profile.template === 'minimal';
-  const cardBg = isLight
-    ? 'linear-gradient(135deg, #ffffff 0%, #f5f5f5 50%, #ffffff 100%)'
-    : profile.template === 'gradient'
-      ? `linear-gradient(135deg, ${accent}22 0%, #111 50%, ${accent}11 100%)`
-      : 'linear-gradient(135deg, #1a1a1a 0%, #111 50%, #1a1a1a 100%)';
-  const cardBorder = isLight ? `${accent}40` : `${accent}30`;
-  const nameColor = isLight ? '#111111' : '#ffffff';
-  const bioColor = isLight ? '#555555' : '#9ca3af';
-  const footerBg = isLight ? '#f0f0f0' : '#0d0d0d';
-  const footerText = isLight ? '#888888' : '#525252';
-  const qrBg = isLight ? '#f5f5f5' : '#111';
-  const scanText = isLight ? '#888888' : '#525252';
-  const pageGlow = isLight ? `${accent}10` : `${accent}18`;
+  // Tema de la tarjeta según el template del perfil
+  const themeMap: Record<string, {
+    pageBg: string; cardBg: string; cardBorder: string;
+    nameColor: string; bioColor: string;
+    footerBg: string; footerText: string;
+    qrBg: string; qrColor: string; scanText: string; pageGlow: string;
+  }> = {
+    minimal: {
+      pageBg: '#f8f8f8',
+      cardBg: 'linear-gradient(135deg, #ffffff 0%, #f5f5f5 50%, #ffffff 100%)',
+      cardBorder: `${accent}40`,
+      nameColor: '#111111',
+      bioColor: '#555555',
+      footerBg: '#f0f0f0',
+      footerText: '#888888',
+      qrBg: '#f5f5f5',
+      qrColor: (accent).replace('#', ''),
+      scanText: '#888888',
+      pageGlow: `${accent}10`,
+    },
+    dark: {
+      pageBg: '#0a0a0a',
+      cardBg: 'linear-gradient(135deg, #1a1a1a 0%, #111111 50%, #1a1a1a 100%)',
+      cardBorder: `${accent}30`,
+      nameColor: '#ffffff',
+      bioColor: '#9ca3af',
+      footerBg: '#0d0d0d',
+      footerText: '#525252',
+      qrBg: '#111111',
+      qrColor: (accent).replace('#', ''),
+      scanText: '#525252',
+      pageGlow: `${accent}18`,
+    },
+    gradient: {
+      pageBg: '#0a0a0a',
+      cardBg: `linear-gradient(135deg, ${accent}33 0%, #111111 50%, ${accent}18 100%)`,
+      cardBorder: `${accent}50`,
+      nameColor: '#ffffff',
+      bioColor: '#d1d5db',
+      footerBg: `${accent}15`,
+      footerText: `${accent}80`,
+      qrBg: '#111111',
+      qrColor: (accent).replace('#', ''),
+      scanText: '#9ca3af',
+      pageGlow: `${accent}25`,
+    },
+    background: {
+      pageBg: '#0a0a0a',
+      cardBg: `linear-gradient(135deg, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.75) 100%)`,
+      cardBorder: `${accent}40`,
+      nameColor: '#ffffff',
+      bioColor: '#e5e7eb',
+      footerBg: 'rgba(0,0,0,0.6)',
+      footerText: '#9ca3af',
+      qrBg: 'rgba(0,0,0,0.5)',
+      qrColor: (accent).replace('#', ''),
+      scanText: '#9ca3af',
+      pageGlow: `${accent}20`,
+    },
+  };
+
+  const theme = themeMap[profile.template] ?? themeMap.dark;
+  const { pageBg, cardBg, cardBorder, nameColor, bioColor, footerBg, footerText, qrBg, qrColor, scanText, pageGlow } = theme;
+  const qrBgColor = profile.template === 'minimal' ? 'f5f5f5' : '111111';
+  const qrUrl = profile.slug
+    ? `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(profileUrl)}&color=${qrColor.replace('#','')}&bgcolor=${qrBgColor}`
+    : '';
 
   return (
-    <div className="min-h-screen flex flex-col" style={{ background: isLight ? '#f8f8f8' : '#0a0a0a' }}>
+    <div className="min-h-screen flex flex-col" style={{ background: pageBg }}>
       {/* Hero section */}
       <div className="flex-1 flex flex-col items-center justify-center px-6 pt-12 pb-6 relative overflow-hidden">
         {/* Background glow */}
