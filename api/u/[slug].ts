@@ -38,12 +38,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const safeAvatar = escapeHtml(avatar);
   const profileUrl = `${APP_URL}/u/${slug}`;
 
-  const ogImage = avatar ? `
-  <meta property="og:image"            content="${safeAvatar}" />
-  <meta property="og:image:secure_url" content="${safeAvatar}" />
-  <meta property="og:image:width"      content="400" />
-  <meta property="og:image:height"     content="400" />
-  <meta name="twitter:image"           content="${safeAvatar}" />` : '';
+  // Imagen OG dinámica: foto en círculo, fondo blanco, estilo tarjeta
+  const ogImageUrl = `${APP_URL}/api/og/${slug}`;
+  const ogImage = `
+  <meta property="og:image"            content="${ogImageUrl}" />
+  <meta property="og:image:secure_url" content="${ogImageUrl}" />
+  <meta property="og:image:width"      content="1200" />
+  <meta property="og:image:height"     content="630" />
+  <meta name="twitter:image"           content="${ogImageUrl}" />`; 
 
   res.setHeader('Content-Type', 'text/html; charset=utf-8');
   res.setHeader('Cache-Control', 's-maxage=3600, stale-while-revalidate=86400');
