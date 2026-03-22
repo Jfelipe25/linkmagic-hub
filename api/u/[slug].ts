@@ -41,8 +41,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const ogImage = avatar ? `
   <meta property="og:image"            content="${safeAvatar}" />
   <meta property="og:image:secure_url" content="${safeAvatar}" />
-  <meta property="og:image:width"      content="400" />
-  <meta property="og:image:height"     content="400" />
+  <meta property="og:image:width"      content="200" />
+  <meta property="og:image:height"     content="200" />
   <meta name="twitter:image"           content="${safeAvatar}" />` : '';
 
   res.setHeader('Content-Type', 'text/html; charset=utf-8');
