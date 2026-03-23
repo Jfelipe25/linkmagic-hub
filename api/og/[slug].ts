@@ -1,15 +1,26 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import sharp from 'sharp';
-import { readFileSync } from 'fs';
+import { readFileSync, existsSync } from 'fs';
 import { join } from 'path';
 
 const SUPABASE_URL = process.env.VITE_SUPABASE_URL!;
 const SUPABASE_KEY = process.env.VITE_SUPABASE_PUBLISHABLE_KEY!;
 
-// Leer fuentes del disco (incluidas en el repo bajo api/fonts/)
-const fontDir = join(process.cwd(), 'api', 'fonts');
-const fontRegularB64 = readFileSync(join(fontDir, 'Poppins-Regular.woff2')).toString('base64');
-const fontBoldB64    = readFileSync(join(fontDir, 'Poppins-Bold.woff2')).toString('base64');
+function loadFont(filename: string): string {
+  // Vercel monta el proyecto en /var/task
+  const paths = [
+    join('/var/task', 'api', 'fonts', filename),
+    join(process.cwd(), 'api', 'fonts', filename),
+    join(__dirname, '..', 'fonts', filename),
+    join(__dirname, 'fonts', filename),
+  ];
+  for (const p of paths) {
+    if (existsSync(p)) {
+      return readFileSync(p).toString('base64');
+    }
+  }
+  return '';
+}
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   const slug = Array.isArray(req.query.slug) ? req.query.slug[0] : req.query.slug || '';
@@ -33,6 +44,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
   } catch (_) {}
 
+  // Cargar fuentes
+  const fontRegularB64 = loadFont('Poppins-Regular.woff2');
+  const fontBoldB64    = loadFont('Poppins-Bold.woff2');
+  const fontFamily = fontRegularB64 ? 'Poppins' : 'DejaVu Sans';
+
   // Avatar circular
   let avatarComposite: sharp.OverlayOptions | null = null;
   if (avatar) {
@@ -43,8 +59,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       const mask = Buffer.from(`<svg width="310" height="310"><circle cx="155" cy="155" r="155" fill="white"/></svg>`);
       const circled = await sharp(resized)
         .composite([{ input: mask, blend: 'dest-in' }])
-        .png()
-        .toBuffer();
+        .png().toBuffer();
       avatarComposite = { input: circled, top: 160, left: 105 };
     } catch (_) {}
   }
@@ -57,20 +72,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const safeName = name.length > 26 ? name.slice(0, 26) + '...' : name;
   const safeBio  = bio.length  > 50 ? bio.slice(0, 50)  + '...' : bio;
 
+  const fontStyle = fontRegularB64 ? `<style>
+    @font-face { font-family: 'Poppins'; font-weight: 400; src: url('data:font/woff2;base64,${fontRegularB64}') format('woff2'); }
+    @font-face { font-family: 'Poppins'; font-weight: 700; src: url('data:font/woff2;base64,${fontBoldB64}') format('woff2'); }
+  </style>` : '';
+
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630">
   <defs>
-    <style>
-      @font-face {
-        font-family: 'Poppins';
-        font-weight: 400;
-        src: url('data:font/woff2;base64,${fontRegularB64}') format('woff2');
-      }
-      @font-face {
-        font-family: 'Poppins';
-        font-weight: 700;
-        src: url('data:font/woff2;base64,${fontBoldB64}') format('woff2');
-      }
-    </style>
+    ${fontStyle}
     <radialGradient id="g" cx="30%" cy="50%" r="70%">
       <stop offset="0%" stop-color="rgb(${aR},${aG},${aB})" stop-opacity="0.15"/>
       <stop offset="100%" stop-color="#111111"/>
@@ -85,15 +94,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   <line x1="480" y1="155" x2="480" y2="475" stroke="rgb(${aR},${aG},${aB})" stroke-width="1" opacity="0.2"/>
   <rect x="545" y="372" width="520" height="1" fill="rgb(${aR},${aG},${aB})" opacity="0.3"/>
   <circle cx="557" cy="416" r="7" fill="rgb(${aR},${aG},${aB})"/>
-  <text x="545" y="268" font-family="Poppins" font-weight="700" font-size="54" fill="white">${safeName}</text>
-  <text x="545" y="330" font-family="Poppins" font-weight="400" font-size="30" fill="#9ca3af">${safeBio}</text>
-  <text x="580" y="425" font-family="Poppins" font-weight="400" font-size="26" fill="rgb(${aR},${aG},${aB})">linkone.bio/u/${slug}</text>
-  <text x="1155" y="608" font-family="Poppins" font-weight="700" font-size="22" fill="rgb(${aR},${aG},${aB})" opacity="0.45" text-anchor="end">LinkOne</text>
+  <text x="545" y="268" font-family="${fontFamily}" font-weight="700" font-size="54" fill="white">${safeName}</text>
+  <text x="545" y="330" font-family="${fontFamily}" font-weight="400" font-size="30" fill="#9ca3af">${safeBio}</text>
+  <text x="580" y="425" font-family="${fontFamily}" font-weight="400" font-size="26" fill="rgb(${aR},${aG},${aB})">linkone.bio/u/${slug}</text>
+  <text x="1155" y="608" font-family="${fontFamily}" font-weight="700" font-size="22" fill="rgb(${aR},${aG},${aB})" opacity="0.45" text-anchor="end">LinkOne</text>
 </svg>`;
 
-  const composites: sharp.OverlayOptions[] = [
-    { input: Buffer.from(svg), top: 0, left: 0 },
-  ];
+  const composites: sharp.OverlayOptions[] = [{ input: Buffer.from(svg), top: 0, left: 0 }];
   if (avatarComposite) composites.unshift(avatarComposite);
 
   const png = await sharp({
