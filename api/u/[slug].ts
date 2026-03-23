@@ -4,6 +4,8 @@ const SUPABASE_URL = process.env.VITE_SUPABASE_URL!;
 const SUPABASE_KEY = process.env.VITE_SUPABASE_PUBLISHABLE_KEY!;
 const APP_URL = 'https://www.linkone.bio';
 
+const BOT_AGENTS = /whatsapp|facebookexternalhit|twitterbot|telegrambot|linkedinbot|slackbot|discordbot|googlebot|bingbot|yandex|baidu|duckduckbot|applebot|pinterest|vkshare|w3c_validator/i;
+
 function escapeHtml(str: string): string {
   return str
     .replace(/&/g, '&amp;')
@@ -38,13 +40,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const safeAvatar = escapeHtml(avatar);
   const profileUrl = `${APP_URL}/u/${slug}`;
 
-  const ogImageUrl = `https://www.linkone.bio/api/og/${slug}`;
-const ogImage = `
-  <meta property="og:image"            content="${ogImageUrl}" />
-  <meta property="og:image:secure_url" content="${ogImageUrl}" />
-  <meta property="og:image:width"      content="1200" />
-  <meta property="og:image:height"     content="630" />
-  <meta name="twitter:image"           content="${ogImageUrl}" />`;
+  const ogImage = avatar ? `
+  <meta property="og:image"            content="${safeAvatar}" />
+  <meta property="og:image:secure_url" content="${safeAvatar}" />
+  <meta property="og:image:width"      content="400" />
+  <meta property="og:image:height"     content="400" />
+  <meta name="twitter:image"           content="${safeAvatar}" />` : '';
 
   res.setHeader('Content-Type', 'text/html; charset=utf-8');
   res.setHeader('Cache-Control', 's-maxage=3600, stale-while-revalidate=86400');
