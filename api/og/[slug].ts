@@ -1,8 +1,15 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import sharp from 'sharp';
+import { readFileSync } from 'fs';
+import { join } from 'path';
 
 const SUPABASE_URL = process.env.VITE_SUPABASE_URL!;
 const SUPABASE_KEY = process.env.VITE_SUPABASE_PUBLISHABLE_KEY!;
+
+// Leer fuentes del disco (incluidas en el repo bajo api/fonts/)
+const fontDir = join(process.cwd(), 'api', 'fonts');
+const fontRegularB64 = readFileSync(join(fontDir, 'Poppins-Regular.woff2')).toString('base64');
+const fontBoldB64    = readFileSync(join(fontDir, 'Poppins-Bold.woff2')).toString('base64');
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   const slug = Array.isArray(req.query.slug) ? req.query.slug[0] : req.query.slug || '';
@@ -51,61 +58,49 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const safeBio  = bio.length  > 50 ? bio.slice(0, 50)  + '...' : bio;
 
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630">
-    <defs>
-      <radialGradient id="g" cx="30%" cy="50%" r="70%">
-        <stop offset="0%" stop-color="rgb(${aR},${aG},${aB})" stop-opacity="0.15"/>
-        <stop offset="100%" stop-color="#111111"/>
-      </radialGradient>
-    </defs>
-    <!-- Fondo -->
-    <rect width="1200" height="630" fill="#111111"/>
-    <rect width="1200" height="630" fill="url(#g)"/>
-    <rect x="0" y="0" width="1200" height="6" fill="rgb(${aR},${aG},${aB})"/>
-    <!-- Círculo avatar -->
-    <circle cx="260" cy="315" r="172" fill="rgb(${aR},${aG},${aB})" opacity="0.08"/>
-    <circle cx="260" cy="315" r="163" fill="#1a1a1a"/>
-    <circle cx="260" cy="315" r="158" fill="none" stroke="rgb(${aR},${aG},${aB})" stroke-width="3" opacity="0.6"/>
-    <!-- Divisor -->
-    <line x1="480" y1="155" x2="480" y2="475" stroke="rgb(${aR},${aG},${aB})" stroke-width="1" opacity="0.2"/>
-    <!-- Línea separadora -->
-    <rect x="545" y="372" width="520" height="1" fill="rgb(${aR},${aG},${aB})" opacity="0.3"/>
-    <!-- Punto link -->
-    <circle cx="557" cy="416" r="7" fill="rgb(${aR},${aG},${aB})"/>
-    <!-- TEXTO con Poppins -->
-    <text x="545" y="268"
-      font-family="Poppins"
-      font-weight="Bold"
-      font-size="54"
-      fill="white">${safeName}</text>
-    <text x="545" y="330"
-      font-family="Poppins"
-      font-weight="Regular"
-      font-size="30"
-      fill="#9ca3af">${safeBio}</text>
-    <text x="580" y="425"
-      font-family="Poppins"
-      font-weight="Regular"
-      font-size="26"
-      fill="rgb(${aR},${aG},${aB})">linkone.bio/u/${slug}</text>
-    <text x="1155" y="608"
-      font-family="Poppins"
-      font-weight="Bold"
-      font-size="22"
-      fill="rgb(${aR},${aG},${aB})"
-      opacity="0.45"
-      text-anchor="end">LinkOne</text>
-  </svg>`;
+  <defs>
+    <style>
+      @font-face {
+        font-family: 'Poppins';
+        font-weight: 400;
+        src: url('data:font/woff2;base64,${fontRegularB64}') format('woff2');
+      }
+      @font-face {
+        font-family: 'Poppins';
+        font-weight: 700;
+        src: url('data:font/woff2;base64,${fontBoldB64}') format('woff2');
+      }
+    </style>
+    <radialGradient id="g" cx="30%" cy="50%" r="70%">
+      <stop offset="0%" stop-color="rgb(${aR},${aG},${aB})" stop-opacity="0.15"/>
+      <stop offset="100%" stop-color="#111111"/>
+    </radialGradient>
+  </defs>
+  <rect width="1200" height="630" fill="#111111"/>
+  <rect width="1200" height="630" fill="url(#g)"/>
+  <rect x="0" y="0" width="1200" height="6" fill="rgb(${aR},${aG},${aB})"/>
+  <circle cx="260" cy="315" r="172" fill="rgb(${aR},${aG},${aB})" opacity="0.08"/>
+  <circle cx="260" cy="315" r="163" fill="#1a1a1a"/>
+  <circle cx="260" cy="315" r="158" fill="none" stroke="rgb(${aR},${aG},${aB})" stroke-width="3" opacity="0.6"/>
+  <line x1="480" y1="155" x2="480" y2="475" stroke="rgb(${aR},${aG},${aB})" stroke-width="1" opacity="0.2"/>
+  <rect x="545" y="372" width="520" height="1" fill="rgb(${aR},${aG},${aB})" opacity="0.3"/>
+  <circle cx="557" cy="416" r="7" fill="rgb(${aR},${aG},${aB})"/>
+  <text x="545" y="268" font-family="Poppins" font-weight="700" font-size="54" fill="white">${safeName}</text>
+  <text x="545" y="330" font-family="Poppins" font-weight="400" font-size="30" fill="#9ca3af">${safeBio}</text>
+  <text x="580" y="425" font-family="Poppins" font-weight="400" font-size="26" fill="rgb(${aR},${aG},${aB})">linkone.bio/u/${slug}</text>
+  <text x="1155" y="608" font-family="Poppins" font-weight="700" font-size="22" fill="rgb(${aR},${aG},${aB})" opacity="0.45" text-anchor="end">LinkOne</text>
+</svg>`;
 
   const composites: sharp.OverlayOptions[] = [
     { input: Buffer.from(svg), top: 0, left: 0 },
   ];
   if (avatarComposite) composites.unshift(avatarComposite);
 
-  const bg = await sharp({
+  const png = await sharp({
     create: { width: 1200, height: 630, channels: 4, background: { r: 17, g: 17, b: 17, alpha: 1 } }
   }).composite(composites).png().toBuffer();
 
   res.setHeader('Content-Type', 'image/png');
   res.setHeader('Cache-Control', 's-maxage=86400, stale-while-revalidate=604800');
-  return res.status(200).send(bg);
+  return res.status(200).send(png);
 }
