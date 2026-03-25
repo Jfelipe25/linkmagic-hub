@@ -12,6 +12,7 @@ import { toast } from 'sonner';
 import { usePricing } from '@/hooks/usePricing';
 import ThemeToggle from '@/components/ThemeToggle';
 import LanguageToggle from '@/components/LanguageToggle';
+import LandingSections from '@/components/LandingSections';
 
 const Index = () => {
   const [profile, setProfile] = useState<ProfileData>({ ...DEFAULT_PROFILE });
@@ -156,6 +157,7 @@ const Index = () => {
           </motion.div>
         </div>
       </div>
+      <LandingSections />
     </div>
   );
 };

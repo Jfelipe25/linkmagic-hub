@@ -26,6 +26,8 @@ import PaymentPending from "./pages/PaymentPending";
 import PaymentFailed from "./pages/PaymentFailed";
 import VirtualCardPage from "./pages/VirtualCardPage";
 import NotFound from "./pages/NotFound";
+import Terminos from "./pages/Terminos";
+import Privacidad from "./pages/Privacidad";
 
 const queryClient = new QueryClient();
 
@@ -50,6 +52,8 @@ const App = () => (
             <Route path="/pago/exitoso" element={<PaymentSuccess />} />
             <Route path="/pago/pendiente" element={<PaymentPending />} />
             <Route path="/pago/fallido" element={<PaymentFailed />} />
+            <Route path="/terminos" element={<Terminos />} />
+            <Route path="/privacidad" element={<Privacidad />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
