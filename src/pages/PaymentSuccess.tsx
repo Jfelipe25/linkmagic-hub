@@ -11,8 +11,23 @@ const PaymentSuccess = () => {
   useEffect(() => {
     const sid = searchParams.get('session_id');
     if (sid) {
-      supabase.from('profiles').select('slug').eq('session_id', sid).maybeSingle()
-        .then(({ data }) => { if (data) setSlug(data.slug); });
+      supabase.from('profiles').select('slug, plan_price, country_code').eq('session_id', sid).maybeSingle()
+        .then(({ data }) => {
+          if (data) {
+            setSlug(data.slug);
+            // Meta Pixel — Purchase
+            try {
+              const price = (data as any).plan_price ?? 20000;
+              const currency = { CO: 'COP', MX: 'MXN', AR: 'ARS', CL: 'CLP', PE: 'PEN', UY: 'UYU', BR: 'BRL', EC: 'USD', BO: 'BOB', PY: 'PYG' }[(data as any).country_code ?? ''] ?? 'COP';
+              (window as any).fbq?.('track', 'Purchase', {
+                value: price,
+                currency,
+                content_name: 'LinkOne Profile',
+                content_type: 'product',
+              });
+            } catch (_) {}
+          }
+        });
     }
   }, [searchParams]);
 
