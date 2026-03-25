@@ -2,8 +2,17 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
+import { useEffect } from "react";
 import { AuthProvider } from "@/contexts/AuthContext";
+
+const PixelPageView = () => {
+  const location = useLocation();
+  useEffect(() => {
+    (window as any).fbq?.('track', 'PageView');
+  }, [location.pathname]);
+  return null;
+};
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import Index from "./pages/Index";
@@ -29,6 +38,7 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter>
+          <PixelPageView />
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/u/:slug" element={<PublicProfile />} />
