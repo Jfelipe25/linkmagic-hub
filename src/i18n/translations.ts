@@ -13,7 +13,7 @@ export const translations = {
     'hero.desc2': 'es la página que pones en tu perfil de Instagram, TikTok o cualquier red social. En lugar de elegir un solo enlace, compartes',
     'hero.allLinks': 'todos tus links',
     'hero.desc3': '— redes sociales, tienda, portafolio, WhatsApp y más — en un diseño profesional con tu marca personal.',
-    'hero.cta': 'Crea tu LinkOne gratis ↓',
+    'hero.cta': 'Crea tu LinkOne ↓',
     'hero.onlyPay': 'Solo pagas al publicar',
     'hero.from': 'Desde',
     // Features
@@ -127,7 +127,7 @@ export const translations = {
     'hero.desc2': 'is the page you put in your Instagram, TikTok or any social media profile. Instead of choosing a single link, you share',
     'hero.allLinks': 'all your links',
     'hero.desc3': '— social media, store, portfolio, WhatsApp and more — in a professional design with your personal brand.',
-    'hero.cta': 'Create your LinkOne for free ↓',
+    'hero.cta': 'Create your LinkOne ↓',
     'hero.onlyPay': 'You only pay when publishing',
     'hero.from': 'From',
     'feat.custom': 'Customizable',
