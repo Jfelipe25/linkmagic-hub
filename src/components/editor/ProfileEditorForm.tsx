@@ -347,7 +347,7 @@ const ProfileEditorForm = ({ profile, onChange, onPublish, publishLabel = 'Pagar
           className="w-full h-11 rounded-full gold-gradient text-sm font-semibold text-primary-foreground hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center justify-center gap-2"
         >
           {isPublishing && <Loader2 size={16} className="animate-spin" />}
-          {selectedPricing ? `Pagar ${selectedPricing.display_price} y publicar` : publishLabel}
+          {selectedPricing ? `Crear mi página — ${selectedPricing.display_price} ✨` : publishLabel}
         </button>
       )}
     </div>
