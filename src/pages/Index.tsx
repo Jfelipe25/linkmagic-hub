@@ -28,6 +28,19 @@ const Index = () => {
     const profileSlug = params.get('_u');
     if (profileSlug) {
       navigate(`/u/${profileSlug}`, { replace: true });
+      return;
+    }
+    // Recuperar perfil guardado si viene de un pago fallido
+    const pending = sessionStorage.getItem('pending_profile');
+    if (pending) {
+      try {
+        const saved = JSON.parse(pending);
+        setProfile(prev => ({ ...prev, ...saved }));
+        // Scroll al editor automáticamente
+        setTimeout(() => {
+          document.getElementById('editor')?.scrollIntoView({ behavior: 'smooth' });
+        }, 400);
+      } catch (_) {}
     }
   }, [navigate]);
 
@@ -55,6 +68,8 @@ const Index = () => {
     } catch (_) {}
 
     setPublishing(true);
+    // Guardar perfil para recuperar si el pago falla
+    sessionStorage.setItem('pending_profile', JSON.stringify({ ...profile, country_code: selectedPricing?.country_code }));
     try {
       const { data, error } = await supabase.functions.invoke('create-payment', {
         body: { ...profile, user_id: user.id, country_code: selectedPricing?.country_code },
@@ -114,7 +129,7 @@ const Index = () => {
               {t('hero.desc1')} <strong className="text-foreground">{t('hero.linkInBio')}</strong> {t('hero.desc2')} <strong className="text-foreground">{t('hero.allLinks')}</strong> {t('hero.desc3')}
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
-              <a href="#editor" className="px-6 py-3 rounded-lg bg-primary text-primary-foreground font-semibold text-sm hover:opacity-90 transition-opacity">
+              <a href="#editor" className="px-8 py-3.5 rounded-full gold-gradient text-primary-foreground font-semibold text-sm hover:opacity-90 transition-opacity shadow-md inline-flex items-center gap-2">
                 {t('hero.cta')}
               </a>
               <span className="text-xs text-muted-foreground">{t('hero.onlyPay')}{!pricingLoading && selectedPricing ? ` • ${t('hero.from')} ${selectedPricing.display_price}` : ''}</span>
