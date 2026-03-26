@@ -46,7 +46,7 @@ export default function Privacidad() {
 
         <section className="space-y-3">
           <h2 className="font-semibold text-base">6. Tus derechos</h2>
-          <p className="text-muted-foreground">Tienes derecho a acceder, corregir o eliminar tu información personal. Para ejercer estos derechos escríbenos a <a href="mailto:hola@linkone.bio" className="text-primary hover:underline">hola@linkone.bio</a>. Responderemos en un plazo máximo de 15 días hábiles.</p>
+          <p className="text-muted-foreground">Tienes derecho a acceder, corregir o eliminar tu información personal. Para ejercer estos derechos puedes contactarnos a través de nuestra plataforma. Responderemos en un plazo máximo de 15 días hábiles.</p>
         </section>
 
         <section className="space-y-3">
@@ -59,10 +59,7 @@ export default function Privacidad() {
           <p className="text-muted-foreground">Podemos actualizar esta política periódicamente. Te notificaremos por email sobre cambios significativos. La fecha de última actualización siempre estará visible al inicio de este documento.</p>
         </section>
 
-        <section className="space-y-3">
-          <h2 className="font-semibold text-base">9. Contacto</h2>
-          <p className="text-muted-foreground">Para cualquier consulta sobre privacidad escríbenos a <a href="mailto:hola@linkone.bio" className="text-primary hover:underline">hola@linkone.bio</a>.</p>
-        </section>
+
       </main>
 
       <footer className="border-t border-border px-6 py-6 text-center text-xs text-muted-foreground">

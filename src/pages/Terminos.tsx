@@ -59,10 +59,7 @@ export default function Terminos() {
           <p className="text-muted-foreground">Podemos actualizar estos términos en cualquier momento. Los cambios sustanciales serán notificados por email. El uso continuado del servicio implica la aceptación de los nuevos términos.</p>
         </section>
 
-        <section className="space-y-3">
-          <h2 className="font-semibold text-base">9. Contacto</h2>
-          <p className="text-muted-foreground">Para cualquier consulta sobre estos términos escríbenos a <a href="mailto:hola@linkone.bio" className="text-primary hover:underline">hola@linkone.bio</a>.</p>
-        </section>
+
       </main>
 
       <footer className="border-t border-border px-6 py-6 text-center text-xs text-muted-foreground">

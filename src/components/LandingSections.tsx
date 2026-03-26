@@ -1,22 +1,25 @@
 import { motion } from 'framer-motion';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  Zap, Link2, Palette, BarChart2, Shield, Smartphone,
-  ChevronDown, ChevronUp, Star, ExternalLink
+  Zap, Link2, Palette, BarChart2, Shield, Smartphone, CreditCard,
+  ChevronDown, ChevronUp, Star
 } from 'lucide-react';
 
 // ─── DATOS — edita aquí los perfiles de clientes ────────────────────────────
 const EJEMPLOS = [
-  { nombre: 'Julieth Perez Rodriguez', categoria: 'Ingeniera Industrial · SST', slug: 'juliethperez', emoji: '👩‍💼' },
-  { nombre: 'Juan Felipe Rodriguez', categoria: 'Ingeniero Mecánico · MBA', slug: 'felipergz', emoji: '👨‍💼' },
-  { nombre: 'LinkOne Demo', categoria: 'Página de ejemplo oficial', slug: 'linkone', emoji: '✨' },
+  { nombre: 'Valentina Ríos', categoria: 'Coach de vida & Bienestar', color: 'from-rose-400/20 to-pink-300/10', emoji: '🌸' },
+  { nombre: 'Carlos Mendoza', categoria: 'Fotógrafo · Portfolio', color: 'from-slate-400/20 to-blue-300/10', emoji: '📸' },
+  { nombre: 'Studio Nómada', categoria: 'Agencia de Diseño', color: 'from-violet-400/20 to-purple-300/10', emoji: '🎨' },
+  { nombre: 'DJ Kronos', categoria: 'Música · Eventos', color: 'from-amber-400/20 to-yellow-300/10', emoji: '🎧' },
+  { nombre: 'Tienda Luma', categoria: 'Tienda Online · Moda', color: 'from-emerald-400/20 to-teal-300/10', emoji: '🛍️' },
+  { nombre: 'Andrés Varela', categoria: 'Emprendedor · Finanzas', color: 'from-cyan-400/20 to-sky-300/10', emoji: '🚀' },
 ];
 
 const TESTIMONIOS = [
   {
     nombre: 'Camila Torres',
-    rol: 'Coach de vida · Colombia',
+    rol: 'Coach de vida & Bienestar',
     texto: 'En menos de 5 minutos tenía mi link listo para compartir en Instagram. Mis clientes ahora encuentran todo en un solo lugar.',
     estrellas: 5,
   },
@@ -34,30 +37,27 @@ const TESTIMONIOS = [
   },
 ];
 
-const FAQS = [
-  {
-    q: '¿Cuánto cuesta LinkOne?',
-    a: 'Pagas una sola vez para publicar tu página. No hay suscripciones ni cobros mensuales. El precio varía según tu país.',
-  },
+// FAQS — la primera se construye dinámicamente con precios reales
+const FAQS_STATIC = [
   {
     q: '¿Puedo editar mi página después de publicarla?',
-    a: 'Sí, puedes editar tu nombre, bio, links, redes sociales, colores y plantilla cuando quieras desde tu dashboard, sin costo adicional.',
+    a: 'Sí, ¡y es gratis! Puedes editar tu nombre, bio, links, redes sociales, colores y plantilla cuando quieras desde tu dashboard, sin ningún costo adicional.',
   },
   {
     q: '¿Qué incluye mi página?',
-    a: 'Links ilimitados, redes sociales, plantillas personalizables, colores y fuentes, código QR descargable, analíticas de visitas y clics, formulario de contacto y tarjeta virtual.',
+    a: 'Links ilimitados, redes sociales, plantillas personalizables, colores y fuentes, código QR descargable, analíticas de visitas y clics, formulario de contacto y tarjeta virtual NFC.',
   },
   {
     q: '¿Puedo usar mi propio dominio?',
-    a: 'Tu página queda en linkone.bio/u/tu-nombre. Si necesitas dominio propio, contáctanos y lo evaluamos.',
+    a: 'Tu página queda en linkone.bio/u/tu-nombre. Si necesitas dominio propio, escríbenos y lo evaluamos.',
   },
   {
     q: '¿Qué métodos de pago aceptan?',
-    a: 'Aceptamos tarjetas de crédito y débito, PSE (Colombia), transferencia bancaria y más — todo a través de MercadoPago, la plataforma de pagos más segura de Latinoamérica.',
+    a: 'Aceptamos tarjetas de crédito y débito, transferencia bancaria y más métodos locales — todo a través de MercadoPago en la moneda de tu país.',
   },
   {
     q: '¿Mis datos están seguros?',
-    a: 'Sí. Usamos Supabase para almacenamiento y MercadoPago para pagos — ambas plataformas con encriptación de nivel bancario.',
+    a: 'Sí. Usamos encriptación para el almacenamiento de todos tus datos.',
   },
 ];
 
@@ -95,6 +95,11 @@ const BENEFICIOS = [
     icon: <Smartphone size={22} className="text-primary" />,
     titulo: 'Optimizado para móvil',
     desc: 'Tu página se ve perfecta en celular, tablet y computador, siempre.',
+  },
+  {
+    icon: <CreditCard size={22} className="text-primary" />,
+    titulo: 'Tarjeta virtual incluida',
+    desc: 'Cada perfil incluye una tarjeta digital profesional con código QR que puedes compartir o descargar para hacer networking al instante.',
   },
   {
     icon: <Shield size={22} className="text-primary" />,
@@ -158,36 +163,25 @@ function SeccionEjemplos() {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {EJEMPLOS.map((e, i) => (
-            <motion.a
+            <motion.div
               key={i}
               {...fadeUp(i * 0.1)}
-              href={`https://www.linkone.bio/u/${e.slug}`}
-              target="_blank"
-              rel="noopener noreferrer"
               className="group block rounded-2xl border border-border bg-card hover:border-primary/40 hover:shadow-lg transition-all overflow-hidden"
             >
-              {/* Preview iframe real */}
-              <div className="h-40 overflow-hidden relative bg-muted pointer-events-none">
-                <iframe
-                  src={`https://www.linkone.bio/u/${e.slug}`}
-                  title={e.nombre}
-                  className="w-full border-0 absolute top-0 left-0"
-                  style={{ height: '600px', transform: 'scale(0.32)', transformOrigin: 'top left', width: '312.5%' }}
-                  loading="lazy"
-                  scrolling="no"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-card/70 to-transparent" />
-              </div>
-              <div className="p-4 flex items-center justify-between">
-                <div>
-                  <p className="font-semibold text-foreground text-sm">{e.nombre}</p>
-                  <p className="text-xs text-muted-foreground">{e.categoria}</p>
+              {/* Preview decorativo */}
+              <div className={`h-40 bg-gradient-to-br ${e.color} flex items-center justify-center relative`}>
+                <div className="flex flex-col items-center gap-2">
+                  <span className="text-4xl">{e.emoji}</span>
+                  <div className="w-16 h-1.5 rounded-full bg-foreground/10" />
+                  <div className="w-10 h-1 rounded-full bg-foreground/10" />
                 </div>
-                <div className="flex items-center gap-1 text-xs text-primary font-medium group-hover:gap-2 transition-all">
-                  Ver <ExternalLink size={12} />
-                </div>
+                <div className="absolute inset-0 bg-gradient-to-t from-card/60 to-transparent" />
               </div>
-            </motion.a>
+              <div className="p-4">
+                <p className="font-semibold text-foreground text-sm">{e.nombre}</p>
+                <p className="text-xs text-muted-foreground">{e.categoria}</p>
+              </div>
+            </motion.div>
           ))}
 
           {/* Card CTA — crear el tuyo */}
@@ -220,8 +214,8 @@ function SeccionTestimonios() {
             Lo que dicen nuestros usuarios
           </span>
           <h2 className="text-2xl md:text-4xl font-extrabold text-foreground">
-            Miles de creadores ya<br />
-            <span className="gold-text">confían en LinkOne</span>
+            Profesionales, marcas, emprendedores<br />
+            <span className="gold-text">y creadores confían en LinkOne</span>
           </h2>
         </motion.div>
 
@@ -250,6 +244,28 @@ function SeccionTestimonios() {
 // ─── FAQ ──────────────────────────────────────────────────────────────────────
 function SeccionFAQ() {
   const [abierto, setAbierto] = useState<number | null>(null);
+  const [precios, setPrecios] = useState<string>('');
+
+  useEffect(() => {
+    import('@/integrations/supabase/client').then(({ supabase }) => {
+      supabase.from('pricing').select('country_name, display_price').order('is_default', { ascending: false })
+        .then(({ data }) => {
+          if (data && data.length > 0) {
+            const lista = data.map((p: any) => `${p.country_name}: ${p.display_price}`).join(' · ');
+            setPrecios(lista);
+          }
+        });
+    });
+  }, []);
+
+  const precioFaq = {
+    q: '¿Cuánto cuesta LinkOne?',
+    a: precios
+      ? `Pagas una sola vez para publicar tu página — sin suscripciones ni cobros mensuales. Los precios en moneda local a través de MercadoPago son: ${precios}.`
+      : 'Pagas una sola vez para publicar tu página — sin suscripciones ni cobros mensuales. El precio varía según tu país y se cobra en moneda local a través de MercadoPago.',
+  };
+
+  const FAQS = [precioFaq, ...FAQS_STATIC];
 
   return (
     <section className="py-20 px-6 border-t border-border bg-muted/30">
@@ -335,9 +351,6 @@ function Footer() {
             <button onClick={() => navigate('/privacidad')} className="hover:text-foreground transition-colors">
               Política de privacidad
             </button>
-            <a href="mailto:hola@linkone.bio" className="hover:text-foreground transition-colors">
-              Contacto
-            </a>
           </nav>
 
           <p className="text-xs text-muted-foreground">
