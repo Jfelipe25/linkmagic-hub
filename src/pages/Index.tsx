@@ -117,7 +117,7 @@ const Index = () => {
               <a href="#editor" className="px-6 py-3 rounded-lg bg-primary text-primary-foreground font-semibold text-sm hover:opacity-90 transition-opacity">
                 {t('hero.cta')}
               </a>
-              <span className="text-xs text-muted-foreground">{t('hero.onlyPay')} • {selectedPricing ? `${t('hero.from')} ${selectedPricing.display_price}` : `${t('hero.from')} $20.000 COP`}</span>
+              <span className="text-xs text-muted-foreground">{t('hero.onlyPay')}{!pricingLoading && selectedPricing ? ` • ${t('hero.from')} ${selectedPricing.display_price}` : ''}</span>
             </div>
           </motion.div>
           
