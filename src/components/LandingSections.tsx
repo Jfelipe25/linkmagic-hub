@@ -92,14 +92,14 @@ const BENEFICIOS = [
     desc: 'Ve cuántas personas visitan tu página y en qué links hacen clic, en tiempo real.',
   },
   {
-    icon: <Smartphone size={22} className="text-primary" />,
-    titulo: 'Optimizado para móvil',
-    desc: 'Tu página se ve perfecta en celular, tablet y computador, siempre.',
-  },
-  {
     icon: <CreditCard size={22} className="text-primary" />,
     titulo: 'Tarjeta virtual incluida',
     desc: 'Cada perfil incluye una tarjeta digital profesional con código QR que puedes compartir o descargar para hacer networking al instante.',
+  },
+  {
+    icon: <Smartphone size={22} className="text-primary" />,
+    titulo: 'Optimizado para móvil',
+    desc: 'Tu página se ve perfecta en celular, tablet y computador, siempre.',
   },
   {
     icon: <Shield size={22} className="text-primary" />,
@@ -128,7 +128,10 @@ function SeccionBeneficios() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
           {BENEFICIOS.map((b, i) => (
             <motion.div key={i} {...fadeUp(i * 0.08)}
-              className="flex gap-4 p-5 rounded-xl bg-card border border-border hover:border-primary/30 transition-colors">
+              className={`flex gap-4 p-5 rounded-xl bg-card border border-border hover:border-primary/30 transition-colors
+                ${i === BENEFICIOS.length - 1 && BENEFICIOS.length % 3 === 1 ? 'lg:col-start-2' : ''}
+                ${i === BENEFICIOS.length - 1 && BENEFICIOS.length % 2 === 1 ? 'sm:col-span-2 lg:col-span-1' : ''}
+              `}>
               <div className="mt-0.5 shrink-0 w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center">
                 {b.icon}
               </div>
