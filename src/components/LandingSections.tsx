@@ -145,60 +145,144 @@ function SeccionBeneficios() {
 }
 
 // ─── Ejemplos ─────────────────────────────────────────────────────────────────
-function SeccionEjemplos() {
-  if (EJEMPLOS.length === 0) return null;
 
+const PHONE_THEMES = [
+  {
+    nombre: 'Juan Rodríguez',
+    bio: 'Ingeniero · MBA',
+    initials: 'JR',
+    label: 'Corporativo',
+    screen: 'bg-[#f8f8f8]',
+    nameColor: 'text-[#111]',
+    bioColor: 'text-[#555]',
+    avatarBg: 'bg-[#dde4f0]',
+    avatarText: 'text-[#3b4a72]',
+    avatarBorder: 'border-[#ddd]',
+    socBg: 'bg-[#333]',
+    btnStyle: 'border border-[#222] text-[#111] bg-transparent',
+    links: ['Portfolio', 'LinkedIn', 'Contáctame'],
+  },
+  {
+    nombre: 'Camilo Torres',
+    bio: 'Coach de Vida & Bienestar',
+    initials: 'CT',
+    label: 'Lifestyle',
+    screen: 'bg-gradient-to-b from-[#2a5425] via-[#3d7535] to-[#1b3b18]',
+    nameColor: 'text-white',
+    bioColor: 'text-white/75',
+    avatarBg: 'bg-[#7aad6a]',
+    avatarText: 'text-white',
+    avatarBorder: 'border-white/60',
+    socBg: 'bg-white/70',
+    btnStyle: 'border border-white/30 text-white bg-white/15',
+    links: ['Servicio Personal', 'Servicio Grupal', 'Empresas'],
+  },
+  {
+    nombre: 'Valentina López',
+    bio: 'Clothes Cute',
+    initials: 'VL',
+    label: 'Tienda / Moda',
+    screen: 'bg-gradient-to-br from-[#c09090] via-[#7d4555] to-[#4a2535]',
+    nameColor: 'text-white',
+    bioColor: 'text-white/75',
+    avatarBg: 'bg-[#c49a9a]',
+    avatarText: 'text-white',
+    avatarBorder: 'border-pink-200/60',
+    socBg: 'bg-white/60',
+    btnStyle: 'border border-white/28 text-white bg-[#a05060]/40',
+    links: ['Catálogo Mujer', 'Catálogo Niñas', 'Pedidos en Línea'],
+  },
+  {
+    nombre: 'Andrés Varela',
+    bio: 'Emprendedor · Finanzas',
+    initials: 'AV',
+    label: 'Dark / Premium',
+    screen: 'bg-[#0a0a0a]',
+    nameColor: 'text-[#e8d9b0]',
+    bioColor: 'text-[#888]',
+    avatarBg: 'bg-[#2a2200]',
+    avatarText: 'text-[#c9a84c]',
+    avatarBorder: 'border-[#c9a84c]',
+    socBg: 'bg-[#c9a84c]',
+    btnStyle: 'border border-[#c9a84c]/45 text-[#c9a84c] bg-[#c9a84c]/10',
+    links: ['Consultoría', 'Podcast', 'Newsletter'],
+  },
+];
+
+function PhoneCard({ p, large = false }: { p: typeof PHONE_THEMES[0]; large?: boolean }) {
+  return (
+    <div className="flex flex-col items-center gap-2">
+      {/* Phone frame */}
+      <div className={`relative rounded-[26px] bg-[#111] overflow-hidden flex-shrink-0 shadow-2xl
+        ${large ? 'w-[172px] h-[340px]' : 'w-[155px] h-[300px]'}
+        border-[5px] border-[#1e1e1e] ring-1 ring-[#3a3a3a]`}>
+        {/* Notch */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-12 h-3.5 bg-[#111] rounded-b-lg z-10" />
+        {/* Screen */}
+        <div className={`w-full h-full rounded-[21px] overflow-hidden flex flex-col items-center pt-6 ${p.screen}`}>
+          {/* Avatar */}
+          <div className={`w-12 h-12 rounded-full border-2 ${p.avatarBorder} ${p.avatarBg} ${p.avatarText}
+            flex items-center justify-center text-sm font-semibold mt-1 mb-1.5 flex-shrink-0`}>
+            {p.initials}
+          </div>
+          <p className={`text-[11px] font-semibold text-center leading-tight ${p.nameColor}`}>{p.nombre}</p>
+          <p className={`text-[9px] text-center mt-0.5 ${p.bioColor}`}>{p.bio}</p>
+          {/* Socials */}
+          <div className="flex gap-1.5 my-1.5">
+            {[0,1,2].map(i => <div key={i} className={`w-3 h-3 rounded-full ${p.socBg}`} />)}
+          </div>
+          {/* Links */}
+          <div className="w-full px-2.5 flex flex-col gap-1 mt-0.5">
+            {p.links.map((l, i) => (
+              <div key={i} className={`w-full py-1.5 rounded-full text-[8.5px] font-medium text-center ${p.btnStyle}`}>
+                {l}
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+      <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">{p.label}</span>
+    </div>
+  );
+}
+
+function SeccionEjemplos() {
   return (
     <section className="py-20 px-6 border-t border-border bg-muted/30">
       <div className="max-w-5xl mx-auto">
         <motion.div {...fadeUp()} className="text-center mb-14 space-y-3">
           <span className="inline-block px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-semibold tracking-wide uppercase">
-            Ejemplos reales
+            Ejemplos
           </span>
           <h2 className="text-2xl md:text-4xl font-extrabold text-foreground">
-            Así se ven las páginas<br />
-            <span className="gold-text">de nuestros clientes</span>
+            Así podría verse<br />
+            <span className="gold-text">tu página en LinkOne</span>
           </h2>
+          <p className="text-muted-foreground text-sm max-w-md mx-auto">
+            Estos son diseños de muestra — el tuyo puede tener tus colores, tu foto y tus links.
+          </p>
         </motion.div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {EJEMPLOS.map((e, i) => (
-            <motion.div
-              key={i}
-              {...fadeUp(i * 0.1)}
-              className="group block rounded-2xl border border-border bg-card hover:border-primary/40 hover:shadow-lg transition-all overflow-hidden"
-            >
-              {/* Preview decorativo */}
-              <div className={`h-40 bg-gradient-to-br ${e.color} flex items-center justify-center relative`}>
-                <div className="flex flex-col items-center gap-2">
-                  <span className="text-4xl">{e.emoji}</span>
-                  <div className="w-16 h-1.5 rounded-full bg-foreground/10" />
-                  <div className="w-10 h-1 rounded-full bg-foreground/10" />
-                </div>
-                <div className="absolute inset-0 bg-gradient-to-t from-card/60 to-transparent" />
-              </div>
-              <div className="p-4">
-                <p className="font-semibold text-foreground text-sm">{e.nombre}</p>
-                <p className="text-xs text-muted-foreground">{e.categoria}</p>
-              </div>
-            </motion.div>
+        <motion.div {...fadeUp(0.1)} className="flex flex-wrap gap-5 justify-center items-end">
+          {PHONE_THEMES.map((p, i) => (
+            <PhoneCard key={i} p={p} large={i === 1} />
           ))}
 
-          {/* Card CTA — crear el tuyo */}
-          <motion.a
-            {...fadeUp(EJEMPLOS.length * 0.1)}
-            href="#editor"
-            className="group block rounded-2xl border-2 border-dashed border-primary/30 bg-card hover:border-primary/60 hover:bg-primary/5 transition-all overflow-hidden"
-          >
-            <div className="h-40 flex items-center justify-center">
-              <span className="text-4xl">✨</span>
-            </div>
-            <div className="p-4 text-center">
-              <p className="font-semibold text-primary text-sm">El tuyo puede ser el siguiente</p>
-              <p className="text-xs text-muted-foreground mt-1">Crea tu página gratis →</p>
-            </div>
-          </motion.a>
-        </div>
+          {/* CTA card */}
+          <div className="flex flex-col items-center gap-2">
+            <a href="#editor"
+              className="w-[155px] h-[300px] rounded-[26px] border-2 border-dashed border-primary/40
+                bg-card hover:border-primary/70 hover:bg-primary/5 transition-all
+                flex flex-col items-center justify-center gap-2 group">
+              <div className="w-9 h-9 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xl font-light group-hover:bg-primary/20 transition-colors">
+                +
+              </div>
+              <p className="text-xs font-semibold text-primary text-center px-4 leading-snug">El tuyo puede ser el siguiente</p>
+              <p className="text-[10px] text-muted-foreground">Crea tu página →</p>
+            </a>
+            <span className="text-[10px] opacity-0">·</span>
+          </div>
+        </motion.div>
       </div>
     </section>
   );
