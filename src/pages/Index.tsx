@@ -58,7 +58,7 @@ const Index = () => {
     // Meta Pixel — InitiateCheckout
     try {
       const price = selectedPricing?.price ?? 20000;
-      const currency = { CO: 'COP', MX: 'MXN', AR: 'ARS', CL: 'CLP', PE: 'PEN', UY: 'UYU', BR: 'BRL', EC: 'USD', BO: 'BOB', PY: 'PYG' }[selectedPricing?.country_code ?? ''] ?? 'COP';
+      const currency = { CO: 'COP', MX: 'MXN', AR: 'ARS', CL: 'CLP', PE: 'PEN', UY: 'UYU', BR: 'BRL', EC: 'USD', BO: 'BOB', PY: 'PYG', US: 'USD' }[selectedPricing?.country_code ?? ''] ?? 'COP';
       (window as any).fbq?.('track', 'InitiateCheckout', {
         value: price,
         currency,

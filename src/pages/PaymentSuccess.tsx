@@ -18,7 +18,7 @@ const PaymentSuccess = () => {
             // Meta Pixel — Purchase
             try {
               const price = (data as any).plan_price ?? 20000;
-              const currency = { CO: 'COP', MX: 'MXN', AR: 'ARS', CL: 'CLP', PE: 'PEN', UY: 'UYU', BR: 'BRL', EC: 'USD', BO: 'BOB', PY: 'PYG' }[(data as any).country_code ?? ''] ?? 'COP';
+              const currency = { CO: 'COP', MX: 'MXN', AR: 'ARS', CL: 'CLP', PE: 'PEN', UY: 'UYU', BR: 'BRL', EC: 'USD', BO: 'BOB', PY: 'PYG', US: 'USD' }[(data as any).country_code ?? ''] ?? 'COP';
               (window as any).fbq?.('track', 'Purchase', {
                 value: price,
                 currency,
