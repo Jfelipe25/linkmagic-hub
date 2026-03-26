@@ -29,7 +29,7 @@ const DarkTemplate = ({ profile, accentColor, profileId }: TemplateProps) => {
       {profile.avatar ? (
         <img src={profile.avatar} alt={profile.name}
           className="w-28 h-28 rounded-full object-cover mb-4"
-          style={{ boxShadow: `0 0 0 3px ${fontColor}` }} />
+          style={{ boxShadow: `0 0 0 3px ${fontColor}` }} loading="lazy" decoding="async" />
       ) : (
         <div className="w-28 h-28 rounded-full mb-4 flex items-center justify-center text-2xl font-bold"
           style={{ backgroundColor: fontColor, color: '#0f0f0f', boxShadow: `0 0 0 3px ${fontColor}44` }}>

@@ -15,19 +15,22 @@ const PixelPageView = () => {
 };
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import { LanguageProvider } from "@/contexts/LanguageContext";
-import Index from "./pages/Index";
-import PublicProfile from "./pages/PublicProfile";
-import Dashboard from "./pages/Dashboard";
-import Admin from "./pages/Admin";
-import Login from "./pages/Login";
-import ResetPassword from "./pages/ResetPassword";
-import PaymentSuccess from "./pages/PaymentSuccess";
-import PaymentPending from "./pages/PaymentPending";
-import PaymentFailed from "./pages/PaymentFailed";
-import VirtualCardPage from "./pages/VirtualCardPage";
-import NotFound from "./pages/NotFound";
-import Terminos from "./pages/Terminos";
-import Privacidad from "./pages/Privacidad";
+import { lazy, Suspense } from "react";
+
+// Lazy load — cada ruta carga solo su chunk
+const Index = lazy(() => import("./pages/Index"));
+const PublicProfile = lazy(() => import("./pages/PublicProfile"));
+const Dashboard = lazy(() => import("./pages/Dashboard"));
+const Admin = lazy(() => import("./pages/Admin"));
+const Login = lazy(() => import("./pages/Login"));
+const ResetPassword = lazy(() => import("./pages/ResetPassword"));
+const PaymentSuccess = lazy(() => import("./pages/PaymentSuccess"));
+const PaymentPending = lazy(() => import("./pages/PaymentPending"));
+const PaymentFailed = lazy(() => import("./pages/PaymentFailed"));
+const VirtualCardPage = lazy(() => import("./pages/VirtualCardPage"));
+const NotFound = lazy(() => import("./pages/NotFound"));
+const Terminos = lazy(() => import("./pages/Terminos"));
+const Privacidad = lazy(() => import("./pages/Privacidad"));
 
 const queryClient = new QueryClient();
 
@@ -41,6 +44,7 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
           <PixelPageView />
+          <Suspense fallback={<div className="min-h-screen bg-background" />}>
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/u/:slug" element={<PublicProfile />} />
@@ -56,6 +60,7 @@ const App = () => (
             <Route path="/privacidad" element={<Privacidad />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
+          </Suspense>
         </BrowserRouter>
       </AuthProvider>
       </LanguageProvider>
