@@ -247,13 +247,7 @@ const StoreView = ({
                 >
                   <Plus size={14} />
                 </button>
-              ) : (
-                <div className="absolute inset-0 flex items-center justify-center bg-black/30">
-                  <span className="px-3 py-1 rounded-full bg-red-500 text-white text-[10px] font-semibold">
-                    Sin stock
-                  </span>
-                </div>
-              )}
+              ) : null}
             </div>
             <div className="p-2">
               <p
@@ -269,9 +263,13 @@ const StoreView = ({
                 >
                   {formatPrice(product.price, currency)}
                 </p>
-                {product.active && (
+                {product.active ? (
                   <span className="text-[9px] font-semibold px-1.5 py-0.5 rounded-full bg-green-500/15 text-green-600">
                     En stock
+                  </span>
+                ) : (
+                  <span className="text-[9px] font-semibold px-1.5 py-0.5 rounded-full bg-red-500/15 text-red-500">
+                    Sin stock
                   </span>
                 )}
               </div>
