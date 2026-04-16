@@ -100,7 +100,7 @@ const PublicProfile = () => {
         href="https://linkone.bio"
         target="_blank"
         rel="noopener noreferrer"
-        className="fixed bottom-3 left-1/2 -translate-x-1/2 z-50 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-black/60 backdrop-blur-sm text-white/80 text-[11px] font-medium tracking-wide hover:bg-black/80 hover:text-white transition-all duration-200"
+        className="fixed bottom-3 left-1/2 -translate-x-1/2 z-30 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-black/60 backdrop-blur-sm text-white/80 text-[11px] font-medium tracking-wide hover:bg-black/80 hover:text-white transition-all duration-200"
       >
         Hecho con linkone.bio
       </a>
