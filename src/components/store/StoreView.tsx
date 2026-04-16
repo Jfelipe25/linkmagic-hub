@@ -261,16 +261,18 @@ const StoreView = ({
           onClick={() => setSelectedProduct(null)}
         >
           <div
-            className="w-full sm:max-w-md bg-white rounded-t-2xl sm:rounded-2xl max-h-[85vh] flex flex-col overflow-hidden"
+            className="w-full sm:max-w-md bg-white rounded-t-2xl sm:rounded-2xl flex flex-col overflow-hidden"
+            style={{ maxHeight: '92vh' }}
             onClick={e => e.stopPropagation()}
           >
-            <div className="relative">
+            <div className="relative flex-shrink-0">
               {selectedProduct.image_url ? (
-                <div className="w-full bg-gray-50 flex items-center justify-center" style={{ maxHeight: '60vh' }}>
+                <div className="w-full bg-gray-50 flex items-center justify-center">
                   <img
                     src={selectedProduct.image_url}
                     alt={selectedProduct.name}
-                    className="w-full max-h-[60vh] object-contain"
+                    className="w-full object-contain"
+                    style={{ maxHeight: '45vh' }}
                   />
                 </div>
               ) : (
@@ -285,7 +287,7 @@ const StoreView = ({
                 <X size={16} />
               </button>
             </div>
-            <div className="p-5 flex-1 overflow-y-auto">
+            <div className="p-5">
               {selectedProduct.category && (
                 <span className="inline-block text-[10px] font-medium px-2 py-0.5 rounded-full bg-gray-100 text-gray-500 mb-2">
                   {selectedProduct.category}
@@ -303,7 +305,7 @@ const StoreView = ({
                 </p>
               )}
             </div>
-            <div className="p-4 border-t border-gray-100">
+            <div className="p-4 border-t border-gray-100 flex-shrink-0">
               <button
                 onClick={() => { addToCart(selectedProduct.id); setSelectedProduct(null); }}
                 className="w-full py-3 rounded-lg text-white font-semibold text-sm flex items-center justify-center gap-2 active:scale-[0.98] transition"
