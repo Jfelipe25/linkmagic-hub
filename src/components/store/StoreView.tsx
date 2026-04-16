@@ -163,7 +163,7 @@ const StoreView = ({
       });
     } catch { /* no-op */ }
     const url = buildWhatsAppUrl(whatsapp, cartItems, storeName, currency, buyer);
-    window.open(url, '_blank');
+    window.location.href = url;
   };
 
   const canCheckout = buyer.name.trim() && buyer.city.trim() && buyer.address.trim();
@@ -352,8 +352,8 @@ const StoreView = ({
           onClick={() => { setCartOpen(false); setShowBuyerForm(false); }}
         >
           <div
-            className="w-full sm:max-w-md bg-white rounded-t-2xl sm:rounded-2xl max-h-[90vh] sm:max-h-[90vh] flex flex-col"
-            style={{ minHeight: 'min(90vh, 500px)' }}
+            className="w-full sm:max-w-md bg-white rounded-t-2xl sm:rounded-2xl flex flex-col"
+            style={{ height: '90dvh', maxHeight: '90dvh' }}
             onClick={e => e.stopPropagation()}
           >
             <div className="flex items-center justify-between p-4 border-b border-gray-100">
@@ -416,7 +416,7 @@ const StoreView = ({
                   ))}
                 </div>
 
-                <div className="p-4 border-t border-gray-100 space-y-3">
+                <div className="p-4 pb-8 border-t border-gray-100 space-y-3">
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-gray-600">Total</span>
                     <span className="text-xl font-bold text-gray-900">{formatPrice(totalPrice, currency)}</span>
@@ -504,7 +504,7 @@ const StoreView = ({
                   </div>
                 </div>
 
-                <div className="p-4 border-t border-gray-100 space-y-3">
+                <div className="p-4 pb-8 border-t border-gray-100 space-y-3">
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-gray-600">Total</span>
                     <span className="text-xl font-bold text-gray-900">{formatPrice(totalPrice, currency)}</span>
