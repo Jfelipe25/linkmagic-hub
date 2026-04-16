@@ -1,5 +1,5 @@
 // src/components/store/ProductsManager.tsx
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Product, formatPrice } from '@/types/store';
 import { Plus, Trash2, Edit2, X, Check, Loader2, Image as ImageIcon } from 'lucide-react';
@@ -27,11 +27,23 @@ const ProductsManager = ({ profileId, currency }: Props) => {
   const [form, setForm] = useState({ ...EMPTY_PRODUCT });
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [activeCategory, setActiveCategory] = useState<string>('Todos');
 
   useEffect(() => {
     if (!profileId) return;
     loadProducts();
   }, [profileId]);
+
+  const categories = useMemo(() => {
+    const cats = new Set<string>();
+    products.forEach(p => { if (p.category) cats.add(p.category); });
+    return ['Todos', ...Array.from(cats)];
+  }, [products]);
+
+  const filteredProducts = useMemo(() => {
+    if (activeCategory === 'Todos') return products;
+    return products.filter(p => p.category === activeCategory);
+  }, [products, activeCategory]);
 
   const loadProducts = async () => {
     setLoading(true);
@@ -167,6 +179,9 @@ const ProductsManager = ({ profileId, currency }: Props) => {
     if (!error) loadProducts();
   };
 
+  const stockCount = products.filter(p => p.active).length;
+  const outOfStockCount = products.filter(p => !p.active).length;
+
   if (loading) {
     return (
       <div className="flex justify-center py-12">
@@ -181,7 +196,10 @@ const ProductsManager = ({ profileId, currency }: Props) => {
         <div>
           <h3 className="text-lg font-semibold text-foreground">Productos</h3>
           <p className="text-xs text-muted-foreground mt-0.5">
-            {products.length} producto{products.length === 1 ? '' : 's'} en tu catálogo
+            {products.length} producto{products.length === 1 ? '' : 's'}
+            {products.length > 0 && (
+              <span> · <span className="text-green-600">{stockCount} en stock</span>{outOfStockCount > 0 && <span> · <span className="text-red-500">{outOfStockCount} sin stock</span></span>}</span>
+            )}
           </p>
         </div>
         {!showForm && (
@@ -193,6 +211,30 @@ const ProductsManager = ({ profileId, currency }: Props) => {
           </button>
         )}
       </div>
+
+      {/* Category filter */}
+      {categories.length > 1 && !showForm && (
+        <div className="flex gap-1.5 flex-wrap">
+          {categories.map(cat => (
+            <button
+              key={cat}
+              onClick={() => setActiveCategory(cat)}
+              className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
+                activeCategory === cat
+                  ? 'bg-primary text-primary-foreground'
+                  : 'border border-border bg-card text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              {cat}
+              {cat !== 'Todos' && (
+                <span className="ml-1 opacity-60">
+                  ({products.filter(p => p.category === cat).length})
+                </span>
+              )}
+            </button>
+          ))}
+        </div>
+      )}
 
       {showForm && (
         <div className="rounded-lg border border-border bg-card p-4 space-y-3">
@@ -305,7 +347,7 @@ const ProductsManager = ({ profileId, currency }: Props) => {
                 className="rounded"
               />
               <label htmlFor="active-checkbox" className="text-sm text-muted-foreground">
-                Visible en la tienda
+                En stock
               </label>
             </div>
           </div>
@@ -337,7 +379,7 @@ const ProductsManager = ({ profileId, currency }: Props) => {
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-          {products.map(product => (
+          {filteredProducts.map(product => (
             <div
               key={product.id}
               className={`rounded-lg border border-border bg-card overflow-hidden transition ${
@@ -371,13 +413,27 @@ const ProductsManager = ({ profileId, currency }: Props) => {
                   </div>
                 </div>
                 <div className="flex items-center gap-1.5 mt-3 pt-3 border-t border-border">
+                  {/* Stock toggle */}
                   <button
                     onClick={() => toggleActive(product)}
-                    className={`text-[11px] px-2 py-1 rounded ${
-                      product.active ? 'text-green-600' : 'text-muted-foreground'
-                    }`}
+                    className="flex items-center gap-1.5 group"
                   >
-                    {product.active ? 'Visible' : 'Oculto'}
+                    <div
+                      className={`relative w-8 h-[18px] rounded-full transition-colors ${
+                        product.active ? 'bg-green-500' : 'bg-red-400'
+                      }`}
+                    >
+                      <div
+                        className={`absolute top-[2px] w-[14px] h-[14px] rounded-full bg-white shadow-sm transition-all ${
+                          product.active ? 'left-[16px]' : 'left-[2px]'
+                        }`}
+                      />
+                    </div>
+                    <span className={`text-[11px] font-medium ${
+                      product.active ? 'text-green-600' : 'text-red-500'
+                    }`}>
+                      {product.active ? 'En stock' : 'Sin stock'}
+                    </span>
                   </button>
                   <div className="flex-1" />
                   <button
