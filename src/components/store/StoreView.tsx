@@ -352,7 +352,8 @@ const StoreView = ({
           onClick={() => { setCartOpen(false); setShowBuyerForm(false); }}
         >
           <div
-            className="w-full sm:max-w-md bg-white rounded-t-2xl sm:rounded-2xl max-h-[90vh] flex flex-col"
+            className="w-full sm:max-w-md bg-white rounded-t-2xl sm:rounded-2xl max-h-[90vh] sm:max-h-[90vh] flex flex-col"
+            style={{ minHeight: 'min(90vh, 500px)' }}
             onClick={e => e.stopPropagation()}
           >
             <div className="flex items-center justify-between p-4 border-b border-gray-100">
