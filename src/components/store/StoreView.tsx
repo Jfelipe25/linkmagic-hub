@@ -96,7 +96,6 @@ const StoreView = ({
         .from('products')
         .select('*')
         .eq('profile_id', profileId)
-        .eq('active', true)
         .order('sort_order', { ascending: true })
         .order('created_at', { ascending: false });
       setProducts(data || []);
