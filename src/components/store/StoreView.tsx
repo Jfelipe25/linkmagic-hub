@@ -348,12 +348,12 @@ const StoreView = ({
       {/* Cart + checkout modal */}
       {cartOpen && (
         <div
-          className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/50 p-0 sm:p-4"
+          className="fixed inset-0 z-50 bg-black/50"
           onClick={() => { setCartOpen(false); setShowBuyerForm(false); }}
         >
           <div
-            className="w-full sm:max-w-md bg-white rounded-t-2xl sm:rounded-2xl flex flex-col"
-            style={{ height: '90dvh', maxHeight: '90dvh' }}
+            className="absolute bottom-0 left-0 right-0 sm:top-1/2 sm:left-1/2 sm:-translate-x-1/2 sm:-translate-y-1/2 sm:max-w-md sm:rounded-2xl bg-white rounded-t-2xl flex flex-col"
+            style={{ top: '8vh' }}
             onClick={e => e.stopPropagation()}
           >
             <div className="flex items-center justify-between p-4 border-b border-gray-100">
