@@ -63,7 +63,13 @@ function buildWhatsAppUrl(
     lines.push(`Comentarios: ${buyer.comments}`);
   }
   const msg = encodeURIComponent(lines.join('\n'));
-  return `https://wa.me/${cleanPhone}?text=${msg}`;
+  // On mobile, use whatsapp:// deep link to open directly
+  // On desktop, use api.whatsapp.com/send which is faster than wa.me
+  const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+  if (isMobile) {
+    return `whatsapp://send?phone=${cleanPhone}&text=${msg}`;
+  }
+  return `https://api.whatsapp.com/send?phone=${cleanPhone}&text=${msg}`;
 }
 
 const StoreView = ({
