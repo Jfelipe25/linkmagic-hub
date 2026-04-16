@@ -10,6 +10,7 @@ interface BuyerInfo {
   city: string;
   address: string;
   email: string;
+  comments: string;
 }
 
 const EMPTY_BUYER: BuyerInfo = {
@@ -18,6 +19,7 @@ const EMPTY_BUYER: BuyerInfo = {
   city: '',
   address: '',
   email: '',
+  comments: '',
 };
 
 interface Props {
@@ -56,6 +58,10 @@ function buildWhatsAppUrl(
   if (buyer.email) lines.push(`Email: ${buyer.email}`);
   lines.push(`Ciudad: ${buyer.city}`);
   lines.push(`Dirección: ${buyer.address}`);
+  if (buyer.comments) {
+    lines.push('');
+    lines.push(`Comentarios: ${buyer.comments}`);
+  }
   const msg = encodeURIComponent(lines.join('\n'));
   return `https://wa.me/${cleanPhone}?text=${msg}`;
 }
@@ -476,6 +482,17 @@ const StoreView = ({
                       onChange={e => setBuyer(b => ({ ...b, address: e.target.value }))}
                       placeholder="Cra 15 #32-45, Barrio Centro"
                       className="mt-1 w-full px-3 py-2.5 rounded-lg border border-gray-200 text-sm bg-white text-gray-900"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs text-gray-500">Comentarios (opcional)</label>
+                    <textarea
+                      value={buyer.comments}
+                      onChange={e => setBuyer(b => ({ ...b, comments: e.target.value }))}
+                      placeholder="Ej: Entregar después de las 5pm, llamar antes..."
+                      maxLength={200}
+                      rows={2}
+                      className="mt-1 w-full px-3 py-2.5 rounded-lg border border-gray-200 text-sm bg-white text-gray-900 resize-none"
                     />
                   </div>
                 </div>
