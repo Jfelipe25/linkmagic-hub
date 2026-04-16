@@ -266,13 +266,15 @@ const StoreView = ({
           >
             <div className="relative">
               {selectedProduct.image_url ? (
-                <img
-                  src={selectedProduct.image_url}
-                  alt={selectedProduct.name}
-                  className="w-full h-56 object-cover"
-                />
+                <div className="w-full bg-gray-50 flex items-center justify-center" style={{ maxHeight: '60vh' }}>
+                  <img
+                    src={selectedProduct.image_url}
+                    alt={selectedProduct.name}
+                    className="w-full max-h-[60vh] object-contain"
+                  />
+                </div>
               ) : (
-                <div className="w-full h-56 bg-gray-100 flex items-center justify-center">
+                <div className="w-full h-48 bg-gray-100 flex items-center justify-center">
                   <ImageIcon size={48} className="text-gray-300" />
                 </div>
               )}
@@ -318,13 +320,14 @@ const StoreView = ({
       {totalItems > 0 && !cartOpen && !selectedProduct && (
         <button
           onClick={() => setCartOpen(true)}
-          className="fixed bottom-14 left-1/2 -translate-x-1/2 z-40 flex items-center gap-2 px-5 py-2.5 rounded-full shadow-lg font-medium text-sm text-white transition active:scale-95"
-          style={{ backgroundColor: accentColor }}
+          className="fixed bottom-16 left-4 right-4 z-40 flex items-center justify-between px-5 py-3 rounded-2xl shadow-lg font-medium text-sm text-white transition active:scale-[0.98]"
+          style={{ backgroundColor: accentColor, maxWidth: '420px', margin: '0 auto' }}
         >
-          <ShoppingBag size={14} />
-          Ver pedido ({totalItems})
-          <span className="opacity-80">·</span>
-          <span>{formatPrice(totalPrice, currency)}</span>
+          <div className="flex items-center gap-2">
+            <ShoppingBag size={16} />
+            <span>Ver pedido ({totalItems})</span>
+          </div>
+          <span className="font-semibold">{formatPrice(totalPrice, currency)}</span>
         </button>
       )}
 
