@@ -219,7 +219,7 @@ const StoreView = ({
         {filteredProducts.map(product => (
           <div
             key={product.id}
-            className="rounded-lg overflow-hidden cursor-pointer"
+            className={`rounded-lg overflow-hidden cursor-pointer ${!product.active ? 'opacity-60' : ''}`}
             style={{ backgroundColor: fontColor + '0A' }}
             onClick={() => setSelectedProduct(product)}
           >
@@ -239,14 +239,22 @@ const StoreView = ({
                   <ImageIcon size={32} />
                 </div>
               )}
-              <button
-                onClick={(e) => { e.stopPropagation(); addToCart(product.id); }}
-                className="absolute bottom-1.5 right-1.5 w-7 h-7 rounded-full flex items-center justify-center text-white shadow-md transition active:scale-90"
-                style={{ backgroundColor: accentColor }}
-                aria-label={`Agregar ${product.name}`}
-              >
-                <Plus size={14} />
-              </button>
+              {product.active ? (
+                <button
+                  onClick={(e) => { e.stopPropagation(); addToCart(product.id); }}
+                  className="absolute bottom-1.5 right-1.5 w-7 h-7 rounded-full flex items-center justify-center text-white shadow-md transition active:scale-90"
+                  style={{ backgroundColor: accentColor }}
+                  aria-label={`Agregar ${product.name}`}
+                >
+                  <Plus size={14} />
+                </button>
+              ) : (
+                <div className="absolute inset-0 flex items-center justify-center bg-black/30">
+                  <span className="px-3 py-1 rounded-full bg-red-500 text-white text-[10px] font-semibold">
+                    Sin stock
+                  </span>
+                </div>
+              )}
             </div>
             <div className="p-2">
               <p
@@ -255,12 +263,19 @@ const StoreView = ({
               >
                 {product.name}
               </p>
-              <p
-                className="text-xs font-semibold mt-1"
-                style={{ color: accentColor }}
-              >
-                {formatPrice(product.price, currency)}
-              </p>
+              <div className="flex items-center justify-between mt-1">
+                <p
+                  className="text-xs font-semibold"
+                  style={{ color: accentColor }}
+                >
+                  {formatPrice(product.price, currency)}
+                </p>
+                {product.active && (
+                  <span className="text-[9px] font-semibold px-1.5 py-0.5 rounded-full bg-green-500/15 text-green-600">
+                    En stock
+                  </span>
+                )}
+              </div>
             </div>
           </div>
         ))}
@@ -311,6 +326,15 @@ const StoreView = ({
               <p className="text-xl font-bold mt-1" style={{ color: accentColor }}>
                 {formatPrice(selectedProduct.price, currency)}
               </p>
+              {selectedProduct.active ? (
+                <span className="inline-block mt-2 text-[11px] font-semibold px-2 py-0.5 rounded-full bg-green-500/15 text-green-600">
+                  En stock
+                </span>
+              ) : (
+                <span className="inline-block mt-2 text-[11px] font-semibold px-2 py-0.5 rounded-full bg-red-500/15 text-red-500">
+                  Sin stock
+                </span>
+              )}
               {selectedProduct.description && (
                 <p className="text-sm text-gray-600 mt-3 leading-relaxed">
                   {selectedProduct.description}
@@ -318,13 +342,22 @@ const StoreView = ({
               )}
             </div>
             <div className="p-4 border-t border-gray-100 flex-shrink-0">
-              <button
-                onClick={() => { addToCart(selectedProduct.id); setSelectedProduct(null); }}
-                className="w-full py-3 rounded-lg text-white font-semibold text-sm flex items-center justify-center gap-2 active:scale-[0.98] transition"
-                style={{ backgroundColor: accentColor }}
-              >
-                <Plus size={16} /> Agregar al pedido
-              </button>
+              {selectedProduct.active ? (
+                <button
+                  onClick={() => { addToCart(selectedProduct.id); setSelectedProduct(null); }}
+                  className="w-full py-3 rounded-lg text-white font-semibold text-sm flex items-center justify-center gap-2 active:scale-[0.98] transition"
+                  style={{ backgroundColor: accentColor }}
+                >
+                  <Plus size={16} /> Agregar al pedido
+                </button>
+              ) : (
+                <button
+                  disabled
+                  className="w-full py-3 rounded-lg bg-gray-200 text-gray-400 font-semibold text-sm flex items-center justify-center gap-2 cursor-not-allowed"
+                >
+                  No disponible
+                </button>
+              )}
             </div>
           </div>
         </div>
