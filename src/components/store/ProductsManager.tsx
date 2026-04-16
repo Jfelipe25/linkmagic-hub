@@ -390,11 +390,11 @@ const ProductsManager = ({ profileId, currency }: Props) => {
                 <img
                   src={product.image_url}
                   alt={product.name}
-                  className="w-full h-32 object-cover"
+                  className="w-full h-44 object-contain bg-muted/30"
                   loading="lazy"
                 />
               ) : (
-                <div className="w-full h-32 bg-muted flex items-center justify-center text-muted-foreground">
+                <div className="w-full h-44 bg-muted flex items-center justify-center text-muted-foreground">
                   <ImageIcon size={24} />
                 </div>
               )}
