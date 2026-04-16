@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
-import { Loader2, LogOut, Users, DollarSign, Clock, Search, ExternalLink, Mail } from 'lucide-react';
+import { Loader2, LogOut, Users, DollarSign, Clock, Search, ExternalLink, Mail, Store } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 interface ProfileRow {
@@ -11,6 +11,7 @@ interface ProfileRow {
   slug: string;
   template: string | null;
   paid: boolean | null;
+  store_enabled: boolean | null;
   created_at: string | null;
   avatar: string | null;
   user_id: string | null;
@@ -52,7 +53,7 @@ const Admin = () => {
     const fetchProfiles = async () => {
       const { data } = await supabase
         .from('profiles')
-        .select('id, name, slug, template, paid, created_at, avatar, user_id, session_id')
+        .select('id, name, slug, template, paid, store_enabled, created_at, avatar, user_id, session_id')
         .order('created_at', { ascending: false });
       if (data) setProfiles(data);
 
@@ -72,6 +73,12 @@ const Admin = () => {
   const activateProfile = async (profileId: string) => {
     await supabase.from('profiles').update({ paid: true }).eq('id', profileId);
     setProfiles(prev => prev.map(p => p.id === profileId ? { ...p, paid: true } : p));
+  };
+
+  const toggleStore = async (profileId: string, currentState: boolean) => {
+    const newState = !currentState;
+    await supabase.from('profiles').update({ store_enabled: newState }).eq('id', profileId);
+    setProfiles(prev => prev.map(p => p.id === profileId ? { ...p, store_enabled: newState } : p));
   };
 
   const deleteProfile = async (profileId: string) => {
@@ -100,6 +107,7 @@ const Admin = () => {
 
   const totalProfiles = profiles.length;
   const paidProfiles = profiles.filter(p => p.paid).length;
+  const storeProfiles = profiles.filter(p => p.store_enabled).length;
   const recentProfiles = profiles.filter(p => {
     if (!p.created_at) return false;
     return Date.now() - new Date(p.created_at).getTime() < 7 * 24 * 60 * 60 * 1000;
@@ -121,10 +129,11 @@ const Admin = () => {
 
       <div className="max-w-7xl mx-auto px-6 py-8 space-y-6">
         {/* Metrics */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
           {[
             { icon: Users, value: totalProfiles, label: 'Perfiles totales', delay: 0 },
             { icon: DollarSign, value: paidProfiles, label: 'Perfiles pagados', delay: 0.1 },
+            { icon: Store, value: storeProfiles, label: 'Tiendas activas', delay: 0.15 },
             { icon: Clock, value: recentProfiles, label: 'Últimos 7 días', delay: 0.2 },
           ].map(({ icon: Icon, value, label, delay }) => (
             <motion.div key={label} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay }}
@@ -169,6 +178,7 @@ const Admin = () => {
                   <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground">Slug</th>
                   <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground">Template</th>
                   <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground">Estado</th>
+                  <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground">Tienda</th>
                   <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground">Fecha</th>
                   <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground"></th>
                 </tr>
@@ -204,6 +214,15 @@ const Admin = () => {
                           {p.paid ? 'Pagado' : 'Pendiente'}
                         </span>
                       </td>
+                      <td className="px-4 py-3">
+                        {p.store_enabled ? (
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-purple-500/20 text-purple-400">
+                            <Store size={10} /> Activa
+                          </span>
+                        ) : (
+                          <span className="text-xs text-muted-foreground opacity-40">—</span>
+                        )}
+                      </td>
                       <td className="px-4 py-3 text-xs text-muted-foreground">
                         {p.created_at ? new Date(p.created_at).toLocaleDateString() : '—'}
                       </td>
@@ -213,6 +232,16 @@ const Admin = () => {
                             <button onClick={() => activateProfile(p.id)}
                               className="text-xs px-2 py-1 rounded-md bg-green-500/20 text-green-400 hover:bg-green-500/30 transition-colors font-medium">
                               Activar
+                            </button>
+                          )}
+                          {p.paid && (
+                            <button onClick={() => toggleStore(p.id, !!p.store_enabled)}
+                              className={`text-xs px-2 py-1 rounded-md font-medium transition-colors ${
+                                p.store_enabled
+                                  ? 'bg-purple-500/20 text-purple-400 hover:bg-purple-500/30'
+                                  : 'bg-blue-500/20 text-blue-400 hover:bg-blue-500/30'
+                              }`}>
+                              {p.store_enabled ? 'Desactivar tienda' : 'Activar tienda'}
                             </button>
                           )}
                           {p.paid && (
@@ -232,7 +261,7 @@ const Admin = () => {
                 })}
                 {filtered.length === 0 && (
                   <tr>
-                    <td colSpan={7} className="px-4 py-8 text-center text-muted-foreground text-sm">
+                    <td colSpan={8} className="px-4 py-8 text-center text-muted-foreground text-sm">
                       No se encontraron perfiles
                     </td>
                   </tr>

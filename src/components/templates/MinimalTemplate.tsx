@@ -65,22 +65,28 @@ const MinimalTemplate = ({ profile, accentColor, profileId }: TemplateProps) => 
       )}
 
       {(!hasStore || activeTab === 'links') && (
-        <div className="w-full mt-6 space-y-3">
-          {visibleLinks.map((link) => (
-            <a key={link.id} href={normalizeUrl(link.url)} target="_blank" rel="noopener noreferrer"
-              className="block w-full text-center py-3 rounded-full text-sm font-medium transition-all"
-              style={{
-                border: `2px solid ${fontColor}`,
-                color: fontColor,
-              }}
-              onClick={() => profile.slug && trackLinkClick(profile.slug, link.id)}
-              onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = fontColor; e.currentTarget.style.color = '#fff'; }}
-              onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; e.currentTarget.style.color = fontColor; }}
-            >
-              {link.label || 'Link'}
-            </a>
-          ))}
-        </div>
+        <>
+          <div className="w-full mt-6 space-y-3">
+            {visibleLinks.map((link) => (
+              <a key={link.id} href={normalizeUrl(link.url)} target="_blank" rel="noopener noreferrer"
+                className="block w-full text-center py-3 rounded-full text-sm font-medium transition-all"
+                style={{
+                  border: `2px solid ${fontColor}`,
+                  color: fontColor,
+                }}
+                onClick={() => profile.slug && trackLinkClick(profile.slug, link.id)}
+                onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = fontColor; e.currentTarget.style.color = '#fff'; }}
+                onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; e.currentTarget.style.color = fontColor; }}
+              >
+                {link.label || 'Link'}
+              </a>
+            ))}
+          </div>
+
+          {profile.enable_contact_form && profileId && (
+            <ContactForm profileId={profileId} accentColor={accentColor} fontColor={fontColor} />
+          )}
+        </>
       )}
 
       {hasStore && activeTab === 'store' && (
@@ -97,9 +103,6 @@ const MinimalTemplate = ({ profile, accentColor, profileId }: TemplateProps) => 
         </div>
       )}
 
-      {profile.enable_contact_form && profileId && (
-        <ContactForm profileId={profileId} accentColor={accentColor} fontColor={fontColor} />
-      )}
       </div>
     </div>
   );

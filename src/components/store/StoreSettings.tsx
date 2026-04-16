@@ -1,7 +1,7 @@
 // src/components/store/StoreSettings.tsx
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { Loader2, Check, MessageCircle } from 'lucide-react';
+import { Loader2, Check, MessageCircle, Edit2, X } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface Props {
@@ -23,16 +23,18 @@ const StoreSettings = ({
   const [message, setMessage] = useState(initialMessage || '');
   const [currency, setCurrency] = useState(initialCurrency || 'COP');
   const [saving, setSaving] = useState(false);
+  const [editingPhone, setEditingPhone] = useState(!initialWhatsapp);
 
   useEffect(() => {
     setWhatsapp(initialWhatsapp || '');
     setMessage(initialMessage || '');
     setCurrency(initialCurrency || 'COP');
+    setEditingPhone(!initialWhatsapp);
   }, [initialWhatsapp, initialMessage, initialCurrency]);
 
   const handleSave = async () => {
     const cleanPhone = whatsapp.replace(/[^0-9]/g, '');
-    if (cleanPhone && cleanPhone.length < 10) {
+    if (!cleanPhone || cleanPhone.length < 10) {
       toast.error('El número de WhatsApp debe tener al menos 10 dígitos con código de país');
       return;
     }
@@ -49,9 +51,22 @@ const StoreSettings = ({
       toast.error('Error al guardar');
     } else {
       toast.success('Configuración guardada');
+      setEditingPhone(false);
       onSaved?.();
     }
     setSaving(false);
+  };
+
+  const formatPhoneDisplay = (phone: string) => {
+    if (!phone) return '';
+    const clean = phone.replace(/[^0-9]/g, '');
+    if (clean.length >= 12) {
+      return `+${clean.slice(0, 2)} ${clean.slice(2, 5)} ${clean.slice(5, 8)} ${clean.slice(8)}`;
+    }
+    if (clean.length >= 10) {
+      return `+${clean.slice(0, 2)} ${clean.slice(2, 5)} ${clean.slice(5)}`;
+    }
+    return clean;
   };
 
   return (
@@ -65,16 +80,42 @@ const StoreSettings = ({
         <label className="text-xs text-muted-foreground block mb-1">
           WhatsApp para recibir pedidos *
         </label>
-        <input
-          type="tel"
-          value={whatsapp}
-          onChange={e => setWhatsapp(e.target.value)}
-          placeholder="573001234567"
-          className="w-full px-3 py-2 rounded-md border border-border bg-background text-sm"
-        />
-        <p className="text-[11px] text-muted-foreground mt-1">
-          Incluye el código de país sin +. Ej: 573001234567 para Colombia.
-        </p>
+        {editingPhone ? (
+          <div className="space-y-1">
+            <div className="flex gap-2">
+              <input
+                type="tel"
+                value={whatsapp}
+                onChange={e => setWhatsapp(e.target.value)}
+                placeholder="573001234567"
+                className="flex-1 px-3 py-2 rounded-md border border-border bg-background text-sm"
+              />
+              {initialWhatsapp && (
+                <button
+                  onClick={() => { setWhatsapp(initialWhatsapp); setEditingPhone(false); }}
+                  className="px-2 py-2 rounded-md border border-border text-muted-foreground hover:text-foreground"
+                >
+                  <X size={14} />
+                </button>
+              )}
+            </div>
+            <p className="text-[11px] text-muted-foreground">
+              Incluye el código de país sin +. Ej: 573001234567 para Colombia.
+            </p>
+          </div>
+        ) : (
+          <div className="flex items-center gap-2 px-3 py-2 rounded-md border border-border bg-muted/30">
+            <span className="flex-1 text-sm font-mono">
+              {formatPhoneDisplay(whatsapp)}
+            </span>
+            <button
+              onClick={() => setEditingPhone(true)}
+              className="flex items-center gap-1 px-2 py-1 rounded text-xs text-muted-foreground hover:text-foreground hover:bg-accent transition"
+            >
+              <Edit2 size={11} /> Editar
+            </button>
+          </div>
+        )}
       </div>
 
       <div>
@@ -99,13 +140,13 @@ const StoreSettings = ({
         <textarea
           value={message}
           onChange={e => setMessage(e.target.value)}
-          placeholder="Ej: ¡Bienvenido a nuestra tienda! Envíos a todo el país."
+          placeholder="Ej: ¡Envíos gratis en Bucaramanga! · Precios al por mayor disponibles."
           maxLength={200}
           rows={2}
           className="w-full px-3 py-2 rounded-md border border-border bg-background text-sm resize-none"
         />
         <p className="text-[11px] text-muted-foreground mt-1">
-          {message.length}/200 caracteres
+          {message.length}/200 · Se muestra arriba de los productos en tu tienda.
         </p>
       </div>
 

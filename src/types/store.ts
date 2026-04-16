@@ -47,25 +47,3 @@ export function formatPrice(amount: number, currency: string = 'COP'): string {
     return `$${amount.toLocaleString(locale)}`;
   }
 }
-
-export function buildWhatsAppUrl(
-  phone: string,
-  items: CartItem[],
-  storeName: string,
-  currency: string = 'COP'
-): string {
-  const cleanPhone = phone.replace(/[^0-9]/g, '');
-  const lines: string[] = [];
-  lines.push(`¡Hola! Quiero hacer un pedido desde tu tienda ${storeName}:`);
-  lines.push('');
-  let total = 0;
-  items.forEach(({ product, quantity }) => {
-    const subtotal = product.price * quantity;
-    total += subtotal;
-    lines.push(`• ${quantity}x ${product.name} — ${formatPrice(subtotal, currency)}`);
-  });
-  lines.push('');
-  lines.push(`*Total: ${formatPrice(total, currency)}*`);
-  const msg = encodeURIComponent(lines.join('\n'));
-  return `https://wa.me/${cleanPhone}?text=${msg}`;
-}
