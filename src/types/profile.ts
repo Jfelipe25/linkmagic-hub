@@ -54,6 +54,7 @@ export interface ProfileData {
   store_whatsapp?: string;
   store_welcome_message?: string;
   store_currency?: string;
+store_name?: string;
 }
 
 export const ACCENT_COLORS = [
@@ -95,6 +96,7 @@ store_enabled: false,
   store_whatsapp: '',
   store_welcome_message: '',
   store_currency: 'COP',
+store_name: '',
 };
 
 /** Filter links based on their schedule */

@@ -89,7 +89,7 @@ const DarkTemplate = ({ profile, accentColor, profileId }: TemplateProps) => {
         <div className="w-full mt-4">
           <StoreView
             profileId={profileId!}
-            storeName={profile.name || 'Tienda'}
+            storeName={profile.store_name || profile.name || 'Tienda'}
             whatsapp={profile.store_whatsapp || ''}
             welcomeMessage={profile.store_welcome_message || ''}
             currency={profile.store_currency || 'COP'}

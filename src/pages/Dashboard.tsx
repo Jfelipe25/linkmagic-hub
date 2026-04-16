@@ -458,6 +458,7 @@ const Dashboard = () => {
       <>
         <StoreSettings
           profileId={activeProfileId}
+initialStoreName={profile.store_name || ''}
           initialWhatsapp={profile.store_whatsapp || ''}
           initialMessage={profile.store_welcome_message || ''}
           initialCurrency={profile.store_currency || 'COP'}

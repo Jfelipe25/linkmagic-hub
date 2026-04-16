@@ -34,6 +34,7 @@ store_enabled: row.store_enabled ?? false,
     store_whatsapp: row.store_whatsapp ?? '',
     store_welcome_message: row.store_welcome_message ?? '',
     store_currency: row.store_currency ?? 'COP',
+store_name: row.store_name ?? '',
   };
 }
 
