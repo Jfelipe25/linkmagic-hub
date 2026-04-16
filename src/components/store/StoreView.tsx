@@ -218,7 +218,7 @@ const StoreView = ({
         {filteredProducts.map(product => (
           <div
             key={product.id}
-            className={`rounded-lg overflow-hidden cursor-pointer ${!product.active ? 'opacity-60' : ''}`}
+            className="rounded-lg overflow-hidden cursor-pointer"
             style={{ backgroundColor: fontColor + '0A' }}
             onClick={() => setSelectedProduct(product)}
           >
