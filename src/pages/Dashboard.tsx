@@ -19,6 +19,9 @@ import ThemeToggle from '@/components/ThemeToggle';
 import LanguageToggle from '@/components/LanguageToggle';
 import { toast } from 'sonner';
 import { motion, AnimatePresence } from 'framer-motion';
+import ProductsManager from '@/components/store/ProductsManager';
+import StoreSettings from '@/components/store/StoreSettings';
+import ActivateStoreCTA from '@/components/store/ActivateStoreCTA';
 
 interface ProfileRow {
   id: string;
@@ -48,7 +51,7 @@ const Dashboard = () => {
   const [newProfile, setNewProfile] = useState<ProfileData>({ ...DEFAULT_PROFILE });
   const [isDemo, setIsDemo] = useState(false);
   const [showFirstVisit, setShowFirstVisit] = useState(false);
-  const [activeTab, setActiveTab] = useState<'editor' | 'analytics' | 'qr' | 'contacts'>('editor');
+  const [activeTab, setActiveTab] = useState<'editor' | 'analytics' | 'qr' | 'contacts' | 'store'>('editor');
 
   const { stats: clickStats, totalClicks } = useLinkClicks(isDemo ? null : (activeProfileId || null));
   const { options: pricingOptions, selected: selectedPricing, setSelected: setSelectedPricing } = usePricing();
@@ -326,6 +329,7 @@ const Dashboard = () => {
                 { key: 'analytics', label: `📊 ${t('dash.analytics')}` },
                 { key: 'qr', label: '🪪 QR & Tarjeta' },
                 { key: 'contacts', label: `👥 ${t('dash.contacts')}` },
+{ key: 'store', label: '🛍️ Tienda' },
               ] as const).map(tab => (
                 <button key={tab.key} onClick={() => setActiveTab(tab.key)}
                   className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
@@ -441,7 +445,41 @@ const Dashboard = () => {
                 )}
               </motion.div>
             )}
-
+{activeTab === 'store' && (
+  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
+    {!profile.store_enabled ? (
+      <ActivateStoreCTA
+        profileId={activeProfileId}
+        isPaid={profile.paid ?? false}
+        countryCode={selectedPricing?.country_code}
+        displayPrice={'$100.000 COP'}
+      />
+    ) : (
+      <>
+        <StoreSettings
+          profileId={activeProfileId}
+          initialWhatsapp={profile.store_whatsapp || ''}
+          initialMessage={profile.store_welcome_message || ''}
+          initialCurrency={profile.store_currency || 'COP'}
+          onSaved={() => {
+            supabase
+              .from('profiles')
+              .select('*')
+              .eq('id', activeProfileId)
+              .maybeSingle()
+              .then(({ data }) => {
+                if (data) setProfile(profileFromRow(data));
+              });
+          }}
+        />
+        <ProductsManager
+          profileId={activeProfileId}
+          currency={profile.store_currency || 'COP'}
+        />
+      </>
+    )}
+  </motion.div>
+)}
             {activeTab === 'editor' && (
               <>
                 {/* Editor + Preview */}

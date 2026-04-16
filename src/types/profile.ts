@@ -49,6 +49,11 @@ export interface ProfileData {
   created_at?: string;
   views?: number;
   enable_contact_form?: boolean;
+// Store module
+  store_enabled?: boolean;
+  store_whatsapp?: string;
+  store_welcome_message?: string;
+  store_currency?: string;
 }
 
 export const ACCENT_COLORS = [
@@ -86,6 +91,10 @@ export const DEFAULT_PROFILE: ProfileData = {
   social_links: {},
   links: [],
   enable_contact_form: false,
+store_enabled: false,
+  store_whatsapp: '',
+  store_welcome_message: '',
+  store_currency: 'COP',
 };
 
 /** Filter links based on their schedule */

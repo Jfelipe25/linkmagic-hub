@@ -1,3 +1,11 @@
+// =====================================================================
+// supabase/functions/webhook/index.ts — UPDATED
+// Changes from current version:
+//   - Added store payment detection (external_reference with "store_" prefix)
+//   - If store payment approved → set store_enabled=true instead of paid=true
+//   - Pro payment flow unchanged, backward compatible
+// =====================================================================
+
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
@@ -86,45 +94,63 @@ serve(async (req) => {
         const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
         const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-        const { error: updateError } = await supabase
-          .from('profiles')
-          .update({ paid: true })
-          .eq('session_id', sessionId);
+        // ===== NEW: detect store payment by prefix =====
+        const isStorePayment = sessionId.startsWith('store_');
 
-        if (updateError) console.error('Error updating profile:', updateError);
+        if (isStorePayment) {
+          // Activate store
+          const { error: updateError } = await supabase
+            .from('profiles')
+            .update({ store_enabled: true })
+            .eq('store_session_id', sessionId);
 
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('session_id', sessionId)
-          .maybeSingle();
+          if (updateError) {
+            console.error('Error activating store:', updateError);
+          } else {
+            console.log(`Store activated for session ${sessionId}`);
+          }
+        } else {
+          // ===== EXISTING Pro payment flow — unchanged =====
+          const { error: updateError } = await supabase
+            .from('profiles')
+            .update({ paid: true })
+            .eq('session_id', sessionId);
 
-        if (profile) {
-          console.log(`Profile ${profile.slug} activated. user_id: ${profile.user_id || 'none'}`);
+          if (updateError) console.error('Error updating profile:', updateError);
 
-          if (!profile.user_id && payment.payer?.email) {
-            const { data: existingUsers } = await supabase.auth.admin.listUsers();
-            const existingUser = existingUsers?.users?.find(u => u.email === payment.payer.email);
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('session_id', sessionId)
+            .maybeSingle();
 
-            if (existingUser) {
-              await supabase.from('profiles').update({ user_id: existingUser.id }).eq('session_id', sessionId);
-              console.log(`Linked existing user ${payment.payer.email} to profile ${profile.slug}`);
-            } else {
-              const tempPassword = crypto.randomUUID().slice(0, 12);
-              const { data: authData, error: authError } = await supabase.auth.admin.createUser({
-                email: payment.payer.email,
-                password: tempPassword,
-                email_confirm: true,
-              });
+          if (profile) {
+            console.log(`Profile ${profile.slug} activated. user_id: ${profile.user_id || 'none'}`);
 
-              if (authData?.user && !authError) {
-                await supabase.from('profiles').update({ user_id: authData.user.id }).eq('session_id', sessionId);
-                const appUrl = Deno.env.get('PUBLIC_APP_URL') || 'https://www.linkone.bio';
-                const publicSupabase = createClient(supabaseUrl, Deno.env.get('SUPABASE_ANON_KEY')!);
-                await publicSupabase.auth.resetPasswordForEmail(payment.payer.email, {
-                  redirectTo: `${appUrl}/reset-password`,
+            if (!profile.user_id && payment.payer?.email) {
+              const { data: existingUsers } = await supabase.auth.admin.listUsers();
+              const existingUser = existingUsers?.users?.find(u => u.email === payment.payer.email);
+
+              if (existingUser) {
+                await supabase.from('profiles').update({ user_id: existingUser.id }).eq('session_id', sessionId);
+                console.log(`Linked existing user ${payment.payer.email} to profile ${profile.slug}`);
+              } else {
+                const tempPassword = crypto.randomUUID().slice(0, 12);
+                const { data: authData, error: authError } = await supabase.auth.admin.createUser({
+                  email: payment.payer.email,
+                  password: tempPassword,
+                  email_confirm: true,
                 });
-                console.log(`User created for ${payment.payer.email}, recovery email sent`);
+
+                if (authData?.user && !authError) {
+                  await supabase.from('profiles').update({ user_id: authData.user.id }).eq('session_id', sessionId);
+                  const appUrl = Deno.env.get('PUBLIC_APP_URL') || 'https://www.linkone.bio';
+                  const publicSupabase = createClient(supabaseUrl, Deno.env.get('SUPABASE_ANON_KEY')!);
+                  await publicSupabase.auth.resetPasswordForEmail(payment.payer.email, {
+                    redirectTo: `${appUrl}/reset-password`,
+                  });
+                  console.log(`User created for ${payment.payer.email}, recovery email sent`);
+                }
               }
             }
           }

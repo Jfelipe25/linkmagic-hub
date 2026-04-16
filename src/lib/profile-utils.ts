@@ -30,6 +30,10 @@ export function profileFromRow(row: any): ProfileData {
     created_at: row.created_at || '',
     views: row.views ?? 0,
     enable_contact_form: row.enable_contact_form ?? false,
+store_enabled: row.store_enabled ?? false,
+    store_whatsapp: row.store_whatsapp ?? '',
+    store_welcome_message: row.store_welcome_message ?? '',
+    store_currency: row.store_currency ?? 'COP',
   };
 }
 

@@ -1,7 +1,10 @@
+import { useState } from 'react';
 import { ProfileData, SocialLinks, SOCIAL_PLATFORMS, getVisibleLinks } from '@/types/profile';
 import { normalizeUrl } from '@/lib/profile-utils';
 import { trackLinkClick } from '@/hooks/useLinkClicks';
 import ContactForm from '@/components/ContactForm';
+import PublicTabSwitcher from '@/components/store/PublicTabSwitcher';
+import StoreView from '@/components/store/StoreView';
 import {
   Facebook, Twitter, Instagram, Github, Send, Linkedin,
   Mail, MessageCircle, Youtube, Music, ExternalLink
@@ -22,6 +25,8 @@ const MinimalTemplate = ({ profile, accentColor, profileId }: TemplateProps) => 
   const socialEntries = Object.entries(profile.social_links || {}).filter(([, v]) => v);
   const fontColor = profile.font_color || '#000000';
   const visibleLinks = getVisibleLinks(profile.links || []);
+  const [activeTab, setActiveTab] = useState<'links' | 'store'>('links');
+  const hasStore = profile.store_enabled && profileId;
 
   return (
     <div className="w-full" style={{ height: "100%", backgroundColor: '#ffffff' }}>
@@ -53,22 +58,44 @@ const MinimalTemplate = ({ profile, accentColor, profileId }: TemplateProps) => 
         </div>
       )}
 
-      <div className="w-full mt-6 space-y-3">
-        {visibleLinks.map((link) => (
-          <a key={link.id} href={normalizeUrl(link.url)} target="_blank" rel="noopener noreferrer"
-            className="block w-full text-center py-3 rounded-full text-sm font-medium transition-all"
-            style={{
-              border: `2px solid ${fontColor}`,
-              color: fontColor,
-            }}
-            onClick={() => profile.slug && trackLinkClick(profile.slug, link.id)}
-            onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = fontColor; e.currentTarget.style.color = '#fff'; }}
-            onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; e.currentTarget.style.color = fontColor; }}
-          >
-            {link.label || 'Link'}
-          </a>
-        ))}
-      </div>
+      {hasStore && (
+        <div className="w-full mt-5">
+          <PublicTabSwitcher activeTab={activeTab} onChange={setActiveTab} fontColor={fontColor} accentColor={accentColor} />
+        </div>
+      )}
+
+      {(!hasStore || activeTab === 'links') && (
+        <div className="w-full mt-6 space-y-3">
+          {visibleLinks.map((link) => (
+            <a key={link.id} href={normalizeUrl(link.url)} target="_blank" rel="noopener noreferrer"
+              className="block w-full text-center py-3 rounded-full text-sm font-medium transition-all"
+              style={{
+                border: `2px solid ${fontColor}`,
+                color: fontColor,
+              }}
+              onClick={() => profile.slug && trackLinkClick(profile.slug, link.id)}
+              onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = fontColor; e.currentTarget.style.color = '#fff'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; e.currentTarget.style.color = fontColor; }}
+            >
+              {link.label || 'Link'}
+            </a>
+          ))}
+        </div>
+      )}
+
+      {hasStore && activeTab === 'store' && (
+        <div className="w-full mt-4">
+          <StoreView
+            profileId={profileId!}
+            storeName={profile.name || 'Tienda'}
+            whatsapp={profile.store_whatsapp || ''}
+            welcomeMessage={profile.store_welcome_message || ''}
+            currency={profile.store_currency || 'COP'}
+            fontColor={fontColor}
+            accentColor={accentColor}
+          />
+        </div>
+      )}
 
       {profile.enable_contact_form && profileId && (
         <ContactForm profileId={profileId} accentColor={accentColor} fontColor={fontColor} />
