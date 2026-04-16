@@ -352,8 +352,7 @@ const StoreView = ({
           onClick={() => { setCartOpen(false); setShowBuyerForm(false); }}
         >
           <div
-            className="w-full sm:max-w-md bg-white rounded-t-2xl sm:rounded-2xl flex flex-col"
-            style={{ height: '90dvh', maxHeight: '90dvh' }}
+            className="w-full sm:max-w-md bg-white rounded-t-2xl sm:rounded-2xl flex flex-col max-h-[95vh] sm:max-h-[85vh]"
             onClick={e => e.stopPropagation()}
           >
             <div className="flex items-center justify-between p-4 border-b border-gray-100">
@@ -437,7 +436,17 @@ const StoreView = ({
               </>
             ) : (
               <>
-                <div className="flex-1 overflow-y-auto p-4 space-y-3">
+                <div
+                  className="flex-1 overflow-y-auto p-4 space-y-3"
+                  onFocus={(e) => {
+                    const target = e.target as HTMLElement;
+                    if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') {
+                      setTimeout(() => {
+                        target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                      }, 350);
+                    }
+                  }}
+                >
                   <p className="text-xs text-gray-500 mb-1">
                     Completa tus datos para que el vendedor pueda enviarte el pedido.
                   </p>
