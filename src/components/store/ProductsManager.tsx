@@ -383,7 +383,7 @@ const ProductsManager = ({ profileId, currency }: Props) => {
             <div
               key={product.id}
               className={`rounded-lg border border-border bg-card overflow-hidden transition ${
-                !product.active ? 'opacity-60' : ''
+                !product.active ? '' : ''
               }`}
             >
               {product.image_url ? (
