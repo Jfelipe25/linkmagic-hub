@@ -25,8 +25,12 @@ const MinimalTemplate = ({ profile, accentColor, profileId }: TemplateProps) => 
   const socialEntries = Object.entries(profile.social_links || {}).filter(([, v]) => v);
   const fontColor = profile.font_color || '#000000';
   const visibleLinks = getVisibleLinks(profile.links || []);
-  const [activeTab, setActiveTab] = useState<'links' | 'store'>('links');
-  const hasStore = profile.store_enabled && profileId;
+
+  const hasLinks = (profile as any).show_links !== false;
+  const hasStore = profile.store_enabled && profileId && (profile as any).show_store !== false;
+  const showTabs = hasLinks && hasStore;
+
+  const [activeTab, setActiveTab] = useState<'links' | 'store'>(hasLinks ? 'links' : 'store');
 
   return (
     <div className="w-full" style={{ height: "100%", backgroundColor: '#ffffff' }}>
@@ -58,13 +62,13 @@ const MinimalTemplate = ({ profile, accentColor, profileId }: TemplateProps) => 
         </div>
       )}
 
-      {hasStore && (
+      {showTabs && (
         <div className="w-full mt-5">
           <PublicTabSwitcher activeTab={activeTab} onChange={setActiveTab} fontColor={fontColor} accentColor={accentColor} />
         </div>
       )}
 
-      {(!hasStore || activeTab === 'links') && (
+      {hasLinks && (!hasStore || activeTab === 'links') && (
         <>
           <div className="w-full mt-6 space-y-3">
             {visibleLinks.map((link) => (
@@ -89,7 +93,7 @@ const MinimalTemplate = ({ profile, accentColor, profileId }: TemplateProps) => 
         </>
       )}
 
-      {hasStore && activeTab === 'store' && (
+      {hasStore && (!hasLinks || activeTab === 'store') && (
         <div className="w-full mt-4">
           <StoreView
             profileId={profileId!}

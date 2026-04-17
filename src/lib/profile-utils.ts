@@ -35,6 +35,8 @@ store_enabled: row.store_enabled ?? false,
     store_welcome_message: row.store_welcome_message ?? '',
     store_currency: row.store_currency ?? 'COP',
 store_name: row.store_name ?? '',
+show_links: row.show_links ?? true,
+show_store: row.show_store ?? true,
   };
 }
 

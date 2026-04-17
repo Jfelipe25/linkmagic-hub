@@ -55,6 +55,8 @@ export interface ProfileData {
   store_welcome_message?: string;
   store_currency?: string;
 store_name?: string;
+show_links?: boolean;
+show_store?: boolean;
 }
 
 export const ACCENT_COLORS = [
@@ -97,6 +99,8 @@ store_enabled: false,
   store_welcome_message: '',
   store_currency: 'COP',
 store_name: '',
+show_links: true,
+show_store: true,
 };
 
 /** Filter links based on their schedule */
