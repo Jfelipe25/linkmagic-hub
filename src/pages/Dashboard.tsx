@@ -301,6 +301,41 @@ const Dashboard = () => {
               <div><p className="text-xs text-muted-foreground">{t('dash.views')}</p><p className="text-sm text-foreground font-semibold">{profile.views ?? 0}</p></div>
               <div><p className="text-xs text-muted-foreground">{t('dash.clicks')}</p><p className="text-sm text-foreground font-semibold">{effectiveTotalClicks}</p></div>
               <div><p className="text-xs text-muted-foreground">{t('dash.created')}</p><p className="text-sm text-foreground">{profile.created_at ? new Date(profile.created_at).toLocaleDateString() : '—'}</p></div>
+              
+              {/* Visibility toggles */}
+              {profile.paid && (
+                <div className="flex items-center gap-3 px-3 py-1.5 rounded-md border border-border bg-background">
+                  <button
+                    onClick={async () => {
+                      const newVal = !profile.show_links;
+                      await supabase.from('profiles').update({ show_links: newVal }).eq('id', activeProfileId);
+                      setProfile(p => ({ ...p, show_links: newVal }));
+                    }}
+                    className="flex items-center gap-1.5"
+                  >
+                    <div className={`relative w-7 h-4 rounded-full transition-colors ${profile.show_links !== false ? 'bg-green-500' : 'bg-gray-300'}`}>
+                      <div className={`absolute top-[2px] w-3 h-3 rounded-full bg-white shadow-sm transition-all ${profile.show_links !== false ? 'left-[14px]' : 'left-[2px]'}`} />
+                    </div>
+                    <span className="text-[11px] text-muted-foreground">Links</span>
+                  </button>
+                  {profile.store_enabled && (
+                    <button
+                      onClick={async () => {
+                        const newVal = !profile.show_store;
+                        await supabase.from('profiles').update({ show_store: newVal }).eq('id', activeProfileId);
+                        setProfile(p => ({ ...p, show_store: newVal }));
+                      }}
+                      className="flex items-center gap-1.5"
+                    >
+                      <div className={`relative w-7 h-4 rounded-full transition-colors ${profile.show_store !== false ? 'bg-green-500' : 'bg-gray-300'}`}>
+                        <div className={`absolute top-[2px] w-3 h-3 rounded-full bg-white shadow-sm transition-all ${profile.show_store !== false ? 'left-[14px]' : 'left-[2px]'}`} />
+                      </div>
+                      <span className="text-[11px] text-muted-foreground">Tienda</span>
+                    </button>
+                  )}
+                </div>
+              )}
+
               <div className="flex gap-2 flex-wrap">
                 {!profile.paid ? (
                   <>
