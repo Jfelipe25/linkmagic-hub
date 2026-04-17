@@ -235,7 +235,7 @@ export const translations = {
     'landing.footer.tagline': 'Tu identidad digital en un solo link',
     'landing.footer.terms': 'Términos y condiciones',
     'landing.footer.privacy': 'Política de privacidad',
-    'landing.footer.copy': 'Hecho en Latinoamérica 🌎',
+    'landing.footer.copy': 'Todos los derechos reservados',
   },
   en: {
     // Nav
@@ -473,7 +473,7 @@ export const translations = {
     'landing.footer.tagline': 'Your digital identity in one link',
     'landing.footer.terms': 'Terms & conditions',
     'landing.footer.privacy': 'Privacy policy',
-    'landing.footer.copy': 'Made in Latin America 🌎',
+    'landing.footer.copy': '',
   },
 } as const;
 
