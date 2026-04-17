@@ -136,10 +136,11 @@ const Index = () => {
             </div>
           </motion.div>
           
-          <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.3 }} className="mt-12 grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-2xl mx-auto">
+          <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.3 }} className="mt-12 grid grid-cols-1 sm:grid-cols-4 gap-4 max-w-3xl mx-auto">
             {[
               { icon: '🎨', title: t('feat.custom'), desc: t('feat.customDesc') },
               { icon: '🔗', title: t('feat.links'), desc: t('feat.linksDesc') },
+              { icon: '🛍️', title: t('feat.store'), desc: t('feat.storeDesc') },
               { icon: '📱', title: t('feat.mobile'), desc: t('feat.mobileDesc') },
             ].map((item, i) => (
               <div key={i} className="flex flex-col items-center gap-2 p-4 rounded-xl bg-card border border-border">
