@@ -121,7 +121,7 @@ export const translations = {
     'landing.store.badge': 'Nuevo · Tienda integrada',
     'landing.store.title1': 'Tu link que',
     'landing.store.title2': 'también vende',
-    'landing.store.desc': 'Agrega un catálogo de productos a tu link-in-bio. Tus clientes arman el pedido y lo reciben directo en tu WhatsApp, listo para confirmar y enviar.',
+    'landing.store.desc': 'Agrega un catálogo de productos a tu link-in-bio. Tus clientes arman el pedido y lo recibes directo en tu WhatsApp, listo para confirmar y enviar.',
     'landing.store.labelLinks': 'Tu link-in-bio',
     'landing.store.labelStore': 'Tu tienda',
     'landing.store.f1.title': 'Catálogo con fotos y precios',
