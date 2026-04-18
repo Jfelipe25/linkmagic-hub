@@ -269,21 +269,29 @@ const StoreView = ({
         </div>
       )}
 
-      {/* Product rows (horizontal layout matching mockup) */}
-      <div className="space-y-2 px-1">
+      {/* Product grid (2 columns with large images) */}
+      <div className="grid grid-cols-2 gap-2">
         {filteredProducts.map(product => (
-          <div key={product.id} className="flex items-center gap-3 rounded-lg p-2 cursor-pointer transition"
+          <div key={product.id} className="rounded-lg overflow-hidden cursor-pointer"
             style={{ backgroundColor: fontColor + '0A' }} onClick={() => setSelectedProduct(product)}>
-            <div className="relative w-14 h-14 rounded-lg overflow-hidden flex-shrink-0" style={{ backgroundColor: fontColor + '10' }}>
+            <div className="relative aspect-square">
               {product.image_url ? (
                 <img src={product.image_url} alt={product.name} className="w-full h-full object-cover" loading="lazy" />
               ) : (
-                <div className="w-full h-full flex items-center justify-center" style={{ color: fontColor, opacity: 0.3 }}><ImageIcon size={20} /></div>
+                <div className="w-full h-full flex items-center justify-center" style={{ color: fontColor, opacity: 0.3 }}><ImageIcon size={32} /></div>
               )}
+              {product.active ? (
+                <button onClick={(e) => { e.stopPropagation(); addToCart(product.id); }}
+                  className="absolute bottom-1.5 right-1.5 w-7 h-7 rounded-full flex items-center justify-center text-white shadow-md transition active:scale-90"
+                  style={{ backgroundColor: accentColor }}
+                  aria-label={`Agregar ${product.name}`}>
+                  <Plus size={14} />
+                </button>
+              ) : null}
             </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium truncate" style={{ color: fontColor }}>{product.name}</p>
-              <div className="flex items-center gap-2 mt-0.5">
+            <div className="p-2">
+              <p className="text-[11px] font-medium line-clamp-2 leading-tight" style={{ color: fontColor }}>{product.name}</p>
+              <div className="flex items-center justify-between mt-1">
                 <p className="text-xs font-semibold" style={{ color: accentColor }}>{formatPrice(product.price, currency)}</p>
                 {product.active ? (
                   <span className="text-[9px] font-semibold px-1.5 py-0.5 rounded-full bg-green-500/15 text-green-600">En stock</span>
@@ -292,13 +300,6 @@ const StoreView = ({
                 )}
               </div>
             </div>
-            {product.active && (
-              <button onClick={(e) => { e.stopPropagation(); addToCart(product.id); }}
-                className="w-8 h-8 rounded-full flex items-center justify-center text-white shadow-sm transition active:scale-90 flex-shrink-0"
-                style={{ backgroundColor: accentColor }}>
-                <Plus size={16} />
-              </button>
-            )}
           </div>
         ))}
       </div>
