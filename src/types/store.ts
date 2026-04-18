@@ -17,6 +17,45 @@ export interface CartItem {
   quantity: number;
 }
 
+export interface ShippingConfig {
+  shipping_free: boolean;
+  shipping_local_enabled: boolean;
+  shipping_local_price: number;
+  shipping_local_cities: string[];
+  shipping_national_enabled: boolean;
+  shipping_national_price: number;
+}
+
+export const DEFAULT_SHIPPING: ShippingConfig = {
+  shipping_free: false,
+  shipping_local_enabled: false,
+  shipping_local_price: 0,
+  shipping_local_cities: [],
+  shipping_national_enabled: false,
+  shipping_national_price: 0,
+};
+
+export interface PromoCode {
+  id: string;
+  profile_id: string;
+  code: string;
+  discount_type: 'percent' | 'fixed';
+  discount_value: number;
+  active: boolean;
+  uses: number;
+  max_uses: number | null;
+  created_at?: string;
+}
+
+export interface AppliedPromo {
+  code: string;
+  discount_type: 'percent' | 'fixed';
+  discount_value: number;
+  discount_amount: number; // calculated
+}
+
+export type ShippingOption = 'free' | 'local' | 'national' | null;
+
 export interface StoreSettings {
   store_enabled: boolean;
   store_whatsapp: string;

@@ -493,10 +493,16 @@ const Dashboard = () => {
       <>
         <StoreSettings
           profileId={activeProfileId}
-initialStoreName={profile.store_name || ''}
+          initialStoreName={profile.store_name || ''}
           initialWhatsapp={profile.store_whatsapp || ''}
           initialMessage={profile.store_welcome_message || ''}
           initialCurrency={profile.store_currency || 'COP'}
+          initialShippingFree={profile.shipping_free ?? false}
+          initialShippingLocalEnabled={profile.shipping_local_enabled ?? false}
+          initialShippingLocalPrice={profile.shipping_local_price ?? 0}
+          initialShippingLocalCities={profile.shipping_local_cities ?? []}
+          initialShippingNationalEnabled={profile.shipping_national_enabled ?? false}
+          initialShippingNationalPrice={profile.shipping_national_price ?? 0}
           onSaved={() => {
             supabase
               .from('profiles')

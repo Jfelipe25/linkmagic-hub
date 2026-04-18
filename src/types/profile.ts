@@ -49,14 +49,21 @@ export interface ProfileData {
   created_at?: string;
   views?: number;
   enable_contact_form?: boolean;
-// Store module
+  // Store module
   store_enabled?: boolean;
   store_whatsapp?: string;
   store_welcome_message?: string;
   store_currency?: string;
-store_name?: string;
-show_links?: boolean;
-show_store?: boolean;
+  store_name?: string;
+  show_links?: boolean;
+  show_store?: boolean;
+  // Shipping
+  shipping_free?: boolean;
+  shipping_local_enabled?: boolean;
+  shipping_local_price?: number;
+  shipping_local_cities?: string[];
+  shipping_national_enabled?: boolean;
+  shipping_national_price?: number;
 }
 
 export const ACCENT_COLORS = [
@@ -94,13 +101,19 @@ export const DEFAULT_PROFILE: ProfileData = {
   social_links: {},
   links: [],
   enable_contact_form: false,
-store_enabled: false,
+  store_enabled: false,
   store_whatsapp: '',
   store_welcome_message: '',
   store_currency: 'COP',
-store_name: '',
-show_links: true,
-show_store: true,
+  store_name: '',
+  show_links: true,
+  show_store: true,
+  shipping_free: false,
+  shipping_local_enabled: false,
+  shipping_local_price: 0,
+  shipping_local_cities: [],
+  shipping_national_enabled: false,
+  shipping_national_price: 0,
 };
 
 /** Filter links based on their schedule */

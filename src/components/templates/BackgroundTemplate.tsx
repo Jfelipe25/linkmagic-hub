@@ -108,6 +108,14 @@ const BackgroundTemplate = ({ profile, accentColor, profileId }: TemplateProps) 
               currency={profile.store_currency || 'COP'}
               fontColor={fontColor}
               accentColor={accentColor}
+            shipping={{
+              shipping_free: profile.shipping_free ?? false,
+              shipping_local_enabled: profile.shipping_local_enabled ?? false,
+              shipping_local_price: profile.shipping_local_price ?? 0,
+              shipping_local_cities: profile.shipping_local_cities ?? [],
+              shipping_national_enabled: profile.shipping_national_enabled ?? false,
+              shipping_national_price: profile.shipping_national_price ?? 0,
+            }}
             />
           </div>
         )}
