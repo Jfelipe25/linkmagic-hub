@@ -111,7 +111,6 @@ const StoreView = ({
 
   // Order confirmation
   const [orderConfirmation, setOrderConfirmation] = useState<OrderConfirmation | null>(() => {
-    // Recover confirmation from sessionStorage if user is returning from WhatsApp
     try {
       const saved = sessionStorage.getItem(`linkone_order_${profileId}`);
       if (saved) {
@@ -121,6 +120,38 @@ const StoreView = ({
     } catch { /* no-op */ }
     return null;
   });
+
+  // Detect when user returns from WhatsApp (back button, app switch, etc.)
+  useEffect(() => {
+    const handleReturn = () => {
+      if (document.visibilityState !== 'visible') return;
+      try {
+        const saved = sessionStorage.getItem(`linkone_order_${profileId}`);
+        if (saved) {
+          sessionStorage.removeItem(`linkone_order_${profileId}`);
+          const confirmation = JSON.parse(saved);
+          setOrderConfirmation(confirmation);
+          setCart({});
+          setBuyer({ ...EMPTY_BUYER });
+          setAppliedPromo(null);
+          setPromoInput('');
+          setSelectedShipping(null);
+          setCartOpen(false);
+          setShowBuyerForm(false);
+        }
+      } catch { /* no-op */ }
+    };
+
+    // visibilitychange fires when switching back to the tab/app
+    document.addEventListener('visibilitychange', handleReturn);
+    // pageshow fires on back/forward navigation (bfcache)
+    window.addEventListener('pageshow', handleReturn);
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleReturn);
+      window.removeEventListener('pageshow', handleReturn);
+    };
+  }, [profileId]);
 
   // Shipping
   const [selectedShipping, setSelectedShipping] = useState<ShippingOption>(null);
