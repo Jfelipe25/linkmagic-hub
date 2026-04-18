@@ -473,7 +473,7 @@ export const translations = {
     'landing.footer.tagline': 'Your digital identity in one link',
     'landing.footer.terms': 'Terms & conditions',
     'landing.footer.privacy': 'Privacy policy',
-    'landing.footer.copy': '',
+    'landing.footer.copy': 'All rights reserved',
   },
 } as const;
 
