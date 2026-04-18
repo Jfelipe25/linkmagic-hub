@@ -2,7 +2,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Product, CartItem, formatPrice, ShippingOption, AppliedPromo } from '@/types/store';
-import { ShoppingBag, Plus, Minus, X, MessageCircle, Image as ImageIcon, ChevronLeft, Tag, Truck } from 'lucide-react';
+import { ShoppingBag, Plus, Minus, X, MessageCircle, Image as ImageIcon, ChevronLeft, Tag, Truck, CheckCircle, ArrowLeft } from 'lucide-react';
 
 interface BuyerInfo {
   name: string;
@@ -11,6 +11,18 @@ interface BuyerInfo {
   address: string;
   email: string;
   comments: string;
+}
+
+interface OrderConfirmation {
+  items: CartItem[];
+  subtotal: number;
+  shippingLabel: string | null;
+  shippingCost: number;
+  promoCode: string | null;
+  discountAmount: number;
+  total: number;
+  buyerName: string;
+  orderDate: string;
 }
 
 const EMPTY_BUYER: BuyerInfo = {
@@ -96,6 +108,9 @@ const StoreView = ({
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [buyer, setBuyer] = useState<BuyerInfo>({ ...EMPTY_BUYER });
   const [showBuyerForm, setShowBuyerForm] = useState(false);
+
+  // Order confirmation
+  const [orderConfirmation, setOrderConfirmation] = useState<OrderConfirmation | null>(null);
 
   // Shipping
   const [selectedShipping, setSelectedShipping] = useState<ShippingOption>(null);
@@ -220,6 +235,19 @@ const StoreView = ({
     if (!whatsapp || cartItems.length === 0) return;
     if (!buyer.name.trim() || !buyer.city.trim() || !buyer.address.trim()) return;
 
+    // Save confirmation data before clearing cart
+    const confirmation: OrderConfirmation = {
+      items: [...cartItems],
+      subtotal: subtotalPrice,
+      shippingLabel,
+      shippingCost,
+      promoCode: appliedPromo?.code || null,
+      discountAmount,
+      total: totalPrice,
+      buyerName: buyer.name,
+      orderDate: new Date().toLocaleString('es-CO', { dateStyle: 'medium', timeStyle: 'short' }),
+    };
+
     // Increment promo uses
     if (appliedPromo) {
       await supabase.from('promo_codes')
@@ -237,7 +265,19 @@ const StoreView = ({
 
     const promoForMsg = appliedPromo ? { ...appliedPromo, discount_amount: discountAmount } : null;
     const url = buildWhatsAppUrl(whatsapp, cartItems, storeName, currency, buyer, shippingLabel, shippingCost, promoForMsg);
-    window.location.href = url;
+
+    // Open WhatsApp
+    window.open(url, '_blank');
+
+    // Clear cart and show confirmation
+    setCart({});
+    setBuyer({ ...EMPTY_BUYER });
+    setAppliedPromo(null);
+    setPromoInput('');
+    setSelectedShipping(null);
+    setCartOpen(false);
+    setShowBuyerForm(false);
+    setOrderConfirmation(confirmation);
   };
 
   const canCheckout = buyer.name.trim() && buyer.city.trim() && buyer.address.trim() && (!hasShippingOptions || selectedShipping);
@@ -248,6 +288,73 @@ const StoreView = ({
       <ShoppingBag size={32} className="mx-auto mb-2 opacity-40" /><p className="text-sm">Aún no hay productos disponibles</p>
     </div>
   );
+
+  // ─── Order confirmation screen ──────────────────────────────────────
+  if (orderConfirmation) {
+    return (
+      <div className="w-full py-6 px-2">
+        <div className="rounded-2xl border-2 border-green-200 bg-green-50/80 p-6 text-center space-y-4">
+          <div className="w-14 h-14 rounded-full bg-green-100 flex items-center justify-center mx-auto">
+            <CheckCircle size={28} className="text-green-600" />
+          </div>
+          <div>
+            <h3 className="text-lg font-bold text-gray-900">¡Pedido enviado!</h3>
+            <p className="text-sm text-gray-600 mt-1">
+              Tu pedido fue enviado por WhatsApp a <strong>{storeName}</strong>.
+              El vendedor te confirmará la disponibilidad y el pago.
+            </p>
+          </div>
+
+          {/* Order summary */}
+          <div className="bg-white rounded-xl p-4 text-left space-y-3 shadow-sm">
+            <p className="text-[11px] text-gray-400 uppercase tracking-wider font-medium">Resumen del pedido</p>
+            <div className="space-y-2">
+              {orderConfirmation.items.map(({ product, quantity }) => (
+                <div key={product.id} className="flex items-center justify-between text-sm">
+                  <span className="text-gray-700">{quantity}x {product.name}</span>
+                  <span className="text-gray-900 font-medium">{formatPrice(product.price * quantity, currency)}</span>
+                </div>
+              ))}
+            </div>
+            <div className="border-t border-gray-100 pt-2 space-y-1">
+              <div className="flex items-center justify-between text-xs text-gray-500">
+                <span>Subtotal</span>
+                <span>{formatPrice(orderConfirmation.subtotal, currency)}</span>
+              </div>
+              {orderConfirmation.promoCode && (
+                <div className="flex items-center justify-between text-xs text-green-600">
+                  <span>Código {orderConfirmation.promoCode}</span>
+                  <span>-{formatPrice(orderConfirmation.discountAmount, currency)}</span>
+                </div>
+              )}
+              {orderConfirmation.shippingLabel && (
+                <div className="flex items-center justify-between text-xs text-gray-500">
+                  <span>{orderConfirmation.shippingLabel}</span>
+                  <span>{orderConfirmation.shippingCost === 0 ? 'Gratis' : formatPrice(orderConfirmation.shippingCost, currency)}</span>
+                </div>
+              )}
+              <div className="flex items-center justify-between text-sm font-bold text-gray-900 pt-1 border-t border-gray-100">
+                <span>Total</span>
+                <span>{formatPrice(orderConfirmation.total, currency)}</span>
+              </div>
+            </div>
+            <p className="text-[11px] text-gray-400 pt-1">
+              {orderConfirmation.buyerName} · {orderConfirmation.orderDate}
+            </p>
+          </div>
+
+          <button
+            onClick={() => setOrderConfirmation(null)}
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium transition"
+            style={{ backgroundColor: accentColor, color: '#fff' }}
+          >
+            <ArrowLeft size={14} />
+            Volver a la tienda
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full pb-20">
