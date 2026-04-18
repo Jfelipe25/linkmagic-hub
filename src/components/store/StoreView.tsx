@@ -110,7 +110,17 @@ const StoreView = ({
   const [showBuyerForm, setShowBuyerForm] = useState(false);
 
   // Order confirmation
-  const [orderConfirmation, setOrderConfirmation] = useState<OrderConfirmation | null>(null);
+  const [orderConfirmation, setOrderConfirmation] = useState<OrderConfirmation | null>(() => {
+    // Recover confirmation from sessionStorage if user is returning from WhatsApp
+    try {
+      const saved = sessionStorage.getItem(`linkone_order_${profileId}`);
+      if (saved) {
+        sessionStorage.removeItem(`linkone_order_${profileId}`);
+        return JSON.parse(saved);
+      }
+    } catch { /* no-op */ }
+    return null;
+  });
 
   // Shipping
   const [selectedShipping, setSelectedShipping] = useState<ShippingOption>(null);
@@ -266,18 +276,13 @@ const StoreView = ({
     const promoForMsg = appliedPromo ? { ...appliedPromo, discount_amount: discountAmount } : null;
     const url = buildWhatsAppUrl(whatsapp, cartItems, storeName, currency, buyer, shippingLabel, shippingCost, promoForMsg);
 
-    // Open WhatsApp
-    window.open(url, '_blank');
+    // Save confirmation to sessionStorage so it shows when user returns
+    try {
+      sessionStorage.setItem(`linkone_order_${profileId}`, JSON.stringify(confirmation));
+    } catch { /* no-op */ }
 
-    // Clear cart and show confirmation
-    setCart({});
-    setBuyer({ ...EMPTY_BUYER });
-    setAppliedPromo(null);
-    setPromoInput('');
-    setSelectedShipping(null);
-    setCartOpen(false);
-    setShowBuyerForm(false);
-    setOrderConfirmation(confirmation);
+    // Redirect to WhatsApp (location.href works reliably on mobile + desktop)
+    window.location.href = url;
   };
 
   const canCheckout = buyer.name.trim() && buyer.city.trim() && buyer.address.trim() && (!hasShippingOptions || selectedShipping);
