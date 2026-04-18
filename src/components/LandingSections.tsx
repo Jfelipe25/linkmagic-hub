@@ -27,21 +27,35 @@ const PHONE_THEMES = [
 const fadeUp = (delay = 0) => ({ initial: { opacity: 0, y: 24 }, whileInView: { opacity: 1, y: 0 }, viewport: { once: true }, transition: { duration: 0.5, delay } });
 
 // ─── Phone Card ─────────────────────────────────────────────────────────────
-function PhoneCard({ p, lang }: { p: typeof PHONE_THEMES[0]; lang: string }) {
+function PhoneCard({ p, lang, large = false }: { p: typeof PHONE_THEMES[0]; lang: string; large?: boolean }) {
   const links = lang === 'en' ? p.linksEn : p.links;
   const bio = lang === 'en' ? p.bioEn : p.bio;
   const label = lang === 'en' ? p.labelEn : p.label;
+
+  const w = large ? 'w-[200px]' : 'w-[155px]';
+  const h = large ? 'h-[400px]' : 'h-[300px]';
+  const r = large ? 'rounded-[30px]' : 'rounded-[26px]';
+  const ri = large ? 'rounded-[25px]' : 'rounded-[21px]';
+  const notch = large ? 'w-14 h-4' : 'w-12 h-3.5';
+  const avatar = large ? 'w-14 h-14 text-base' : 'w-12 h-12 text-sm';
+  const nameSize = large ? 'text-[13px]' : 'text-[11px]';
+  const bioSize = large ? 'text-[10px]' : 'text-[9px]';
+  const socSize = large ? 'w-4 h-4' : 'w-3 h-3';
+  const btnPy = large ? 'py-2' : 'py-1.5';
+  const btnText = large ? 'text-[10px]' : 'text-[8.5px]';
+  const px = large ? 'px-3' : 'px-2.5';
+
   return (
     <div className="flex flex-col items-center gap-2">
-      <div className="relative rounded-[26px] bg-[#111] overflow-hidden flex-shrink-0 shadow-2xl w-[155px] h-[300px] border-[5px] border-[#1e1e1e] ring-1 ring-[#3a3a3a]">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-12 h-3.5 bg-[#111] rounded-b-lg z-10" />
-        <div className={`w-full h-full rounded-[21px] overflow-hidden flex flex-col items-center pt-6 ${p.screen}`}>
-          <div className={`w-12 h-12 rounded-full border-2 ${p.avatarBorder} ${p.avatarBg} ${p.avatarText} flex items-center justify-center text-sm font-semibold mt-1 mb-1.5 flex-shrink-0`}>{p.initials}</div>
-          <p className={`text-[11px] font-semibold text-center leading-tight ${p.nameColor}`}>{p.nombre}</p>
-          <p className={`text-[9px] text-center mt-0.5 ${p.bioColor}`}>{bio}</p>
-          <div className="flex gap-1.5 my-1.5">{[0,1,2].map(i => <div key={i} className={`w-3 h-3 rounded-full ${p.socBg}`} />)}</div>
-          <div className="w-full px-2.5 flex flex-col gap-1 mt-0.5">
-            {links.map((l, i) => <div key={i} className={`w-full py-1.5 rounded-full text-[8.5px] font-medium text-center ${p.btnStyle}`}>{l}</div>)}
+      <div className={`relative ${r} bg-[#111] overflow-hidden flex-shrink-0 shadow-2xl ${w} ${h} border-[5px] border-[#1e1e1e] ring-1 ring-[#3a3a3a]`}>
+        <div className={`absolute top-0 left-1/2 -translate-x-1/2 ${notch} bg-[#111] rounded-b-lg z-10`} />
+        <div className={`w-full h-full ${ri} overflow-hidden flex flex-col items-center pt-6 ${p.screen}`}>
+          <div className={`${avatar} rounded-full border-2 ${p.avatarBorder} ${p.avatarBg} ${p.avatarText} flex items-center justify-center font-semibold mt-1 mb-1.5 flex-shrink-0`}>{p.initials}</div>
+          <p className={`${nameSize} font-semibold text-center leading-tight ${p.nameColor}`}>{p.nombre}</p>
+          <p className={`${bioSize} text-center mt-0.5 ${p.bioColor}`}>{bio}</p>
+          <div className="flex gap-1.5 my-1.5">{[0,1,2].map(i => <div key={i} className={`${socSize} rounded-full ${p.socBg}`} />)}</div>
+          <div className={`w-full ${px} flex flex-col gap-1 mt-0.5`}>
+            {links.map((l, i) => <div key={i} className={`w-full ${btnPy} rounded-full ${btnText} font-medium text-center ${p.btnStyle}`}>{l}</div>)}
           </div>
         </div>
       </div>
@@ -137,7 +151,7 @@ function SeccionTienda() {
           {/* Mockups */}
           <motion.div {...fadeUp(0.1)} className="flex justify-center items-end gap-4 sm:gap-6">
             <div className="flex flex-col items-center gap-2">
-              <PhoneCard p={PHONE_THEMES[2]} lang={language} />
+              <PhoneCard p={PHONE_THEMES[2]} lang={language} large />
               <span className="text-[10px] font-medium text-primary uppercase tracking-wider">
                 {t('landing.store.labelLinks')}
               </span>

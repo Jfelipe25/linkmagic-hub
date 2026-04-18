@@ -36,6 +36,9 @@ const ProfileEditorForm = ({ profile, onChange, onPublish, publishLabel = 'Pagar
   const [slugStatus, setSlugStatus] = useState<'idle' | 'checking' | 'available' | 'taken'>('idle');
   const [slugTimeout, setSlugTimeoutId] = useState<ReturnType<typeof setTimeout> | null>(null);
 
+  // If the form is used in dashboard (save mode), lock the slug
+  const isSlugLocked = profile.slug.length >= 3 && publishLabel !== 'Pagar y publicar' && publishLabel !== 'Crear mi página ✨';
+
   const update = useCallback(<K extends keyof ProfileData>(key: K, value: ProfileData[K]) => {
     onChange({ ...profile, [key]: value });
   }, [profile, onChange]);
@@ -201,15 +204,17 @@ const ProfileEditorForm = ({ profile, onChange, onPublish, publishLabel = 'Pagar
             <input
               type="text" value={slugInput} onChange={(e) => handleSlugChange(e.target.value)}
               placeholder="tu-nombre" maxLength={30}
-              className="flex-1 h-9 rounded-md border border-input bg-background px-3 text-sm text-foreground font-mono placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring"
+              disabled={isSlugLocked}
+              className={`flex-1 h-9 rounded-md border border-input bg-background px-3 text-sm text-foreground font-mono placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring ${isSlugLocked ? 'opacity-60 cursor-not-allowed bg-muted' : ''}`}
             />
-            {slugStatus === 'checking' && <Loader2 size={16} className="animate-spin text-muted-foreground" />}
-            {slugStatus === 'available' && <Check size={16} className="text-green-500" />}
-            {slugStatus === 'taken' && <X size={16} className="text-red-500" />}
+            {!isSlugLocked && slugStatus === 'checking' && <Loader2 size={16} className="animate-spin text-muted-foreground" />}
+            {!isSlugLocked && slugStatus === 'available' && <Check size={16} className="text-green-500" />}
+            {!isSlugLocked && slugStatus === 'taken' && <X size={16} className="text-red-500" />}
           </div>
-          {slugStatus === 'taken' && <p className="text-xs text-red-500 mt-1">Este nombre ya está en uso</p>}
-          {slugStatus === 'available' && <p className="text-xs text-green-500 mt-1">¡Disponible!</p>}
-          {slugInput.length > 0 && slugInput.length < 3 && <p className="text-xs text-muted-foreground mt-1">Mínimo 3 caracteres</p>}
+          {isSlugLocked && <p className="text-xs text-muted-foreground mt-1">La URL no se puede cambiar después de publicar</p>}
+          {!isSlugLocked && slugStatus === 'taken' && <p className="text-xs text-red-500 mt-1">Este nombre ya está en uso</p>}
+          {!isSlugLocked && slugStatus === 'available' && <p className="text-xs text-green-500 mt-1">¡Disponible!</p>}
+          {!isSlugLocked && slugInput.length > 0 && slugInput.length < 3 && <p className="text-xs text-muted-foreground mt-1">Mínimo 3 caracteres</p>}
         </div>
       </FormSection>
 

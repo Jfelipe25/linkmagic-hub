@@ -487,7 +487,7 @@ const Dashboard = () => {
         profileId={activeProfileId}
         isPaid={profile.paid ?? false}
         countryCode={selectedPricing?.country_code}
-        displayPrice={'$100.000 COP'}
+        displayPrice={'$130.000 COP'}
       />
     ) : (
       <>

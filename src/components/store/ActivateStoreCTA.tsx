@@ -73,7 +73,7 @@ const ActivateStoreCTA = ({ profileId, isPaid, countryCode, displayPrice }: Prop
             <div>
               <div className="flex items-baseline gap-2">
                 <span className="text-2xl font-bold text-foreground">
-                  {displayPrice || '$100.000 COP'}
+                  {displayPrice || '$130.000 COP'}
                 </span>
                 <span className="text-xs text-muted-foreground">pago único</span>
               </div>
